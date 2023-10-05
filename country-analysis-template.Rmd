@@ -1,0 +1,43 @@
+---
+title: "Country Analysis Template"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    theme: journal
+---
+
+## Background
+
+(brief TIMCI hybrid study background)
+
+## Using this document
+
+(agreed upon conventions)
+
+```{r setup, include=FALSE}
+# install these packages if not already on your computer
+library(plyr)
+library(dplyr)
+
+# Define country
+country <- ""
+
+# Read in (cleaned) data using file choose
+```
+
+This report contains data from `r country`.
+
+# Section 1: Participant Characteristics {.tabset}
+
+# Section 2: Measurement Characteristics & Precision {.tabset}
+
+# Section 3: Bland Altman Plots {.tabset}
+
+# Section 4: Intraclass Correlation Coefficients {.tabset}
+
+# Section 5: Confusion Matrices {.tabset}
+
+# Section 6: Percent Agreement {.tabset}
+
