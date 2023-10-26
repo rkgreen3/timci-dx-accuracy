@@ -10,7 +10,9 @@ output:
 
 ## Background
 
-(brief TIMCI hybrid study background)
+The overall goal of this project is to reduce morbidity and mortality of sick children attending primary care facilities while supporting the rational and efficient use of diagnostics and medicines by healthcare providers. This study is focused on generating evidence for pulse oximetry and clinical decision support algorithms (CDSAs) in primary care. To determine the performance of the multimodal PO devices under investigation in this study, a cross-sectional diagnostic accuracy study will compare the index multimodal PO devices to an accepted reference standard.
+
+The primary objective of this study is to determine the performance of available multimodal PO devices compared to an accepted reference standard by primary care providers assessing chidlren 0-59 months seeking care at the primary care level. Reference standards for the different clinical measurements include: Masimo Rad97 patient monitor (SpO2, PR), video derived annotated respiratory rate (RR), and digital infrared thermometer (temp). Secondary objectives include determining if any variability in performance is detected by age category or skin pigmentation and assessing interrater reliability.
 
 ## Using this document
 
@@ -25,6 +27,7 @@ library(dplyr)
 country <- ""
 
 # Read in (cleaned) data using file choose
+df <- file.choose()
 ```
 
 This report contains data from `r country`.
