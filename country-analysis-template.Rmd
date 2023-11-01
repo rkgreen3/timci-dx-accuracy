@@ -19,23 +19,98 @@ The primary objective of this study is to determine the performance of available
 (agreed upon conventions)
 
 ```{r setup, include=FALSE}
+rm(list = ls())
 # install these packages if not already on your computer
 library(plyr)
 library(dplyr)
-
-# Define country
-country <- ""
+library(tableone)
+library(kableExtra)
 
 # Read in (cleaned) data using file choose
-df <- file.choose()
+filename <- file.choose()
+df_og <- read.csv(filename)
+df_og <- df_og %>% select(-c("X"))
+
+# Define country and subset
+COUNTRY <- "Kenya" # Kenya, Tanzania, India -- USER INPUT HERE
+df_og <- subset(df_og, df_og$country==COUNTRY)
+
+# Create a df for each device -- note: any variable formatting (e.g., converting to factors) or additional variable creation should happen prior to creating these little dataframes
+df_radg <- subset(df_og, index_device_name=="Rad-G Temp (Masimo)")
+df_bio <- subset(df_og, index_device_name=="m800 (Biolight)")
+df_neo <- subset(df_og, index_device_name=="NeoGuard (Neopenda)")
+df_onyx <- subset(df_og, index_device_name=="Onyx PO+RR (Nonin)")
+df_scan <- subset(df_og, index_device_name=="Scanbo v8 (Scanbo)")
 ```
 
-This report contains data from `r country`.
+This report contains data from `r COUNTRY`.
 
 # Section 1: Participant Characteristics {.tabset}
 Leila
+Table 1: Participant Characteristics Overall and by Facility
+```{r echo=FALSE, include=FALSE}
+# Assign the correct df object to the df identifier (to minimize need for syntactical updates -- less important for this section, more important for other sections)
+df <- df_og
+
+# consider using the CreateTableOne function from the tableone package, example:
+## Define row labels (optional): t1lab <- c("N", "Age category", "Sex = Male (%)", ...)
+## Define all variables: vars <- c("age_cat2", "sex", ...)
+## Define the variables you want it to treat as factors (useful if they could be perceived as continuous): fvar <- c("age_cat2", sex", ...)
+
+## create the tableone object: out1 <- CreateTableOne(vars = vars,
+#                                       factorVars = fvar,
+#                                       strata = "health_facility",
+#                                       data = df)
+# print as table: t1 <- print(out1)
+# assign rownames defined above (optional - would recommend only doing this once the rows are set so you know what each one is): rownames(t1) <- c(t1lab)
+
+# kable formatting if you want to get fancy: 
+#  t1 <- kable(out1) %>%
+#  kable_styling(position = "center") %>%
+#  add_indent(c(3:5))
+```
+`r t1`
+
 # Section 2: Measurement Characteristics & Precision {.tabset}
 Leila
+
+## Reference
+```{r echo=FALSE, include=FALSE}
+
+```
+
+
+## Rad-G Temp (Masimo)
+```{r echo=FALSE, include=FALSE}
+df <- df_radg
+
+```
+
+
+## m800 (Biolight)
+```{r echo=FALSE, include=FALSE}
+df <- df_bio
+
+```
+
+## NeoGuard (Neopenda)
+```{r echo=FALSE, include=FALSE}
+df <- df_neo
+
+```
+
+## Onyx PO+RR (Nonin)
+```{r echo=FALSE, include=FALSE}
+df <- df_onyx
+
+```
+
+## Scanbo v8 (Scanbo)
+```{r echo=FALSE, include=FALSE}
+df <- df_scan
+
+```
+
 # Section 3: Bland Altman Plots {.tabset}
 
 # Section 4: Intraclass Correlation Coefficients {.tabset}
