@@ -110,3 +110,6 @@ df$age_cat2 <- case_when(df$month_diff<2 ~ "0-1 month",
                          df$month_diff>=2 & df$month_diff<12 ~ "2-11 months",
                          df$month_diff>=12 ~ "12-59 months")
 df <- df %>% select(-c(bdate))
+
+# Write file as .csv to shared Box folder
+write.csv(df, "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2023-11-01.csv")
