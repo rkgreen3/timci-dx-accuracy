@@ -25,6 +25,8 @@ library(plyr)
 library(dplyr)
 library(tableone)
 library(kableExtra)
+library(BlandAltmanLeh)
+library(irr)
 
 # Read in (cleaned) data using file choose
 filename <- file.choose()
@@ -34,6 +36,8 @@ df_og <- df_og %>% select(-c("X"))
 # Define country and subset
 COUNTRY <- "Kenya" # Kenya, Tanzania, India -- USER INPUT HERE
 df_og <- subset(df_og, df_og$country==COUNTRY)
+
+# Define thresholds for hypoxia, fast breathing, tachycardia, and fever for all index and reference measurements (for confusion matrices in section 5) -- should be binary indicators for above/below threshold
 
 # Create a df for each device -- note: any variable formatting (e.g., converting to factors) or additional variable creation should happen prior to creating these little dataframes
 df_radg <- subset(df_og, index_device_name=="Rad-G Temp (Masimo)")
@@ -49,9 +53,6 @@ This report contains data from `r COUNTRY`.
 Leila
 Table 1: Participant Characteristics Overall and by Facility
 ```{r echo=FALSE, include=FALSE}
-# Assign the correct df object to the df identifier (to minimize need for syntactical updates -- less important for this section, more important for other sections)
-df <- df_og
-
 # consider using the CreateTableOne function from the tableone package, example:
 ## Define row labels (optional): t1lab <- c("N", "Age category", "Sex = Male (%)", ...)
 ## Define all variables: vars <- c("age_cat2", "sex", ...)
@@ -79,43 +80,109 @@ Leila
 
 ```
 
-
 ## Rad-G Temp (Masimo)
-```{r echo=FALSE, include=FALSE}
-df <- df_radg
-
-```
 
 
 ## m800 (Biolight)
-```{r echo=FALSE, include=FALSE}
-df <- df_bio
 
-```
 
 ## NeoGuard (Neopenda)
-```{r echo=FALSE, include=FALSE}
-df <- df_neo
 
-```
 
 ## Onyx PO+RR (Nonin)
-```{r echo=FALSE, include=FALSE}
-df <- df_onyx
 
-```
 
 ## Scanbo v8 (Scanbo)
-```{r echo=FALSE, include=FALSE}
-df <- df_scan
 
-```
 
 # Section 3: Bland Altman Plots {.tabset}
 
+-- RG Note: let's see if we can find a way to get M1, M2, and M3 all on the same plot and perhaps distinguish them by color?
+Example code:
+```{r}
+# Default subtraction is grp1 - grp2 --> place reference first, test second
+#bland.altman.plot(df$reference, df$index, graph.sys = "ggplot2") + labs(title = "Bland-Altman Plot: [specify measurement and age group]") + xlab("Means") + ylab("Differences") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+## Rad-G Temp (Masimo) {.tabset}
+```{r echo=FALSE, include=FALSE}
+
+```
+
+### Temperature
+
+### Oxygen
+
+### Profusion Index
+
+### Pulse Rate
+
+### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
+
+## m800 (Biolight) {.tabset}
+```{r echo=FALSE, include=FALSE}
+
+```
+
+### Oxygen
+
+### Pulse Rate
+
+### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
+
+## NeoGuard (Neopenda) {.tabset}
+```{r echo=FALSE, include=FALSE}
+
+```
+
+### Temperature
+
+### Oxygen
+
+### Pulse Rate
+
+### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
+
+## Onyx PO+RR (Nonin) {.tabset}
+```{r echo=FALSE, include=FALSE}
+df <- df_onyx
+```
+
+## Scanbo v8 (Scanbo) {.tabset}
+```{r echo=FALSE, include=FALSE}
+
+```
+
+### Temperature
+
+### Oxygen
+
+### Pulse Rate
+
+### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
+
 # Section 4: Intraclass Correlation Coefficients {.tabset}
+Rebecca
 
 # Section 5: Confusion Matrices {.tabset}
+5 & 6 should be done by same person
+```{r echo=FALSE, include=FALSE}
+# key functions: irr::agree, addmargins(table()), prop.table
+```
+
+## Rad-G Temp (Masimo)
+
+
+## m800 (Biolight)
+
+
+## NeoGuard (Neopenda)
+
+
+## Onyx PO+RR (Nonin)
+
+
+## Scanbo v8 (Scanbo)
 
 # Section 6: Percent Agreement {.tabset}
 
