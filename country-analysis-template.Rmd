@@ -165,6 +165,7 @@ df <- df_onyx
 Rebecca
 
 # Section 5: Confusion Matrices {.tabset}
+Samwel
 5 & 6 should be done by same person
 ```{r echo=FALSE, include=FALSE}
 # key functions: irr::agree, addmargins(table()), prop.table
