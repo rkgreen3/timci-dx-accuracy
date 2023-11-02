@@ -96,6 +96,7 @@ Leila
 
 
 # Section 3: Bland Altman Plots {.tabset}
+Anmol
 
 -- RG Note: let's see if we can find a way to get M1, M2, and M3 all on the same plot and perhaps distinguish them by color?
 Example code:
@@ -186,4 +187,4 @@ Samwel
 ## Scanbo v8 (Scanbo)
 
 # Section 6: Percent Agreement {.tabset}
-
+Samwel
