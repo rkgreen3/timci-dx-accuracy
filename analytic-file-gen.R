@@ -50,6 +50,17 @@ colnames(df)[colnames(df) == "reported_tx___2"] = "tx_antimalarial"
 colnames(df)[colnames(df) == "reported_tx___3"] = "tx_dehydration"
 colnames(df)[colnames(df) == "reported_tx___4"] = "tx_bronchodilator"
 colnames(df)[colnames(df) == "reported_tx___5"] = "tx_other"
+colnames(df)[colnames(df) == "recieved_txt"] = "received_tx"
+
+# Create variable for each of above to indicate more than one option was selected
+df$visit_rsn_sum <- sum(df$visit_rsn_illness, df$visit_rsn_immunize, df$visit_rsn_routine, df$visit_rsn_trauma, df$visit_rsn_admit, na.rm = T)
+df$visit_rsn_multiple <- ifelse(df$visit_rsn_sum>1, 1, 0)
+df$ill_sxs_sum <- sum(df$ill_sxs_cough, df$ill_sxs_rapidbreathing, df$ill_sxs_fever, df$ill_sxs_diarrhea, df$ill_sxs_vomit, df$ill_sxs_other, na.rm = T)
+df$ill_sxs_multiple <- ifelse(df$ill_sxs_sum>1, 1, 0)
+df$dx_sum <- sum(df$dx_dehydration, df$dx_respiratory, df$dx_digestive, df$dx_malaria, df$dx_fever, df$dx_measles, df$dx_earinfection, df$dx_throatinfection, df$dx_other, na.rm = T)
+df$dx_multiple <- ifelse(df$dx_sum>1, 1, 0)
+df$tx_sum <- sum(df$tx_antibiotic, df$tx_antimalarial, df$tx_dehydration, df$tx_bronchodilator, df$tx_other, na.rm = T)
+df$tx_multiple <- ifelse(df$tx_sum>1, 1, 0)
 
 # Replace all 999 with NA
 ## M1
@@ -109,7 +120,11 @@ df$month_diff <- interval(df$bdate, df$visit_date) %/% days(1) / (365/12)
 df$age_cat2 <- case_when(df$month_diff<2 ~ "0-1 month",
                          df$month_diff>=2 & df$month_diff<12 ~ "2-11 months",
                          df$month_diff>=12 ~ "12-59 months")
-df <- df %>% select(-c(bdate))
+df$age_cat <- df$age_cat2
+df$age_months <- round(df$month_diff, 0)
+
+# Remove unnecessary variables
+df <- df %>% select(-c(bdate, age_cat2, month_diff, m1_30s_pic, m1_90s_pic, m2_30s_pic, m2_90s_pic, m3_30s_pic, m3_90s_pic))
 
 # Write file as .csv to shared Box folder
 write.csv(df, "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2023-11-01.csv")
