@@ -69,8 +69,10 @@ Table 1: Participant Characteristics Overall and by Facility
 #  t1 <- kable(out1) %>%
 #  kable_styling(position = "center") %>%
 #  add_indent(c(3:5))
+
+#`r t1`
 ```
-`r t1`
+
 
 # Section 2: Measurement Characteristics & Precision {.tabset}
 Leila
@@ -163,7 +165,20 @@ df <- df_onyx
 ### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
 
 # Section 4: Intraclass Correlation Coefficients {.tabset}
-Rebecca
+Reporting information:
+- Model: Two-way mixed effects [NOTE: no functional difference between 2-way random and mixed effects...seems the difference is more conceptual than mathematical but should confirm w/Laina]
+-- Justification: Repeated measurements cannot be considered random samples.
+- Type: Single measurement
+-- Justification: In clinical practice, a single measurement rather than the mean of multiple measurements is considered as the unit of analysis.
+- Definition: Absolute agreement
+-- Justification: This is the only appropriate definition for a test-retest analysis, as the device of interest would be meaningless without agreement between repeated measures.
+
+How to interpret the ICC:
+-	<0.5: Poor reliability
+-	0.5<0.75: Moderate reliability
+-	0.75<0.9: Good reliability
+-	≥0.9: Excellent reliability
+
 ```{r echo=FALSE, include=FALSE}
 # Create M1-3 matrices by age category, device, and measurement type
 
@@ -340,19 +355,78 @@ icc_t1 <- kable(out1, col.names = c("","Rad-G Temp (Masimo)", "M800 (Biolight)",
   pack_rows("Oxygen", 3, 4) %>%
   pack_rows("Profusion Index", 5, 6) %>%
   pack_rows("Pulse Rate", 7, 8) %>%
-  pack_rows("Respiratory Rate", 9, 10)
+  pack_rows("Respiratory Rate", 9, 10) %>%
+  add_header_above(c(" ", "Intraclass correlation coefficient for clinical measures across devices for participantss aged 0-1 month (95%CI)" = 3))
 
 # Age Cat 2
-icc_t2
+out2 <- data.frame(cc = c("", "", "", "", "", "", "", "", "", ""),
+                   radg = c(round(icc_radg_cat2_temp$value, 2), paste("(", round(icc_radg_cat2_temp$lbound, 2)," - ", round(icc_radg_cat2_temp$ubound, 2),")", sep = ""), 
+                            round(icc_radg_cat2_o2$value, 2), paste("(", round(icc_radg_cat2_o2$lbound, 2)," - ", round(icc_radg_cat2_o2$ubound, 2),")", sep = ""), 
+                            round(icc_radg_cat2_pi$value, 2), paste("(", round(icc_radg_cat2_pi$lbound, 2)," - ", round(icc_radg_cat2_pi$ubound, 2), ")", sep = ""),
+                            round(icc_radg_cat2_pr$value, 2), paste("(", round(icc_radg_cat2_pr$lbound, 2) ," - ", round(icc_radg_cat2_pr$ubound, 2) ,")", sep = ""),
+                            round(icc_radg_cat2_rr$value, 2), paste("(", round(icc_radg_cat2_rr$lbound, 2)," - ", round(icc_radg_cat2_rr$ubound, 2),")", sep = "")), 
+                   bio = c(NA, NA,
+                           round(icc_bio_cat2_o2$value, 2), paste("(", round(icc_bio_cat2_o2$lbound, 2)," - ", round(icc_bio_cat2_o2$ubound, 2), ")", sep = ""),
+                           NA, NA,
+                           round(icc_bio_cat2_pr$value, 2), paste("(", round(icc_bio_cat2_pr$lbound, 2), " - ", round(icc_bio_cat2_pr$ubound, 2),")", sep = ""),
+                           round(icc_bio_cat2_rr$value, 2), paste("(", round(icc_bio_cat2_rr$lbound, 2) ," - ", round(icc_bio_cat2_rr$ubound, 2),")", sep = "")),
+                   neo = c(round(icc_neo_cat2_temp$value, 2), paste("(", round(icc_neo_cat2_temp$lbound, 2)," - ", round(icc_neo_cat2_temp$ubound, 2), ")", sep = ""),
+                           round(icc_neo_cat2_o2$value, 2), paste("(", round(icc_neo_cat2_o2$lbound, 2), " - ", round(icc_neo_cat2_o2$ubound, 2), ")", sep = ""),
+                           NA, NA,
+                           round(icc_neo_cat2_pr$value, 2), paste("(", round(icc_neo_cat2_pr$lbound, 2), " - ", round(icc_neo_cat2_pr$ubound, 2),")", sep = ""),
+                           round(icc_neo_cat2_rr$value, 2), paste("(", round(icc_neo_cat2_rr$lbound, 2), " - ", round(icc_neo_cat2_rr$ubound, 2), ")", sep = "")))
+icc_t2 <- kable(out2, col.names = c("","Rad-G Temp (Masimo)", "M800 (Biolight)", "NeoGuard (Neopenda)")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
+  pack_rows("Temperature", 1, 2) %>%
+  pack_rows("Oxygen", 3, 4) %>%
+  pack_rows("Profusion Index", 5, 6) %>%
+  pack_rows("Pulse Rate", 7, 8) %>%
+  pack_rows("Respiratory Rate", 9, 10) %>%
+  add_header_above(c(" ", "Intraclass correlation coefficient for clinical measures across devices for participantss aged 2-11 months (95%CI)" = 3))
 
-icc_t3
+# Age Cat 3
+out3 <- data.frame(cc = c("", "", "", "", "", "", "", "", "", ""),
+                   radg = c(round(icc_radg_cat3_temp$value, 2), paste("(", round(icc_radg_cat3_temp$lbound, 2)," - ", round(icc_radg_cat3_temp$ubound, 2),")", sep = ""), 
+                            round(icc_radg_cat3_o2$value, 2), paste("(", round(icc_radg_cat3_o2$lbound, 2)," - ", round(icc_radg_cat3_o2$ubound, 2),")", sep = ""), 
+                            round(icc_radg_cat3_pi$value, 2), paste("(", round(icc_radg_cat3_pi$lbound, 2)," - ", round(icc_radg_cat3_pi$ubound, 2), ")", sep = ""),
+                            round(icc_radg_cat3_pr$value, 2), paste("(", round(icc_radg_cat3_pr$lbound, 2) ," - ", round(icc_radg_cat3_pr$ubound, 2) ,")", sep = ""),
+                            round(icc_radg_cat3_rr$value, 2), paste("(", round(icc_radg_cat3_rr$lbound, 2)," - ", round(icc_radg_cat3_rr$ubound, 2),")", sep = "")), 
+                   bio = c(NA, NA,
+                           round(icc_bio_cat3_o2$value, 2), paste("(", round(icc_bio_cat3_o2$lbound, 2)," - ", round(icc_bio_cat3_o2$ubound, 2), ")", sep = ""),
+                           NA, NA,
+                           round(icc_bio_cat3_pr$value, 2), paste("(", round(icc_bio_cat3_pr$lbound, 2), " - ", round(icc_bio_cat3_pr$ubound, 2),")", sep = ""),
+                           round(icc_bio_cat3_rr$value, 2), paste("(", round(icc_bio_cat3_rr$lbound, 2) ," - ", round(icc_bio_cat3_rr$ubound, 2),")", sep = "")),
+                   scan = c(round(icc_scan_cat3_temp$value, 2), paste("(", round(icc_scan_cat3_temp$lbound, 2)," - ", round(icc_scan_cat3_temp$ubound, 2), ")", sep = ""),
+                           round(icc_scan_cat3_o2$value, 2), paste("(", round(icc_scan_cat3_o2$lbound, 2), " - ", round(icc_scan_cat3_o2$ubound, 2), ")", sep = ""),
+                           NA, NA,
+                           round(icc_scan_cat3_pr$value, 2), paste("(", round(icc_scan_cat3_pr$lbound, 2), " - ", round(icc_scan_cat3_pr$ubound, 2),")", sep = ""),
+                           round(icc_scan_cat3_rr$value, 2), paste("(", round(icc_scan_cat3_rr$lbound, 2), " - ", round(icc_scan_cat3_rr$ubound, 2), ")", sep = "")),
+                   onyx = c(NA, NA,
+                           round(icc_onyx_cat3_o2$value, 2), paste("(", round(icc_onyx_cat3_o2$lbound, 2)," - ", round(icc_onyx_cat3_o2$ubound, 2), ")", sep = ""),
+                           NA, NA,
+                           round(icc_onyx_cat3_pr$value, 2), paste("(", round(icc_onyx_cat3_pr$lbound, 2), " - ", round(icc_onyx_cat3_pr$ubound, 2),")", sep = ""),
+                           round(icc_onyx_cat3_rr$value, 2), paste("(", round(icc_onyx_cat3_rr$lbound, 2) ," - ", round(icc_onyx_cat3_rr$ubound, 2),")", sep = "")),
+                   neo = c(round(icc_neo_cat3_temp$value, 2), paste("(", round(icc_neo_cat3_temp$lbound, 2)," - ", round(icc_neo_cat3_temp$ubound, 2), ")", sep = ""),
+                           round(icc_neo_cat3_o2$value, 2), paste("(", round(icc_neo_cat3_o2$lbound, 2), " - ", round(icc_neo_cat3_o2$ubound, 2), ")", sep = ""),
+                           NA, NA,
+                           round(icc_neo_cat3_pr$value, 2), paste("(", round(icc_neo_cat3_pr$lbound, 2), " - ", round(icc_neo_cat3_pr$ubound, 2),")", sep = ""),
+                           round(icc_neo_cat3_rr$value, 2), paste("(", round(icc_neo_cat3_rr$lbound, 2), " - ", round(icc_neo_cat3_rr$ubound, 2), ")", sep = "")))
+icc_t3 <- kable(out3, col.names = c("","Rad-G Temp (Masimo)", "M800 (Biolight)", "Scanbo v8 (Scanbo)", "Onyx PO+RR (Nonin)", "NeoGuard (Neopenda)")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
+  pack_rows("Temperature", 1, 2) %>%
+  pack_rows("Oxygen", 3, 4) %>%
+  pack_rows("Profusion Index", 5, 6) %>%
+  pack_rows("Pulse Rate", 7, 8) %>%
+  pack_rows("Respiratory Rate", 9, 10) %>%
+  add_header_above(c(" ", "Intraclass correlation coefficient for clinical measures across devices for participantss aged 12-59 months (95%CI)" = 5))
 ```
 
-## Table 3a: Intraclass correlation coefficient for clinical measures across devices for participants aged 0-1 month [95%CI].
+## Table 3a
 `r icc_t1`
-## Table 3b: Intraclass correlation coefficeint for clinical measures across devices for participants aged 2-11 months [95%CI].
-
-## Table 3c: Intraclass correlation coefficient for clinical measures across devices for participantss aged 12-59 months [95%CI].
+## Table 3b
+`r icc_t2`
+## Table 3c
+`r icc_t3`
 
 # Section 5: Confusion Matrices {.tabset}
 Samwel
