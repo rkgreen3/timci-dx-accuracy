@@ -73,6 +73,132 @@ Table 1: Participant Characteristics Overall and by Facility
 #`r t1`
 ```
 
+```{r}
+
+## Convert categorical variables into factors
+
+df_og$age_cat <- factor(df_og$age_cat,levels = c(1,2,3),
+                        labels = c("0-1 month","2-11 months","12-59 months"))
+df_og$sex <- factor(df_og$sex, levels = c(0,1),
+                    labels = c("Male","Female"))
+df_og$cg_relationship <- factor(df_og$cg_relationship, levels = c(1,2,3,4,5,6,7,8,9,10),
+                                labels = c("Mother and Father","Mother and Grandmother","Mother only",
+                                           "Father only", "Grandmother only","Grandfather only","Sibling",
+                                           "Other family member","Community member", "Other"))
+df_og$visit_rsn_illness <- factor(df_og$visit_rsn_illness,levels = c(0,1), 
+                                 labels =c("FALSE","TRUE")) #Visited due to illness
+df_og$visit_reason___2 <- factor(df_og$visit_reason___2,levels = c(0,1),
+                                 labels =c("FALSE","TRUE")) #Visited due to immunization
+df_og$visit_reason___3 <- factor(df_og$visit_reason___3,levels = c(0,1),
+                                 labels =c("FALSE","TRUE")) #Visited due to routine monitoring
+df_og$visit_reason___4 <- factor(df_og$visit_reason___4,levels = c(0,1),
+                                 labels =c("FALSE","TRUE")) #Visited due to trauma
+df_og$visit_reason___5 <- factor(df_og$visit_reason___5,levels = c(0,1),
+                                 labels =c("FALSE","TRUE")) #Visited due to admission at the facility
+df_og$visit_reason_ill_sxs___1 <- factor(df_og$visit_reason_ill_sxs___1,levels = c(0,1),
+                                         labels =c("FALSE","TRUE")) #Cough
+df_og$visit_reason_ill_sxs___2 <- factor(df_og$visit_reason_ill_sxs___2,levels = c(0,1),
+                                         labels =c("FALSE","TRUE")) #Difficulty/rapid breathing
+df_og$visit_reason_ill_sxs___3 <- factor(df_og$visit_reason_ill_sxs___3,levels = c(0,1),
+                                         labels =c("FALSE","TRUE")) #Fever
+df_og$visit_reason_ill_sxs___4 <- factor(df_og$visit_reason_ill_sxs___4,levels = c(0,1),
+                                         labels =c("FALSE","TRUE")) #Diarrhea
+df_og$visit_reason_ill_sxs___5 <- factor(df_og$visit_reason_ill_sxs___5,levels = c(0,1),
+                                         labels =c("FALSE","TRUE")) #Vomiting
+df_og$visit_reason_ill_sxs___6 <- factor(df_og$visit_reason_ill_sxs___6,levels = c(0,1),
+                                         labels =c("FALSE","TRUE")) ##Other
+df_og$received_dx <- factor(df_og$received_dx,levels = c(0,1),
+                            labels = c("FALSE","TRUE")) #was a diagnosis received
+df_og$reported_dx___1 <- factor(df_og$reported_dx___1,levels = c(0,1),
+                                labels =c("FALSE","TRUE")) #Dehydration
+df_og$reported_dx___2 <- factor(df_og$reported_dx___2,levels = c(0,1),
+                                labels =c("FALSE","TRUE")) #Respiratory
+df_og$reported_dx___3 <- factor(df_og$reported_dx___3,levels = c(0,1),
+                                labels =c("FALSE","TRUE")) #Digestive
+df_og$reported_dx___4 <- factor(df_og$reported_dx___4,levels = c(0,1),
+                                labels =c("FALSE","TRUE")) #Malaria
+df_og$reported_dx___5 <- factor(df_og$reported_dx___5,levels = c(0,1),
+                                labels =c("FALSE","TRUE")) #Fever
+df_og$reported_dx___6 <- factor(df_og$reported_dx___6,levels = c(0,1),
+                                labels =c("FALSE","TRUE")) #Measles
+df_og$reported_dx___7 <- factor(df_og$reported_dx___7,levels = c(0,1),
+                                labels =c("FALSE","TRUE")) #Ear infection
+df_og$reported_dx___8 <- factor(df_og$reported_dx___8,levels = c(0,1),
+                                labels =c("FALSE","TRUE")) #Throat infection
+df_og$reported_dx___9 <- factor(df_og$reported_dx___9,levels = c(0,1),
+                                labels =c("FALSE","TRUE")) #Other
+df_og$recieved_txt <- factor(df_og$recieved_txt, levels = c(0,1),
+                             labels = c("FALSE", "TRUE"))
+df_og$reported_tx___1 <- factor(df_og$reported_tx___1, levels = c(0, 1),
+                                labels = c("FALSE", "TRUE"))
+df_og$reported_tx___2 <- factor(df_og$reported_tx___2, levels = c(0, 1),
+                                labels = c("FALSE", "TRUE"))
+df_og$reported_tx___3 <- factor(df_og$reported_tx___3, levels = c(0, 1),
+                                labels = c("FALSE", "TRUE"))
+df_og$reported_tx___4 <- factor(df_og$reported_tx___4, levels = c(0, 1),
+                                labels = c("FALSE", "TRUE"))
+df_og$reported_tx___5 <- factor(df_og$reported_tx___5, levels = c(0, 1),
+                                labels = c("FALSE", "TRUE"))
+
+## Create an object "cat_var" with all categorical variables
+
+cat_var <- c("age_cat", "sex","cg_relationship", 
+         "visit_rsn_illness", "visit_reason___2", "visit_reason___3", "visit_reason___4", "visit_reason___5",
+         "visit_reason_ill_sxs___1", "visit_reason_ill_sxs___2", "visit_reason_ill_sxs___3",
+         "visit_reason_ill_sxs___4", "visit_reason_ill_sxs___5", "visit_reason_ill_sxs___6",
+         "received_dx", "reported_dx___1", "reported_dx___2", "reported_dx___3", "reported_dx___4",
+         "reported_dx___5", "reported_dx___6", "reported_dx___7", "reported_dx___8", "reported_dx___9",
+         "recieved_txt", "reported_tx___1", "reported_tx___2", "reported_tx___3", "reported_tx___4",
+         "reported_tx___5")
+
+## Continuous variables
+
+## Create a dataframe 'ref_values' with all our reference measurements (excluding RR awaiting video annotation)
+ref_values <- df_og %>% 
+  select(m1_ref_sp02, m2_ref_sp02, m3_ref_sp02,
+         m1_ref_pr, m2_ref_pr, m3_ref_pr,
+         m1_therm_skin_temp, m2_therm_skin_temp, m3_therm_skin_temp)
+
+## Create objects with the mean values of our reference measurements
+
+mean_ref_sp02 <- rowMeans(ref_values [, c("m1_ref_sp02", "m2_ref_sp02", "m3_ref_sp02")],
+                                  na.rm = TRUE)
+
+mean_ref_pr <- rowMeans(ref_values [, c("m1_ref_pr", "m2_ref_pr", "m3_ref_pr")],
+                                  na.rm = TRUE)
+
+mean_ref_temp <- rowMeans(ref_values [, c("m1_therm_skin_temp", "m2_therm_skin_temp",
+                                          "m3_therm_skin_temp")], 
+                          na.rm = TRUE)
+
+## Create a dataframe 'mean_ref_values' containing the mean values computed above
+
+mean_ref_values <- data.frame(mean_ref_pr, mean_ref_sp02, mean_ref_temp)
+
+## Summarise 
+
+cont <- summary(mean_ref_values)
+
+## Create an object "myVars" which contains all the variables we want in our table1 (both categorical and continuous)
+## Not yet included SpO2, PR, RR, Temp
+
+myVars <- c("age_cat", "sex","cg_relationship", 
+         "visit_rsn_illness", "visit_reason___2", "visit_reason___3", "visit_reason___4", "visit_reason___5",
+         "visit_reason_ill_sxs___1", "visit_reason_ill_sxs___2", "visit_reason_ill_sxs___3",
+         "visit_reason_ill_sxs___4", "visit_reason_ill_sxs___5", "visit_reason_ill_sxs___6",
+         "received_dx", "reported_dx___1", "reported_dx___2", "reported_dx___3", "reported_dx___4",
+         "reported_dx___5", "reported_dx___6", "reported_dx___7", "reported_dx___8", "reported_dx___9",
+         "recieved_txt", "reported_tx___1", "reported_tx___2", "reported_tx___3", "reported_tx___4",
+         "reported_tx___5", "height", "weight", "muac", "hemocue_hb")
+
+## Use CreateTableOne function to generate output
+
+CreateTableOne(vars = myVars,
+               data = df_og,
+               factorVars = cat_var,
+               strata = "facility_name")
+```
+
 
 # Section 2: Measurement Characteristics & Precision {.tabset}
 Leila
