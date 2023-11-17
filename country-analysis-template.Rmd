@@ -14,10 +14,6 @@ The overall goal of this project is to reduce morbidity and mortality of sick ch
 
 The primary objective of this study is to determine the performance of available multimodal PO devices compared to an accepted reference standard by primary care providers assessing chidlren 0-59 months seeking care at the primary care level. Reference standards for the different clinical measurements include: Masimo Rad97 patient monitor (SpO2, PR), video derived annotated respiratory rate (RR), and digital infrared thermometer (temp). Secondary objectives include determining if any variability in performance is detected by age category or skin pigmentation and assessing interrater reliability.
 
-## Using this document
-
-(agreed upon conventions)
-
 ```{r setup, include=FALSE}
 rm(list = ls())
 # install these packages if not already on your computer
@@ -39,29 +35,123 @@ df_og <- df_og %>% select(-c("X"))
 COUNTRY <- "Kenya" # Kenya, Tanzania, India -- USER INPUT HERE
 df_og <- subset(df_og, df_og$country==COUNTRY)
 
-# Define thresholds for hypoxia, fast breathing, tachycardia, and fever for all index and reference measurements (for confusion matrices in section 5) -- should be binary indicators for above/below threshold
+# Create reshaped df's
+## use regular expressions to identify measurement-related columns and trim to only variables needed
+df_reshaped <- df_og %>% select(ppt_id, index_device_name, age_cat, colnames(df_og[grepl("m[[:digit:]]_index_+", names(df_og))]), colnames(df_og[grepl("therm", names(df_og))]), colnames(df_og[grepl("m[[:digit:]]_ref_+", names(df_og))]))
+df_reshaped <- df_reshaped %>% select(-c(colnames(df_og[grepl("error", names(df_og))]), colnames(df_og[grepl("attempt", names(df_og))]), colnames(df_og[grepl("thb", names(df_og))])))
+mdf_reshaped <- melt(df_reshaped, id.vars = c("ppt_id", "index_device_name", "age_cat")) ## Melt df into long format, maintaining ID vars
+mdf_reshaped$grp <- toupper(substr(mdf_reshaped$variable, start = 1, stop = 2)) # Extract measurement number into grouping variable
+mdf_reshaped$mes <- substr(mdf_reshaped$variable, start = 4, stop = nchar(as.character(mdf_reshaped$variable))) # Extract index/ref and measurement type into variable
+mdf_reshaped <- mdf_reshaped %>% select(-c(variable))
+mdf_reshaped$mes <- ifelse(mdf_reshaped$mes=="therm_skin_temp", "ref_temp", mdf_reshaped$mes)
+## Subset into index measurments only, further subset into each measurement type so value can be renamed accordingly
+mdf_reshaped_i <- subset(mdf_reshaped, grepl("index", mdf_reshaped$mes))
+mdf_reshaped_i_temp <- subset(mdf_reshaped_i, grepl("temp", mdf_reshaped_i$mes)) # Temp
+names(mdf_reshaped_i_temp)[4] <- paste(mdf_reshaped_i_temp$mes)
+mdf_reshaped_i_temp <- mdf_reshaped_i_temp %>% select(-c(mes))
+mdf_reshaped_i_spo2 <- subset(mdf_reshaped_i, grepl("spo2", mdf_reshaped_i$mes)) # SpO2
+names(mdf_reshaped_i_spo2)[4] <- paste(mdf_reshaped_i_spo2$mes)
+mdf_reshaped_i_spo2 <- mdf_reshaped_i_spo2 %>% select(-c(mes))
+mdf_reshaped_i_o2 <- subset(mdf_reshaped_i, grepl("_o2", mdf_reshaped_i$mes)) # O2
+names(mdf_reshaped_i_o2)[4] <- paste(mdf_reshaped_i_o2$mes)
+mdf_reshaped_i_o2 <- mdf_reshaped_i_o2 %>% select(-c(mes))
+mdf_reshaped_i_pr <- subset(mdf_reshaped_i, grepl("pr", mdf_reshaped_i$mes)) # PR
+names(mdf_reshaped_i_pr)[4] <- paste(mdf_reshaped_i_pr$mes)
+mdf_reshaped_i_pr <- mdf_reshaped_i_pr %>% select(-c(mes))
+mdf_reshaped_i_pi <- subset(mdf_reshaped_i, grepl("pi", mdf_reshaped_i$mes)) # PI
+names(mdf_reshaped_i_pi)[4] <- paste(mdf_reshaped_i_pi$mes)
+mdf_reshaped_i_pi <- mdf_reshaped_i_pi %>% select(-c(mes))
+mdf_reshaped_i_rr <- subset(mdf_reshaped_i, grepl("rr", mdf_reshaped_i$mes)) # RR
+names(mdf_reshaped_i_rr)[4] <- paste(mdf_reshaped_i_rr$mes)
+mdf_reshaped_i_rr <- mdf_reshaped_i_rr %>% select(-c(mes))
+## Join back to one df for recreation of full df
+mdf_reshaped_i <- left_join(mdf_reshaped_i_temp, mdf_reshaped_i_o2, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
+mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_spo2, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
+mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_pr, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
+mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_pi, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
+mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_rr, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
+## Do all of the above for reference measurements
+mdf_reshaped_r <- subset(mdf_reshaped, grepl("ref", mdf_reshaped$mes))
+mdf_reshaped_r_temp <- subset(mdf_reshaped_r, grepl("temp", mdf_reshaped_r$mes)) # Temp
+names(mdf_reshaped_r_temp)[4] <- paste(mdf_reshaped_r_temp$mes)
+mdf_reshaped_r_temp <- mdf_reshaped_r_temp %>% select(-c(mes))
+mdf_reshaped_r_spo2 <- subset(mdf_reshaped_r, grepl("sp02", mdf_reshaped_r$mes)) # SpO2
+names(mdf_reshaped_r_spo2)[4] <- paste(mdf_reshaped_r_spo2$mes)
+mdf_reshaped_r_spo2 <- mdf_reshaped_r_spo2 %>% select(-c(mes))
+mdf_reshaped_r_o2 <- subset(mdf_reshaped_r, grepl("_o2", mdf_reshaped_r$mes)) # O2
+names(mdf_reshaped_r_o2)[4] <- paste(mdf_reshaped_r_o2$mes)
+mdf_reshaped_r_o2 <- mdf_reshaped_r_o2 %>% select(-c(mes))
+mdf_reshaped_r_pr <- subset(mdf_reshaped_r, grepl("pr", mdf_reshaped_r$mes)) # PR
+names(mdf_reshaped_r_pr)[4] <- paste(mdf_reshaped_r_pr$mes)
+mdf_reshaped_r_pr <- mdf_reshaped_r_pr %>% select(-c(mes))
+mdf_reshaped_r_pi <- subset(mdf_reshaped_r, grepl("pi", mdf_reshaped_r$mes)) # PI
+names(mdf_reshaped_r_pi)[4] <- paste(mdf_reshaped_r_pi$mes)
+mdf_reshaped_r_pi <- mdf_reshaped_r_pi %>% select(-c(mes))
+mdf_reshaped_r_rr <- subset(mdf_reshaped_r, grepl("rr", mdf_reshaped_r$mes)) # RR
+names(mdf_reshaped_r_rr)[4] <- paste(mdf_reshaped_r_rr$mes)
+mdf_reshaped_r_rr <- mdf_reshaped_r_rr %>% select(-c(mes))
+## Join back to one df for recreation of full df
+mdf_reshaped_r <- left_join(mdf_reshaped_r_temp, mdf_reshaped_r_o2, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_spo2, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_pr, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_pi, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_rr, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
+# Join index and ref df's back to one melted df
+mdf_reshaped <- left_join(mdf_reshaped_i, mdf_reshaped_r, by = c("ppt_id", "index_device_name", "age_cat", "grp")) #long format df w/index & ref measurements for all devices & measurement types
 
-# Create a df for each device -- note: any variable formatting (e.g., converting to factors) or additional variable creation should happen prior to creating these little dataframes
-df_radg <- subset(df_og, index_device_name=="Rad-G Temp (Masimo)")
-df_radg_cat1 <- subset(df_radg, age_cat=="0-1 month")
-df_radg_cat2 <- subset(df_radg, age_cat=="2-11 months")
-df_radg_cat3 <- subset(df_radg, age_cat=="12-59 months")
+# Add indicator variables here for clinical thresholds (long format) -- Note: From the SAP, these are defined for the user in Section 5, if changed here be sure to change there and below
+mdf_reshaped$index_hypoxic <- ifelse(mdf_reshaped$index_o2<90, 1, 0)
+mdf_reshaped$ref_hypoxic <- ifelse(mdf_reshaped$ref_o2<90, 1, 0)
 
-df_bio <- subset(df_og, index_device_name=="m800 (Biolight)")
-df_bio_cat1 <- subset(df_bio, age_cat=="0-1 month")
-df_bio_cat2 <- subset(df_bio, age_cat=="2-11 months")
-df_bio_cat3 <- subset(df_bio, age_cat=="12-59 months")
 
-df_neo <- subset(df_og, index_device_name=="NeoGuard (Neopenda)")
-df_neo_cat1 <- subset(df_neo, age_cat=="0-1 month")
-df_neo_cat2 <- subset(df_neo, age_cat=="2-11 months")
-df_neo_cat3 <- subset(df_neo, age_cat=="12-59 months")
+# Create a df for each device (in both wide and long format) -- note: any variable formatting (e.g., converting to factors) or additional variable creation should happen prior to creating these little dataframes
 
-df_onyx <- subset(df_og, index_device_name=="Onyx PO+RR (Nonin)")
-df_onyx_cat3 <- subset(df_onyx, age_cat=="12-59 months")
+## Long format (M1-M3 are levels of one variable)
+df_radg_l <- subset(mdf_reshaped, index_device_name=="Rad-G Temp (Masimo)")
+df_radg_cat1_l <- subset(df_radg_l, age_cat=="0-1 month")
+df_radg_cat2_l <- subset(df_radg_l, age_cat=="2-11 months")
+df_radg_cat3_l <- subset(df_radg_l, age_cat=="12-59 months")
 
-df_scan <- subset(df_og, index_device_name=="Scanbo v8 (Scanbo)")
-df_scan_cat3 <- subset(df_scan, age_cat=="12-59 months")
+df_bio_l <- subset(mdf_reshaped, index_device_name=="m800 (Biolight)")
+df_bio_cat1_l <- subset(df_bio_l, age_cat=="0-1 month")
+df_bio_cat2_l <- subset(df_bio_l, age_cat=="2-11 months")
+df_bio_cat3_l <- subset(df_bio_l, age_cat=="12-59 months")
+
+df_neo_l <- subset(mdf_reshaped, index_device_name=="NeoGuard (Neopenda)")
+df_neo_cat1_l <- subset(df_neo_l, age_cat=="0-1 month")
+df_neo_cat2_l <- subset(df_neo_l, age_cat=="2-11 months")
+df_neo_cat3_l <- subset(df_neo_l, age_cat=="12-59 months")
+
+df_onyx_l <- subset(mdf_reshaped, index_device_name=="Onyx PO+RR (Nonin)")
+df_onyx_cat3_l <- subset(df_onyx_l, age_cat=="12-59 months")
+
+df_scan_l <- subset(mdf_reshaped, index_device_name=="Scanbo v8 (Scanbo)")
+df_scan_cat3_l <- subset(df_scan_l, age_cat=="12-59 months")
+
+# Add indicator variables here for clinical thresholds (wide format), each measurement -- Note: From the SAP, these are defined for the user in Section 5, if changed here be sure to change there and above
+
+## Wide format (M1-M3 are variables)
+df_radg_w <- subset(df_og, index_device_name=="Rad-G Temp (Masimo)")
+df_radg_cat1_w <- subset(df_radg_w, age_cat=="0-1 month")
+df_radg_cat2_w <- subset(df_radg_w, age_cat=="2-11 months")
+df_radg_cat3_w <- subset(df_radg_w, age_cat=="12-59 months")
+
+df_bio_w <- subset(df_og, index_device_name=="m800 (Biolight)")
+df_bio_cat1_w <- subset(df_bio_w, age_cat=="0-1 month")
+df_bio_cat2_w <- subset(df_bio_w, age_cat=="2-11 months")
+df_bio_cat3_w <- subset(df_bio_w, age_cat=="12-59 months")
+
+df_neo_w <- subset(df_og, index_device_name=="NeoGuard (Neopenda)")
+df_neo_cat1_w <- subset(df_neo_w, age_cat=="0-1 month")
+df_neo_cat2_w <- subset(df_neo_w, age_cat=="2-11 months")
+df_neo_cat3_w <- subset(df_neo_w, age_cat=="12-59 months")
+
+df_onyx_w <- subset(df_og, index_device_name=="Onyx PO+RR (Nonin)")
+df_onyx_cat3_w <- subset(df_onyx_w, age_cat=="12-59 months")
+
+df_scan_w <- subset(df_og, index_device_name=="Scanbo v8 (Scanbo)")
+df_scan_cat3_w <- subset(df_scan_w, age_cat=="12-59 months")
+
 ```
 
 This report contains data from *`r COUNTRY`*.
@@ -248,28 +338,11 @@ Anmol
 -- RG Note: let's see if we can find a way to get M1, M2, and M3 all on the same plot and perhaps distinguish them by color?
 Example code:
 ```{r}
-# @Anmol - I had a couple ideas of things to try for the plots... 1) I think we will need the data structured differently to make this type of grouping work - see sample code below using the melt function from the reshape2 package and 2) I think if we switch the graphical system to base instead of ggplot we can make it work -- see sample code in next chunk
-## tdf = test data frame; m_tdf = melted test data frame (would recommend more intuitive naming) -- let me know if you'd like some help building out these different mini-df's, I know it's a lot of coding
+# @Anmol - I think I found a solution to get all the measurements on one plot...it required reshaping the data, which I added to the beginning prep section of the document. There are now both long and wide formats of the data, and if we use the long format for the plots and switch the graphical system to base instead of ggplot, it seems like it will work -- see sample code below
 
-tdf <- df_radg_cat1 %>% select(ppt_id, colnames(df_radg_cat1[grepl("+_o2", names(df_radg_cat1))]))
-m_tdf <- melt(tdf)
-m_tdf$grp <- substr(m_tdf$variable, start = 1, stop = 2)
-m_tdf$mes <- substr(m_tdf$variable, start = 4, stop = nchar(as.character(m_tdf$variable)))
-m_tdf <- m_tdf %>% select(-c(variable))
-m_tdf_i <- subset(m_tdf, grepl("index", m_tdf$mes))
-names(m_tdf_i)[2] <- paste(m_tdf_i$mes)
-m_tdf_i <- m_tdf_i %>% select(-c(mes))
-m_tdf_r <- subset(m_tdf, grepl("ref", m_tdf$mes))
-names(m_tdf_r)[2] <- paste(m_tdf_r$mes)
-m_tdf_r <- m_tdf_r %>% select(-c(mes))
-m_tdf <- left_join(m_tdf_i, m_tdf_r, by = c("ppt_id", "grp"))
-m_tdf$grp <- factor(m_tdf$grp)
-
-```
-
-```{r}
 bland.altman.plot(m_tdf$ref_o2, m_tdf$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (0-1 month)", col = c("black", "blue", "green"), pch=19)
 legend("topleft", legend = levels(m_tdf$grp), col = c("black", "blue", "green"), pch = 19)
+
 ```
 
 ## Rad-G Temp (Masimo) {.tabset}
@@ -584,9 +657,19 @@ icc_t3 <- kable(out3, col.names = c("","Rad-G Temp (Masimo)", "M800 (Biolight)",
 
 # Section 5: Confusion Matrices {.tabset}
 Samwel
-5 & 6 should be done by same person
+Clinical thresholds used in the section are as follows:
+
+- Hypoxemia: <90%
+- Fast breathing: <12 months 50 bpm; 12-35 months 40 bpm; 36-60 months 30 bpm
+- Tachycardia: <12 months 180 bpm; 12-60 months 140 bpm
+- Fever: ≥100.4F | 38C
+
 ```{r echo=FALSE, include=FALSE}
-# key functions: irr::agree, addmargins(table()), prop.table
+# @ Samwel, I didn't get as far on this as I'd hoped but I did get the data structured properly -- for the 2x2's, we'll want to use the long format so we can look at all the measurements together. For the percent agreement, we'll want to calculate for each M1-M3 separately and then look at them all in the same table -- let me know if you want me to take that section since I know you're quite busy with the data from the main TIMCI study. I'll have some time Monday/Tuesday next week to work on this as well if that would be helpful!
+```
+
+```{r echo=FALSE, include=FALSE}
+# key functions: addmargins(table()), prop.table
 ```
 
 ## Rad-G Temp (Masimo)
@@ -604,4 +687,4 @@ Samwel
 ## Scanbo v8 (Scanbo)
 
 # Section 6: Percent Agreement {.tabset}
-Samwel
+Samwel (Rebecca can take this if helpful)
