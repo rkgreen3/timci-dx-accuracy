@@ -27,6 +27,8 @@ library(tableone)
 library(kableExtra)
 library(BlandAltmanLeh)
 library(irr)
+library(reshape2)
+library(ggplot2)
 
 # Read in (cleaned) data using file choose
 filename <- file.choose()
@@ -41,13 +43,28 @@ df_og <- subset(df_og, df_og$country==COUNTRY)
 
 # Create a df for each device -- note: any variable formatting (e.g., converting to factors) or additional variable creation should happen prior to creating these little dataframes
 df_radg <- subset(df_og, index_device_name=="Rad-G Temp (Masimo)")
+df_radg_cat1 <- subset(df_radg, age_cat=="0-1 month")
+df_radg_cat2 <- subset(df_radg, age_cat=="2-11 months")
+df_radg_cat3 <- subset(df_radg, age_cat=="12-59 months")
+
 df_bio <- subset(df_og, index_device_name=="m800 (Biolight)")
+df_bio_cat1 <- subset(df_bio, age_cat=="0-1 month")
+df_bio_cat2 <- subset(df_bio, age_cat=="2-11 months")
+df_bio_cat3 <- subset(df_bio, age_cat=="12-59 months")
+
 df_neo <- subset(df_og, index_device_name=="NeoGuard (Neopenda)")
+df_neo_cat1 <- subset(df_neo, age_cat=="0-1 month")
+df_neo_cat2 <- subset(df_neo, age_cat=="2-11 months")
+df_neo_cat3 <- subset(df_neo, age_cat=="12-59 months")
+
 df_onyx <- subset(df_og, index_device_name=="Onyx PO+RR (Nonin)")
+df_onyx_cat3 <- subset(df_onyx, age_cat=="12-59 months")
+
 df_scan <- subset(df_og, index_device_name=="Scanbo v8 (Scanbo)")
+df_scan_cat3 <- subset(df_scan, age_cat=="12-59 months")
 ```
 
-This report contains data from `r COUNTRY`.
+This report contains data from *`r COUNTRY`*.
 
 # Section 1: Participant Characteristics {.tabset}
 Leila
@@ -74,6 +91,8 @@ Table 1: Participant Characteristics Overall and by Facility
 ```
 
 ```{r}
+
+# @ Leila and team - would recommend using the cleaned check box variables (have been added to the codebook), also just an fyi that you don't need to explicitly create factored variables for the CreateTableOne to treat them as categorical, as long as they're included in your factorVars list they'll be handled as categorical even if they're numeric
 
 ## Convert categorical variables into factors
 
@@ -229,8 +248,28 @@ Anmol
 -- RG Note: let's see if we can find a way to get M1, M2, and M3 all on the same plot and perhaps distinguish them by color?
 Example code:
 ```{r}
-# Default subtraction is grp1 - grp2 --> place reference first, test second
-#bland.altman.plot(df$reference, df$index, graph.sys = "ggplot2") + labs(title = "Bland-Altman Plot: [specify measurement and age group]") + xlab("Means") + ylab("Differences") + theme(plot.title = element_text(hjust = 0.5))
+# @Anmol - I had a couple ideas of things to try for the plots... 1) I think we will need the data structured differently to make this type of grouping work - see sample code below using the melt function from the reshape2 package and 2) I think if we switch the graphical system to base instead of ggplot we can make it work -- see sample code in next chunk
+## tdf = test data frame; m_tdf = melted test data frame (would recommend more intuitive naming) -- let me know if you'd like some help building out these different mini-df's, I know it's a lot of coding
+
+tdf <- df_radg_cat1 %>% select(ppt_id, colnames(df_radg_cat1[grepl("+_o2", names(df_radg_cat1))]))
+m_tdf <- melt(tdf)
+m_tdf$grp <- substr(m_tdf$variable, start = 1, stop = 2)
+m_tdf$mes <- substr(m_tdf$variable, start = 4, stop = nchar(as.character(m_tdf$variable)))
+m_tdf <- m_tdf %>% select(-c(variable))
+m_tdf_i <- subset(m_tdf, grepl("index", m_tdf$mes))
+names(m_tdf_i)[2] <- paste(m_tdf_i$mes)
+m_tdf_i <- m_tdf_i %>% select(-c(mes))
+m_tdf_r <- subset(m_tdf, grepl("ref", m_tdf$mes))
+names(m_tdf_r)[2] <- paste(m_tdf_r$mes)
+m_tdf_r <- m_tdf_r %>% select(-c(mes))
+m_tdf <- left_join(m_tdf_i, m_tdf_r, by = c("ppt_id", "grp"))
+m_tdf$grp <- factor(m_tdf$grp)
+
+```
+
+```{r}
+bland.altman.plot(m_tdf$ref_o2, m_tdf$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (0-1 month)", col = c("black", "blue", "green"), pch=19)
+legend("topleft", legend = levels(m_tdf$grp), col = c("black", "blue", "green"), pch = 19)
 ```
 
 ## Rad-G Temp (Masimo) {.tabset}
@@ -310,21 +349,18 @@ How to interpret the ICC:
 
 # -- Rad-G
 ## Rad-G, Age Cat 1
-df_radg_cat1 <- subset(df_radg, age_cat=="0-1 month")
 df_radg_cat1_temp <- df_radg_cat1 %>% select(colnames(df_radg_cat1[grepl("+index_temp", names(df_radg_cat1))]))
 df_radg_cat1_o2 <- df_radg_cat1 %>% select(colnames(df_radg_cat1[grepl("+index_o2", names(df_radg_cat1))]))
 df_radg_cat1_pi <- df_radg_cat1 %>% select(colnames(df_radg_cat1[grepl("+index_pi", names(df_radg_cat1))]))
 df_radg_cat1_pr <- df_radg_cat1 %>% select(colnames(df_radg_cat1[grepl("+index_pr", names(df_radg_cat1))]))
 df_radg_cat1_rr <- df_radg_cat1 %>% select(colnames(df_radg_cat1[grepl("+index_rr", names(df_radg_cat1))]))
 ## Rad-G, Age Cat 2
-df_radg_cat2 <- subset(df_radg, age_cat=="2-11 months")
 df_radg_cat2_temp <- df_radg_cat2 %>% select(colnames(df_radg_cat2[grepl("+index_temp", names(df_radg_cat2))]))
 df_radg_cat2_o2 <- df_radg_cat2 %>% select(colnames(df_radg_cat2[grepl("+index_o2", names(df_radg_cat2))]))
 df_radg_cat2_pi <- df_radg_cat2 %>% select(colnames(df_radg_cat2[grepl("+index_pi", names(df_radg_cat2))]))
 df_radg_cat2_pr <- df_radg_cat2 %>% select(colnames(df_radg_cat2[grepl("+index_pr", names(df_radg_cat2))]))
 df_radg_cat2_rr <- df_radg_cat2 %>% select(colnames(df_radg_cat2[grepl("+index_rr", names(df_radg_cat2))]))
 ## Rad-G, Age Cat 3
-df_radg_cat3 <- subset(df_radg, age_cat=="12-59 months")
 df_radg_cat3_temp <- df_radg_cat3 %>% select(colnames(df_radg_cat3[grepl("+index_temp", names(df_radg_cat3))]))
 df_radg_cat3_o2 <- df_radg_cat3 %>% select(colnames(df_radg_cat3[grepl("+index_o2", names(df_radg_cat3))]))
 df_radg_cat3_pi <- df_radg_cat3 %>% select(colnames(df_radg_cat3[grepl("+index_pi", names(df_radg_cat3))]))
@@ -333,36 +369,30 @@ df_radg_cat3_rr <- df_radg_cat3 %>% select(colnames(df_radg_cat3[grepl("+index_r
 
 # -- Biolight
 ## Biolight, Age Cat 1
-df_bio_cat1 <- subset(df_bio, age_cat=="0-1 month")
 df_bio_cat1_o2 <- df_bio_cat1 %>% select(colnames(df_bio_cat1[grepl("+index_o2", names(df_bio_cat1))]))
 df_bio_cat1_pr <- df_bio_cat1 %>% select(colnames(df_bio_cat1[grepl("+index_pr", names(df_bio_cat1))]))
 df_bio_cat1_rr <- df_bio_cat1 %>% select(colnames(df_bio_cat1[grepl("+index_rr", names(df_bio_cat1))]))
 ## Biolight, Age Cat 2
-df_bio_cat2 <- subset(df_bio, age_cat=="2-11 months")
 df_bio_cat2_o2 <- df_bio_cat2 %>% select(colnames(df_bio_cat2[grepl("+index_o2", names(df_bio_cat2))]))
 df_bio_cat2_pr <- df_bio_cat2 %>% select(colnames(df_bio_cat2[grepl("+index_pr", names(df_bio_cat2))]))
 df_bio_cat2_rr <- df_bio_cat2 %>% select(colnames(df_bio_cat2[grepl("+index_rr", names(df_bio_cat2))]))
 ## Biolight, Age Cat 3
-df_bio_cat3 <- subset(df_bio, age_cat=="12-59 months")
 df_bio_cat3_o2 <- df_bio_cat3 %>% select(colnames(df_bio_cat3[grepl("+index_o2", names(df_bio_cat3))]))
 df_bio_cat3_pr <- df_bio_cat3 %>% select(colnames(df_bio_cat3[grepl("+index_pr", names(df_bio_cat3))]))
 df_bio_cat3_rr <- df_bio_cat3 %>% select(colnames(df_bio_cat3[grepl("+index_rr", names(df_bio_cat3))]))
 
 # -- NeoGuard
 ## NeoGuard, Age Cat 1
-df_neo_cat1 <- subset(df_neo, age_cat=="0-1 month")
 df_neo_cat1_temp <- df_neo_cat1 %>% select(colnames(df_neo_cat1[grepl("+index_temp", names(df_neo_cat1))]))
 df_neo_cat1_o2 <- df_neo_cat1 %>% select(colnames(df_neo_cat1[grepl("+index_o2", names(df_neo_cat1))]))
 df_neo_cat1_pr <- df_neo_cat1 %>% select(colnames(df_neo_cat1[grepl("+index_pr", names(df_neo_cat1))]))
 df_neo_cat1_rr <- df_neo_cat1 %>% select(colnames(df_neo_cat1[grepl("+index_rr", names(df_neo_cat1))]))
 ## NeoGuard, Age Cat 2
-df_neo_cat2 <- subset(df_neo, age_cat=="2-11 months")
 df_neo_cat2_temp <- df_neo_cat2 %>% select(colnames(df_neo_cat2[grepl("+index_temp", names(df_neo_cat2))]))
 df_neo_cat2_o2 <- df_neo_cat2 %>% select(colnames(df_neo_cat2[grepl("+index_o2", names(df_neo_cat2))]))
 df_neo_cat2_pr <- df_neo_cat2 %>% select(colnames(df_neo_cat2[grepl("+index_pr", names(df_neo_cat2))]))
 df_neo_cat2_rr <- df_neo_cat2 %>% select(colnames(df_neo_cat2[grepl("+index_rr", names(df_neo_cat2))]))
 ## NeoGuard, Age Cat 3
-df_neo_cat3 <- subset(df_neo, age_cat=="12-59 months")
 df_neo_cat3_temp <- df_neo_cat3 %>% select(colnames(df_neo_cat3[grepl("+index_temp", names(df_neo_cat3))]))
 df_neo_cat3_o2 <- df_neo_cat3 %>% select(colnames(df_neo_cat3[grepl("+index_o2", names(df_neo_cat3))]))
 df_neo_cat3_pr <- df_neo_cat3 %>% select(colnames(df_neo_cat3[grepl("+index_pr", names(df_neo_cat3))]))
@@ -370,7 +400,6 @@ df_neo_cat3_rr <- df_neo_cat3 %>% select(colnames(df_neo_cat3[grepl("+index_rr",
 
 # -- Scanbo
 ## Scanbo, Age Cat 3
-df_scan_cat3 <- subset(df_scan, age_cat=="12-59 months")
 df_scan_cat3_temp <- df_scan_cat3 %>% select(colnames(df_scan_cat3[grepl("+index_temp", names(df_scan_cat3))]))
 df_scan_cat3_sp02 <- df_scan_cat3 %>% select(colnames(df_scan_cat3[grepl("+index_sp02", names(df_scan_cat3))]))
 df_scan_cat3_o2 <- df_scan_cat3 %>% select(colnames(df_scan_cat3[grepl("+index_o2", names(df_scan_cat3))]))
@@ -379,7 +408,6 @@ df_scan_cat3_rr <- df_scan_cat3 %>% select(colnames(df_scan_cat3[grepl("+index_r
 
 # -- Onyx
 ## Onyx, Age Cat 3
-df_onyx_cat3 <- subset(df_onyx, age_cat=="12-59 months")
 df_onyx_cat3_o2 <- df_onyx_cat3 %>% select(colnames(df_onyx_cat3[grepl("+index_o2", names(df_onyx_cat3))]))
 df_onyx_cat3_pr <- df_onyx_cat3 %>% select(colnames(df_onyx_cat3[grepl("+index_pr", names(df_onyx_cat3))]))
 df_onyx_cat3_rr <- df_onyx_cat3 %>% select(colnames(df_onyx_cat3[grepl("+index_rr", names(df_onyx_cat3))]))

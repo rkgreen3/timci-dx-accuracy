@@ -1,4 +1,4 @@
-# Version date: 2023-11-01
+# Version date: 2023-11-17
 
 # Load packages
 library(plyr)
@@ -53,13 +53,13 @@ colnames(df)[colnames(df) == "reported_tx___5"] = "tx_other"
 colnames(df)[colnames(df) == "recieved_txt"] = "received_tx"
 
 # Create variable for each of above to indicate more than one option was selected
-df$visit_rsn_sum <- sum(df$visit_rsn_illness, df$visit_rsn_immunize, df$visit_rsn_routine, df$visit_rsn_trauma, df$visit_rsn_admit, na.rm = T)
+df$visit_rsn_sum <- df$visit_rsn_illness + df$visit_rsn_immunize + df$visit_rsn_routine + df$visit_rsn_trauma + df$visit_rsn_admit
 df$visit_rsn_multiple <- ifelse(df$visit_rsn_sum>1, 1, 0)
-df$ill_sxs_sum <- sum(df$ill_sxs_cough, df$ill_sxs_rapidbreathing, df$ill_sxs_fever, df$ill_sxs_diarrhea, df$ill_sxs_vomit, df$ill_sxs_other, na.rm = T)
+df$ill_sxs_sum <- df$ill_sxs_cough + df$ill_sxs_rapidbreathing + df$ill_sxs_fever + df$ill_sxs_diarrhea + df$ill_sxs_vomit + df$ill_sxs_other
 df$ill_sxs_multiple <- ifelse(df$ill_sxs_sum>1, 1, 0)
-df$dx_sum <- sum(df$dx_dehydration, df$dx_respiratory, df$dx_digestive, df$dx_malaria, df$dx_fever, df$dx_measles, df$dx_earinfection, df$dx_throatinfection, df$dx_other, na.rm = T)
+df$dx_sum <- df$dx_dehydration + df$dx_respiratory + df$dx_digestive + df$dx_malaria + df$dx_fever + df$dx_measles + df$dx_earinfection + df$dx_throatinfection + df$dx_other
 df$dx_multiple <- ifelse(df$dx_sum>1, 1, 0)
-df$tx_sum <- sum(df$tx_antibiotic, df$tx_antimalarial, df$tx_dehydration, df$tx_bronchodilator, df$tx_other, na.rm = T)
+df$tx_sum <- df$tx_antibiotic + df$tx_antimalarial + df$tx_dehydration + df$tx_bronchodilator + df$tx_other
 df$tx_multiple <- ifelse(df$tx_sum>1, 1, 0)
 
 # Replace all 999 with NA
@@ -124,7 +124,7 @@ df$age_cat <- df$age_cat2
 df$age_months <- round(df$month_diff, 0)
 
 # Remove unnecessary variables
-df <- df %>% select(-c(bdate, age_cat2, month_diff, m1_30s_pic, m1_90s_pic, m2_30s_pic, m2_90s_pic, m3_30s_pic, m3_90s_pic))
+df <- df %>% select(-c(bdate, age_cat2, month_diff, m1_30s_pic, m1_90s_pic, m2_30s_pic, m2_90s_pic, m3_30s_pic, m3_90s_pic, cg_interview_yn, cg_sex, cg_edu_mother, cg_edu_mother_oth, cg_overall_comfort, cg_like_most, cg_like_least, cg_prov_challenges_yn, cg_prov_challenges, cg_overall_satisfied, cg_confident_use, cg_confident_performance, cg_adequate_assess_yn,  cg_adequate_assess_rsn, cg_advantage, cg_concerns, cg_compare_assess, cg_compare_assess_rsn, cg_useful, cg_useful_rsn, cg_rec_device, cg_rec_device_rsn, cg_rec_facility, cg_rec_facility_rsn,  cg_major_considerations, cg_provider_use_yn, cg_provider_use, cg_overall_impression, cg_advantages, cg_disadvantages, cg_understand_purpose, cg_discomfort, cg_discomfort_des, cg_recommend,  cg_change_desire, cg_oth_comments, caregiver_interview_complete))
 
 # Write file as .csv to shared Box folder
-write.csv(df, "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2023-11-01.csv")
+write.csv(df, "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2023-11-17.csv")
