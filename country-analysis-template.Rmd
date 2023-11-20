@@ -35,11 +35,12 @@ df_og <- df_og %>% select(-c("X"))
 COUNTRY <- "Kenya" # Kenya, Tanzania, India -- USER INPUT HERE
 df_og <- subset(df_og, df_og$country==COUNTRY)
 
+# --- SECTION 1: CREATING LONG DF
 # Create reshaped df's
 ## use regular expressions to identify measurement-related columns and trim to only variables needed
-df_reshaped <- df_og %>% select(ppt_id, index_device_name, age_cat, colnames(df_og[grepl("m[[:digit:]]_index_+", names(df_og))]), colnames(df_og[grepl("therm", names(df_og))]), colnames(df_og[grepl("m[[:digit:]]_ref_+", names(df_og))]))
+df_reshaped <- df_og %>% select(ppt_id, index_device_name, age_months, age_cat, colnames(df_og[grepl("m[[:digit:]]_index_+", names(df_og))]), colnames(df_og[grepl("therm", names(df_og))]), colnames(df_og[grepl("m[[:digit:]]_ref_+", names(df_og))]))
 df_reshaped <- df_reshaped %>% select(-c(colnames(df_og[grepl("error", names(df_og))]), colnames(df_og[grepl("attempt", names(df_og))]), colnames(df_og[grepl("thb", names(df_og))])))
-mdf_reshaped <- melt(df_reshaped, id.vars = c("ppt_id", "index_device_name", "age_cat")) ## Melt df into long format, maintaining ID vars
+mdf_reshaped <- melt(df_reshaped, id.vars = c("ppt_id", "index_device_name", "age_months", "age_cat")) ## Melt df into long format, maintaining ID vars
 mdf_reshaped$grp <- toupper(substr(mdf_reshaped$variable, start = 1, stop = 2)) # Extract measurement number into grouping variable
 mdf_reshaped$mes <- substr(mdf_reshaped$variable, start = 4, stop = nchar(as.character(mdf_reshaped$variable))) # Extract index/ref and measurement type into variable
 mdf_reshaped <- mdf_reshaped %>% select(-c(variable))
@@ -47,63 +48,75 @@ mdf_reshaped$mes <- ifelse(mdf_reshaped$mes=="therm_skin_temp", "ref_temp", mdf_
 ## Subset into index measurments only, further subset into each measurement type so value can be renamed accordingly
 mdf_reshaped_i <- subset(mdf_reshaped, grepl("index", mdf_reshaped$mes))
 mdf_reshaped_i_temp <- subset(mdf_reshaped_i, grepl("temp", mdf_reshaped_i$mes)) # Temp
-names(mdf_reshaped_i_temp)[4] <- paste(mdf_reshaped_i_temp$mes)
+names(mdf_reshaped_i_temp)[5] <- paste(mdf_reshaped_i_temp$mes)
 mdf_reshaped_i_temp <- mdf_reshaped_i_temp %>% select(-c(mes))
 mdf_reshaped_i_spo2 <- subset(mdf_reshaped_i, grepl("spo2", mdf_reshaped_i$mes)) # SpO2
-names(mdf_reshaped_i_spo2)[4] <- paste(mdf_reshaped_i_spo2$mes)
+names(mdf_reshaped_i_spo2)[5] <- paste(mdf_reshaped_i_spo2$mes)
 mdf_reshaped_i_spo2 <- mdf_reshaped_i_spo2 %>% select(-c(mes))
 mdf_reshaped_i_o2 <- subset(mdf_reshaped_i, grepl("_o2", mdf_reshaped_i$mes)) # O2
-names(mdf_reshaped_i_o2)[4] <- paste(mdf_reshaped_i_o2$mes)
+names(mdf_reshaped_i_o2)[5] <- paste(mdf_reshaped_i_o2$mes)
 mdf_reshaped_i_o2 <- mdf_reshaped_i_o2 %>% select(-c(mes))
 mdf_reshaped_i_pr <- subset(mdf_reshaped_i, grepl("pr", mdf_reshaped_i$mes)) # PR
-names(mdf_reshaped_i_pr)[4] <- paste(mdf_reshaped_i_pr$mes)
+names(mdf_reshaped_i_pr)[5] <- paste(mdf_reshaped_i_pr$mes)
 mdf_reshaped_i_pr <- mdf_reshaped_i_pr %>% select(-c(mes))
 mdf_reshaped_i_pi <- subset(mdf_reshaped_i, grepl("pi", mdf_reshaped_i$mes)) # PI
-names(mdf_reshaped_i_pi)[4] <- paste(mdf_reshaped_i_pi$mes)
+names(mdf_reshaped_i_pi)[5] <- paste(mdf_reshaped_i_pi$mes)
 mdf_reshaped_i_pi <- mdf_reshaped_i_pi %>% select(-c(mes))
 mdf_reshaped_i_rr <- subset(mdf_reshaped_i, grepl("rr", mdf_reshaped_i$mes)) # RR
-names(mdf_reshaped_i_rr)[4] <- paste(mdf_reshaped_i_rr$mes)
+names(mdf_reshaped_i_rr)[5] <- paste(mdf_reshaped_i_rr$mes)
 mdf_reshaped_i_rr <- mdf_reshaped_i_rr %>% select(-c(mes))
 ## Join back to one df for recreation of full df
-mdf_reshaped_i <- left_join(mdf_reshaped_i_temp, mdf_reshaped_i_o2, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
-mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_spo2, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
-mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_pr, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
-mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_pi, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
-mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_rr, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
+mdf_reshaped_i <- left_join(mdf_reshaped_i_temp, mdf_reshaped_i_o2, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_spo2, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_pr, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_pi, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_rr, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
 ## Do all of the above for reference measurements
 mdf_reshaped_r <- subset(mdf_reshaped, grepl("ref", mdf_reshaped$mes))
 mdf_reshaped_r_temp <- subset(mdf_reshaped_r, grepl("temp", mdf_reshaped_r$mes)) # Temp
-names(mdf_reshaped_r_temp)[4] <- paste(mdf_reshaped_r_temp$mes)
+names(mdf_reshaped_r_temp)[5] <- paste(mdf_reshaped_r_temp$mes)
 mdf_reshaped_r_temp <- mdf_reshaped_r_temp %>% select(-c(mes))
 mdf_reshaped_r_spo2 <- subset(mdf_reshaped_r, grepl("sp02", mdf_reshaped_r$mes)) # SpO2
-names(mdf_reshaped_r_spo2)[4] <- paste(mdf_reshaped_r_spo2$mes)
+names(mdf_reshaped_r_spo2)[5] <- paste(mdf_reshaped_r_spo2$mes)
 mdf_reshaped_r_spo2 <- mdf_reshaped_r_spo2 %>% select(-c(mes))
 mdf_reshaped_r_o2 <- subset(mdf_reshaped_r, grepl("_o2", mdf_reshaped_r$mes)) # O2
-names(mdf_reshaped_r_o2)[4] <- paste(mdf_reshaped_r_o2$mes)
+names(mdf_reshaped_r_o2)[5] <- paste(mdf_reshaped_r_o2$mes)
 mdf_reshaped_r_o2 <- mdf_reshaped_r_o2 %>% select(-c(mes))
 mdf_reshaped_r_pr <- subset(mdf_reshaped_r, grepl("pr", mdf_reshaped_r$mes)) # PR
-names(mdf_reshaped_r_pr)[4] <- paste(mdf_reshaped_r_pr$mes)
+names(mdf_reshaped_r_pr)[5] <- paste(mdf_reshaped_r_pr$mes)
 mdf_reshaped_r_pr <- mdf_reshaped_r_pr %>% select(-c(mes))
 mdf_reshaped_r_pi <- subset(mdf_reshaped_r, grepl("pi", mdf_reshaped_r$mes)) # PI
-names(mdf_reshaped_r_pi)[4] <- paste(mdf_reshaped_r_pi$mes)
+names(mdf_reshaped_r_pi)[5] <- paste(mdf_reshaped_r_pi$mes)
 mdf_reshaped_r_pi <- mdf_reshaped_r_pi %>% select(-c(mes))
 mdf_reshaped_r_rr <- subset(mdf_reshaped_r, grepl("rr", mdf_reshaped_r$mes)) # RR
-names(mdf_reshaped_r_rr)[4] <- paste(mdf_reshaped_r_rr$mes)
+names(mdf_reshaped_r_rr)[5] <- paste(mdf_reshaped_r_rr$mes)
 mdf_reshaped_r_rr <- mdf_reshaped_r_rr %>% select(-c(mes))
 ## Join back to one df for recreation of full df
-mdf_reshaped_r <- left_join(mdf_reshaped_r_temp, mdf_reshaped_r_o2, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
-mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_spo2, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
-mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_pr, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
-mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_pi, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
-mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_rr, by = c("ppt_id", "index_device_name", "age_cat", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r_temp, mdf_reshaped_r_o2, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_spo2, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_pr, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_pi, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_rr, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
 # Join index and ref df's back to one melted df
-mdf_reshaped <- left_join(mdf_reshaped_i, mdf_reshaped_r, by = c("ppt_id", "index_device_name", "age_cat", "grp")) #long format df w/index & ref measurements for all devices & measurement types
+mdf_reshaped <- left_join(mdf_reshaped_i, mdf_reshaped_r, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp")) #long format df w/index & ref measurements for all devices & measurement types
 
 # Add indicator variables here for clinical thresholds (long format) -- Note: From the SAP, these are defined for the user in Section 5, if changed here be sure to change there and below
 mdf_reshaped$index_hypoxic <- ifelse(mdf_reshaped$index_o2<90, 1, 0)
 mdf_reshaped$ref_hypoxic <- ifelse(mdf_reshaped$ref_o2<90, 1, 0)
+mdf_reshaped$index_fever <- ifelse(mdf_reshaped$index_temp>37, 1, 0)
+mdf_reshaped$ref_fever <- ifelse(mdf_reshaped$ref_temp>37, 1, 0)
+mdf_reshaped$index_fastbreath_12mo <- ifelse(mdf_reshaped$index_rr>49 & mdf_reshaped$age_months<12, 1, 0)
+mdf_reshaped$ref_fastbreath_12mo <- ifelse(mdf_reshaped$ref_rr>49 & mdf_reshaped$age_months<12, 1, 0)
+mdf_reshaped$index_fastbreath_35mo <- ifelse(mdf_reshaped$index_rr>39 & (mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36), 1, 0)
+mdf_reshaped$ref_fastbreath_35mo <- ifelse(mdf_reshaped$ref_rr>39 & (mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36), 1, 0)
+mdf_reshaped$index_fastbreath_59mo <- ifelse(mdf_reshaped$index_rr>29 & (mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60), 1, 0)
+mdf_reshaped$ref_fastbreath_59mo <- ifelse(mdf_reshaped$ref_rr>29 & (mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60), 1, 0)
+mdf_reshaped$index_tachycardic_12mo <- ifelse(mdf_reshaped$index_pr>179 & mdf_reshaped$age_months<12, 1, 0)
+mdf_reshaped$ref_tachycardic_12mo <- ifelse(mdf_reshaped$ref_pr>179 & mdf_reshaped$age_months<12, 1, 0)
+mdf_reshaped$index_tachycardic_59mo <- ifelse(mdf_reshaped$index_pr>139 & mdf_reshaped$age_months>11, 1, 0)
+mdf_reshaped$ref_tachycardic_59mo <- ifelse(mdf_reshaped$ref_pr>139 & mdf_reshaped$age_months>11, 1, 0)
 
-
+# --- SECTION 2: CREATING DEVICE DF'S
 # Create a df for each device (in both wide and long format) -- note: any variable formatting (e.g., converting to factors) or additional variable creation should happen prior to creating these little dataframes
 
 ## Long format (M1-M3 are levels of one variable)
@@ -129,8 +142,53 @@ df_scan_l <- subset(mdf_reshaped, index_device_name=="Scanbo v8 (Scanbo)")
 df_scan_cat3_l <- subset(df_scan_l, age_cat=="12-59 months")
 
 # Add indicator variables here for clinical thresholds (wide format), each measurement -- Note: From the SAP, these are defined for the user in Section 5, if changed here be sure to change there and above
+## M1
+df_og$m1_index_hypoxic <- ifelse(df_og$m1_index_o2<90, 1, 0)
+df_og$m1_ref_hypoxic <- ifelse(df_og$m1_ref_o2<90, 1, 0)
+df_og$m1_index_fever <- ifelse(df_og$m1_index_temp>37, 1, 0)
+df_og$m1_ref_fever <- ifelse(df_og$m1_them_skin_temp>37, 1, 0)
+df_og$m1_index_fastbreath_12mo <- ifelse(df_og$m1_index_rr>49 & df_og$age_months<12, 1, 0)
+df_og$m1_ref_fastbreath_12mo <- ifelse(df_og$m1_ref_rracoustic>49 & df_og$age_months<12, 1, 0)
+df_og$m1_index_fastbreath_35mo <- ifelse(df_og$m1_index_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
+df_og$m1_ref_fastbreath_35mo <- ifelse(df_og$m1_ref_rracoustic>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
+df_og$m1_index_fastbreath_59mo <- ifelse(df_og$m1_index_rr>29 & (df_og$age_months>35 & df_og$age_months<60), 1, 0)
+df_og$m1_ref_fastbreath_59mo <- ifelse(df_og$m1_ref_rracoustic>29 & (df_og$age_months>35 & df_og$age_months<60), 1, 0)
+df_og$m1_index_tachycardic_12mo <- ifelse(df_og$m1_index_pr>179 & df_og$age_months<12, 1, 0)
+df_og$m1_ref_tachycardic_12mo <- ifelse(df_og$m1_ref_pr>179 & df_og$age_months<12, 1, 0)
+df_og$m1_index_tachycardic_59mo <- ifelse(df_og$m1_index_pr>139 & df_og$age_months>11, 1, 0)
+df_og$m1_ref_tachycardic_59mo <- ifelse(df_og$m1_ref_pr>139 & df_og$age_months>11, 1, 0)
+## M2
+df_og$m2_index_hypoxic <- ifelse(df_og$m2_index_o2<90, 1, 0)
+df_og$m2_ref_hypoxic <- ifelse(df_og$m2_ref_o2<90, 1, 0)
+df_og$m2_index_fever <- ifelse(df_og$m2_index_temp>37, 1, 0)
+df_og$m2_ref_fever <- ifelse(df_og$m2_them_skin_temp>37, 1, 0)
+df_og$m2_index_fastbreath_12mo <- ifelse(df_og$m2_index_rr>49 & df_og$age_months<12, 1, 0)
+df_og$m2_ref_fastbreath_12mo <- ifelse(df_og$m2_ref_rracoustic>49 & df_og$age_months<12, 1, 0)
+df_og$m2_index_fastbreath_35mo <- ifelse(df_og$m2_index_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
+df_og$m2_ref_fastbreath_35mo <- ifelse(df_og$m2_ref_rracoustic>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
+df_og$m2_index_fastbreath_59mo <- ifelse(df_og$m2_index_rr>29 & (df_og$age_months>35 & df_og$age_months<60), 1, 0)
+df_og$m2_ref_fastbreath_59mo <- ifelse(df_og$m2_ref_rracoustic>29 & (df_og$age_months>35 & df_og$age_months<60), 1, 0)
+df_og$m2_index_tachycardic_12mo <- ifelse(df_og$m2_index_pr>179 & df_og$age_months<12, 1, 0)
+df_og$m2_ref_tachycardic_12mo <- ifelse(df_og$m2_ref_pr>179 & df_og$age_months<12, 1, 0)
+df_og$m2_index_tachycardic_59mo <- ifelse(df_og$m2_index_pr>139 & df_og$age_months>11, 1, 0)
+df_og$m2_ref_tachycardic_59mo <- ifelse(df_og$m2_ref_pr>139 & df_og$age_months>11, 1, 0)
+## M3
+df_og$m3_index_hypoxic <- ifelse(df_og$m3_index_o2<90, 1, 0)
+df_og$m3_ref_hypoxic <- ifelse(df_og$m3_ref_o2<90, 1, 0)
+df_og$m3_index_fever <- ifelse(df_og$m3_index_temp>37, 1, 0)
+df_og$m3_ref_fever <- ifelse(df_og$m3_them_skin_temp>37, 1, 0)
+df_og$m3_index_fastbreath_12mo <- ifelse(df_og$m3_index_rr>49 & df_og$age_months<12, 1, 0)
+df_og$m3_ref_fastbreath_12mo <- ifelse(df_og$m3_ref_rracoustic>49 & df_og$age_months<12, 1, 0)
+df_og$m3_index_fastbreath_35mo <- ifelse(df_og$m3_index_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
+df_og$m3_ref_fastbreath_35mo <- ifelse(df_og$m3_ref_rracoustic>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
+df_og$m3_index_fastbreath_59mo <- ifelse(df_og$m3_index_rr>29 & (df_og$age_months>35 & df_og$age_months<60), 1, 0)
+df_og$m3_ref_fastbreath_59mo <- ifelse(df_og$m3_ref_rracoustic>29 & (df_og$age_months>35 & df_og$age_months<60), 1, 0)
+df_og$m3_index_tachycardic_12mo <- ifelse(df_og$m3_index_pr>179 & df_og$age_months<12, 1, 0)
+df_og$m3_ref_tachycardic_12mo <- ifelse(df_og$m3_ref_pr>179 & df_og$age_months<12, 1, 0)
+df_og$m3_index_tachycardic_59mo <- ifelse(df_og$m3_index_pr>139 & df_og$age_months>11, 1, 0)
+df_og$m3_ref_tachycardic_59mo <- ifelse(df_og$m3_ref_pr>139 & df_og$age_months>11, 1, 0)
 
-## Wide format (M1-M3 are variables)
+## Wide format device df's (M1-M3 are variables)
 df_radg_w <- subset(df_og, index_device_name=="Rad-G Temp (Masimo)")
 df_radg_cat1_w <- subset(df_radg_w, age_cat=="0-1 month")
 df_radg_cat2_w <- subset(df_radg_w, age_cat=="2-11 months")
@@ -158,7 +216,7 @@ This report contains data from *`r COUNTRY`*.
 
 # Section 1: Participant Characteristics {.tabset}
 Leila
-Table 1: Participant Characteristics Overall and by Facility
+## Table 1: Participant Characteristics Overall and by Facility
 ```{r echo=FALSE, include=FALSE}
 # consider using the CreateTableOne function from the tableone package, example:
 ## Define row labels (optional): t1lab <- c("N", "Age category", "Sex = Male (%)", ...)
@@ -308,6 +366,20 @@ CreateTableOne(vars = myVars,
                strata = "facility_name")
 ```
 
+## List of free responses entered for 'other' fields {.tabset}
+
+### Symptoms
+```{r echo=FALSE}
+df_og[df_og$ill_sxs_other==1,c("ppt_id", "visit_reason_ill_sxs_oth")]
+```
+### Diagnosis
+```{r echo=FALSE}
+df_og[df_og$dx_other==1,c("ppt_id", "reported_dx_oth")]
+```
+### Treatment
+```{r echo=FALSE}
+df_og[df_og$tx_other==1,c("ppt_id", "reported_tx_oth")]
+```
 
 # Section 2: Measurement Characteristics & Precision {.tabset}
 Leila
@@ -660,9 +732,9 @@ Samwel
 Clinical thresholds used in the section are as follows:
 
 - Hypoxemia: <90%
-- Fast breathing: <12 months 50 bpm; 12-35 months 40 bpm; 36-60 months 30 bpm
-- Tachycardia: <12 months 180 bpm; 12-60 months 140 bpm
-- Fever: ≥100.4F | 38C
+- Fast breathing: <12 months (>49 bpm); 12-35 months (>39 bpm); 36-60 months (>29 bpm)
+- Tachycardia: <12 months (>179 bpm); 12-60 months (>139 bpm)
+- Fever: >37C (≥100.4F)
 
 ```{r echo=FALSE, include=FALSE}
 # @ Samwel, I didn't get as far on this as I'd hoped but I did get the data structured properly -- for the 2x2's, we'll want to use the long format so we can look at all the measurements together. For the percent agreement, we'll want to calculate for each M1-M3 separately and then look at them all in the same table -- let me know if you want me to take that section since I know you're quite busy with the data from the main TIMCI study. I'll have some time Monday/Tuesday next week to work on this as well if that would be helpful!
