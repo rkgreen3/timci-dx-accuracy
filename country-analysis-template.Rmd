@@ -115,6 +115,12 @@ mdf_reshaped$index_tachycardic_12mo <- ifelse(mdf_reshaped$index_pr>179 & mdf_re
 mdf_reshaped$ref_tachycardic_12mo <- ifelse(mdf_reshaped$ref_pr>179 & mdf_reshaped$age_months<12, 1, 0)
 mdf_reshaped$index_tachycardic_59mo <- ifelse(mdf_reshaped$index_pr>139 & mdf_reshaped$age_months>11, 1, 0)
 mdf_reshaped$ref_tachycardic_59mo <- ifelse(mdf_reshaped$ref_pr>139 & mdf_reshaped$age_months>11, 1, 0)
+# Add clinical age categories for fast breathing and tachycardic
+mdf_reshaped$age_cat_tachy <- ifelse(mdf_reshaped$age_months<12, "0-11 months", "12-59 months")
+mdf_reshaped$age_cat_fastbreathe <- case_when(mdf_reshaped$age_months<12 ~ "0-11 months",
+                                              mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 ~ "12-35 months",
+                                              mdf_reshaped$age_months>35 ~ "36-59 months")
+mdf_reshaped$grp <- as.factor(mdf_reshaped$grp)
 
 # --- SECTION 2: CREATING DEVICE DF'S
 # Create a df for each device (in both wide and long format) -- note: any variable formatting (e.g., converting to factors) or additional variable creation should happen prior to creating these little dataframes
@@ -124,29 +130,50 @@ df_radg_l <- subset(mdf_reshaped, index_device_name=="Rad-G Temp (Masimo)")
 df_radg_cat1_l <- subset(df_radg_l, age_cat=="0-1 month")
 df_radg_cat2_l <- subset(df_radg_l, age_cat=="2-11 months")
 df_radg_cat3_l <- subset(df_radg_l, age_cat=="12-59 months")
+df_radg_cat1tachy_l <- subset(df_radg_l, age_cat_tachy=="0-11 months")
+df_radg_cat2tachy_l <- subset(df_radg_l, age_cat_tachy=="12-59 months")
+df_radg_cat1fb_l <- subset(df_radg_l, age_cat_fastbreathe=="0-11 months")
+df_radg_cat2fb_l <- subset(df_radg_l, age_cat_fastbreathe=="12-35 months")
+df_radg_cat3fb_l <- subset(df_radg_l, age_cat_fastbreathe=="36-59 months")
 
 df_bio_l <- subset(mdf_reshaped, index_device_name=="m800 (Biolight)")
 df_bio_cat1_l <- subset(df_bio_l, age_cat=="0-1 month")
 df_bio_cat2_l <- subset(df_bio_l, age_cat=="2-11 months")
 df_bio_cat3_l <- subset(df_bio_l, age_cat=="12-59 months")
+df_bio_cat1tachy_l <- subset(df_bio_l, age_cat_tachy=="0-11 months")
+df_bio_cat2tachy_l <- subset(df_bio_l, age_cat_tachy=="12-59 months")
+df_bio_cat1fb_l <- subset(df_bio_l, age_cat_fastbreathe=="0-11 months")
+df_bio_cat2fb_l <- subset(df_bio_l, age_cat_fastbreathe=="12-35 months")
+df_bio_cat3fb_l <- subset(df_bio_l, age_cat_fastbreathe=="36-59 months")
 
 df_neo_l <- subset(mdf_reshaped, index_device_name=="NeoGuard (Neopenda)")
 df_neo_cat1_l <- subset(df_neo_l, age_cat=="0-1 month")
 df_neo_cat2_l <- subset(df_neo_l, age_cat=="2-11 months")
 df_neo_cat3_l <- subset(df_neo_l, age_cat=="12-59 months")
+df_neo_cat1tachy_l <- subset(df_neo_l, age_cat_tachy=="0-11 months")
+df_neo_cat2tachy_l <- subset(df_neo_l, age_cat_tachy=="12-59 months")
+df_neo_cat1fb_l <- subset(df_neo_l, age_cat_fastbreathe=="0-11 months")
+df_neo_cat2fb_l <- subset(df_neo_l, age_cat_fastbreathe=="12-35 months")
+df_neo_cat3fb_l <- subset(df_neo_l, age_cat_fastbreathe=="36-59 months")
 
 df_onyx_l <- subset(mdf_reshaped, index_device_name=="Onyx PO+RR (Nonin)")
 df_onyx_cat3_l <- subset(df_onyx_l, age_cat=="12-59 months")
+df_onyx_cat2tachy_l <- subset(df_onyx_l, age_cat_tachy=="12-59 months")
+df_onyx_cat2fb_l <- subset(df_onyx_l, age_cat_fastbreathe=="12-35 months")
+df_onyx_cat3fb_l <- subset(df_onyx_l, age_cat_fastbreathe=="36-59 months")
 
 df_scan_l <- subset(mdf_reshaped, index_device_name=="Scanbo v8 (Scanbo)")
 df_scan_cat3_l <- subset(df_scan_l, age_cat=="12-59 months")
+df_scan_cat2tachy_l <- subset(df_scan_l, age_cat_tachy=="12-59 months")
+df_scan_cat2fb_l <- subset(df_scan_l, age_cat_fastbreathe=="12-35 months")
+df_scan_cat3fb_l <- subset(df_scan_l, age_cat_fastbreathe=="36-59 months")
 
 # Add indicator variables here for clinical thresholds (wide format), each measurement -- Note: From the SAP, these are defined for the user in Section 5, if changed here be sure to change there and above
 ## M1
 df_og$m1_index_hypoxic <- ifelse(df_og$m1_index_o2<90, 1, 0)
 df_og$m1_ref_hypoxic <- ifelse(df_og$m1_ref_o2<90, 1, 0)
 df_og$m1_index_fever <- ifelse(df_og$m1_index_temp>37, 1, 0)
-df_og$m1_ref_fever <- ifelse(df_og$m1_them_skin_temp>37, 1, 0)
+df_og$m1_ref_fever <- ifelse(df_og$m1_therm_skin_temp>37, 1, 0)
 df_og$m1_index_fastbreath_12mo <- ifelse(df_og$m1_index_rr>49 & df_og$age_months<12, 1, 0)
 df_og$m1_ref_fastbreath_12mo <- ifelse(df_og$m1_ref_rracoustic>49 & df_og$age_months<12, 1, 0)
 df_og$m1_index_fastbreath_35mo <- ifelse(df_og$m1_index_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
@@ -161,7 +188,7 @@ df_og$m1_ref_tachycardic_59mo <- ifelse(df_og$m1_ref_pr>139 & df_og$age_months>1
 df_og$m2_index_hypoxic <- ifelse(df_og$m2_index_o2<90, 1, 0)
 df_og$m2_ref_hypoxic <- ifelse(df_og$m2_ref_o2<90, 1, 0)
 df_og$m2_index_fever <- ifelse(df_og$m2_index_temp>37, 1, 0)
-df_og$m2_ref_fever <- ifelse(df_og$m2_them_skin_temp>37, 1, 0)
+df_og$m2_ref_fever <- ifelse(df_og$m2_therm_skin_temp>37, 1, 0)
 df_og$m2_index_fastbreath_12mo <- ifelse(df_og$m2_index_rr>49 & df_og$age_months<12, 1, 0)
 df_og$m2_ref_fastbreath_12mo <- ifelse(df_og$m2_ref_rracoustic>49 & df_og$age_months<12, 1, 0)
 df_og$m2_index_fastbreath_35mo <- ifelse(df_og$m2_index_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
@@ -176,7 +203,7 @@ df_og$m2_ref_tachycardic_59mo <- ifelse(df_og$m2_ref_pr>139 & df_og$age_months>1
 df_og$m3_index_hypoxic <- ifelse(df_og$m3_index_o2<90, 1, 0)
 df_og$m3_ref_hypoxic <- ifelse(df_og$m3_ref_o2<90, 1, 0)
 df_og$m3_index_fever <- ifelse(df_og$m3_index_temp>37, 1, 0)
-df_og$m3_ref_fever <- ifelse(df_og$m3_them_skin_temp>37, 1, 0)
+df_og$m3_ref_fever <- ifelse(df_og$m3_therm_skin_temp>37, 1, 0)
 df_og$m3_index_fastbreath_12mo <- ifelse(df_og$m3_index_rr>49 & df_og$age_months<12, 1, 0)
 df_og$m3_ref_fastbreath_12mo <- ifelse(df_og$m3_ref_rracoustic>49 & df_og$age_months<12, 1, 0)
 df_og$m3_index_fastbreath_35mo <- ifelse(df_og$m3_index_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
@@ -187,35 +214,62 @@ df_og$m3_index_tachycardic_12mo <- ifelse(df_og$m3_index_pr>179 & df_og$age_mont
 df_og$m3_ref_tachycardic_12mo <- ifelse(df_og$m3_ref_pr>179 & df_og$age_months<12, 1, 0)
 df_og$m3_index_tachycardic_59mo <- ifelse(df_og$m3_index_pr>139 & df_og$age_months>11, 1, 0)
 df_og$m3_ref_tachycardic_59mo <- ifelse(df_og$m3_ref_pr>139 & df_og$age_months>11, 1, 0)
+# Add clinical age categories for fast breathing and tachycardic
+df_og$age_cat_tachy <- ifelse(df_og$age_months<12, "0-11 months", "12-59 months")
+df_og$age_cat_fastbreathe <- case_when(df_og$age_months<12 ~ "0-11 months",
+                                        df_og$age_months>11 & df_og$age_months<36 ~ "12-35 months",
+                                        df_og$age_months>35 ~ "36-59 months")
 
 ## Wide format device df's (M1-M3 are variables)
 df_radg_w <- subset(df_og, index_device_name=="Rad-G Temp (Masimo)")
 df_radg_cat1_w <- subset(df_radg_w, age_cat=="0-1 month")
 df_radg_cat2_w <- subset(df_radg_w, age_cat=="2-11 months")
 df_radg_cat3_w <- subset(df_radg_w, age_cat=="12-59 months")
+df_radg_cat1tachy_w <- subset(df_radg_w, age_cat_tachy=="0-11 months")
+df_radg_cat2tachy_w <- subset(df_radg_w, age_cat_tachy=="12-59 months")
+df_radg_cat1fb_w <- subset(df_radg_w, age_cat_fastbreathe=="0-11 months")
+df_radg_cat2fb_w <- subset(df_radg_w, age_cat_fastbreathe=="12-35 months")
+df_radg_cat3fb_w <- subset(df_radg_w, age_cat_fastbreathe=="36-59 months")
 
 df_bio_w <- subset(df_og, index_device_name=="m800 (Biolight)")
 df_bio_cat1_w <- subset(df_bio_w, age_cat=="0-1 month")
 df_bio_cat2_w <- subset(df_bio_w, age_cat=="2-11 months")
 df_bio_cat3_w <- subset(df_bio_w, age_cat=="12-59 months")
+df_bio_cat1tachy_w <- subset(df_bio_w, age_cat_tachy=="0-11 months")
+df_bio_cat2tachy_w <- subset(df_bio_w, age_cat_tachy=="12-59 months")
+df_bio_cat1fb_w <- subset(df_bio_w, age_cat_fastbreathe=="0-11 months")
+df_bio_cat2fb_w <- subset(df_bio_w, age_cat_fastbreathe=="12-35 months")
+df_bio_cat3fb_w <- subset(df_bio_w, age_cat_fastbreathe=="36-59 months")
 
 df_neo_w <- subset(df_og, index_device_name=="NeoGuard (Neopenda)")
 df_neo_cat1_w <- subset(df_neo_w, age_cat=="0-1 month")
 df_neo_cat2_w <- subset(df_neo_w, age_cat=="2-11 months")
 df_neo_cat3_w <- subset(df_neo_w, age_cat=="12-59 months")
+df_neo_cat1tachy_w <- subset(df_neo_w, age_cat_tachy=="0-11 months")
+df_neo_cat2tachy_w <- subset(df_neo_w, age_cat_tachy=="12-59 months")
+df_neo_cat1fb_w <- subset(df_neo_w, age_cat_fastbreathe=="0-11 months")
+df_neo_cat2fb_w <- subset(df_neo_w, age_cat_fastbreathe=="12-35 months")
+df_neo_cat3fb_w <- subset(df_neo_w, age_cat_fastbreathe=="36-59 months")
 
 df_onyx_w <- subset(df_og, index_device_name=="Onyx PO+RR (Nonin)")
 df_onyx_cat3_w <- subset(df_onyx_w, age_cat=="12-59 months")
+df_onyx_cat2tachy_w <- subset(df_onyx_w, age_cat_tachy=="12-59 months")
+df_onyx_cat2fb_w <- subset(df_onyx_w, age_cat_fastbreathe=="12-35 months")
+df_onyx_cat3fb_w <- subset(df_onyx_w, age_cat_fastbreathe=="36-59 months")
 
 df_scan_w <- subset(df_og, index_device_name=="Scanbo v8 (Scanbo)")
 df_scan_cat3_w <- subset(df_scan_w, age_cat=="12-59 months")
+df_scan_cat2tachy_w <- subset(df_scan_w, age_cat_tachy=="12-59 months")
+df_scan_cat2fb_w <- subset(df_scan_w, age_cat_fastbreathe=="12-35 months")
+df_scan_cat3fb_w <- subset(df_scan_w, age_cat_fastbreathe=="36-59 months")
 
 ```
 
-This report contains data from *`r COUNTRY`*.
+This report contains data from **`r COUNTRY`**.
 
 # Section 1: Participant Characteristics {.tabset}
 Leila
+
 ## Table 1: Participant Characteristics Overall and by Facility
 ```{r echo=FALSE, include=FALSE}
 # consider using the CreateTableOne function from the tableone package, example:
@@ -244,68 +298,68 @@ Leila
 
 ## Convert categorical variables into factors
 
-df_og$age_cat <- factor(df_og$age_cat,levels = c(1,2,3),
-                        labels = c("0-1 month","2-11 months","12-59 months"))
-df_og$sex <- factor(df_og$sex, levels = c(0,1),
-                    labels = c("Male","Female"))
-df_og$cg_relationship <- factor(df_og$cg_relationship, levels = c(1,2,3,4,5,6,7,8,9,10),
-                                labels = c("Mother and Father","Mother and Grandmother","Mother only",
-                                           "Father only", "Grandmother only","Grandfather only","Sibling",
-                                           "Other family member","Community member", "Other"))
-df_og$visit_rsn_illness <- factor(df_og$visit_rsn_illness,levels = c(0,1), 
-                                 labels =c("FALSE","TRUE")) #Visited due to illness
-df_og$visit_reason___2 <- factor(df_og$visit_reason___2,levels = c(0,1),
-                                 labels =c("FALSE","TRUE")) #Visited due to immunization
-df_og$visit_reason___3 <- factor(df_og$visit_reason___3,levels = c(0,1),
-                                 labels =c("FALSE","TRUE")) #Visited due to routine monitoring
-df_og$visit_reason___4 <- factor(df_og$visit_reason___4,levels = c(0,1),
-                                 labels =c("FALSE","TRUE")) #Visited due to trauma
-df_og$visit_reason___5 <- factor(df_og$visit_reason___5,levels = c(0,1),
-                                 labels =c("FALSE","TRUE")) #Visited due to admission at the facility
-df_og$visit_reason_ill_sxs___1 <- factor(df_og$visit_reason_ill_sxs___1,levels = c(0,1),
-                                         labels =c("FALSE","TRUE")) #Cough
-df_og$visit_reason_ill_sxs___2 <- factor(df_og$visit_reason_ill_sxs___2,levels = c(0,1),
-                                         labels =c("FALSE","TRUE")) #Difficulty/rapid breathing
-df_og$visit_reason_ill_sxs___3 <- factor(df_og$visit_reason_ill_sxs___3,levels = c(0,1),
-                                         labels =c("FALSE","TRUE")) #Fever
-df_og$visit_reason_ill_sxs___4 <- factor(df_og$visit_reason_ill_sxs___4,levels = c(0,1),
-                                         labels =c("FALSE","TRUE")) #Diarrhea
-df_og$visit_reason_ill_sxs___5 <- factor(df_og$visit_reason_ill_sxs___5,levels = c(0,1),
-                                         labels =c("FALSE","TRUE")) #Vomiting
-df_og$visit_reason_ill_sxs___6 <- factor(df_og$visit_reason_ill_sxs___6,levels = c(0,1),
-                                         labels =c("FALSE","TRUE")) ##Other
-df_og$received_dx <- factor(df_og$received_dx,levels = c(0,1),
-                            labels = c("FALSE","TRUE")) #was a diagnosis received
-df_og$reported_dx___1 <- factor(df_og$reported_dx___1,levels = c(0,1),
-                                labels =c("FALSE","TRUE")) #Dehydration
-df_og$reported_dx___2 <- factor(df_og$reported_dx___2,levels = c(0,1),
-                                labels =c("FALSE","TRUE")) #Respiratory
-df_og$reported_dx___3 <- factor(df_og$reported_dx___3,levels = c(0,1),
-                                labels =c("FALSE","TRUE")) #Digestive
-df_og$reported_dx___4 <- factor(df_og$reported_dx___4,levels = c(0,1),
-                                labels =c("FALSE","TRUE")) #Malaria
-df_og$reported_dx___5 <- factor(df_og$reported_dx___5,levels = c(0,1),
-                                labels =c("FALSE","TRUE")) #Fever
-df_og$reported_dx___6 <- factor(df_og$reported_dx___6,levels = c(0,1),
-                                labels =c("FALSE","TRUE")) #Measles
-df_og$reported_dx___7 <- factor(df_og$reported_dx___7,levels = c(0,1),
-                                labels =c("FALSE","TRUE")) #Ear infection
-df_og$reported_dx___8 <- factor(df_og$reported_dx___8,levels = c(0,1),
-                                labels =c("FALSE","TRUE")) #Throat infection
-df_og$reported_dx___9 <- factor(df_og$reported_dx___9,levels = c(0,1),
-                                labels =c("FALSE","TRUE")) #Other
-df_og$recieved_txt <- factor(df_og$recieved_txt, levels = c(0,1),
-                             labels = c("FALSE", "TRUE"))
-df_og$reported_tx___1 <- factor(df_og$reported_tx___1, levels = c(0, 1),
-                                labels = c("FALSE", "TRUE"))
-df_og$reported_tx___2 <- factor(df_og$reported_tx___2, levels = c(0, 1),
-                                labels = c("FALSE", "TRUE"))
-df_og$reported_tx___3 <- factor(df_og$reported_tx___3, levels = c(0, 1),
-                                labels = c("FALSE", "TRUE"))
-df_og$reported_tx___4 <- factor(df_og$reported_tx___4, levels = c(0, 1),
-                                labels = c("FALSE", "TRUE"))
-df_og$reported_tx___5 <- factor(df_og$reported_tx___5, levels = c(0, 1),
-                                labels = c("FALSE", "TRUE"))
+# df_og$age_cat <- factor(df_og$age_cat,levels = c(1,2,3),
+#                         labels = c("0-1 month","2-11 months","12-59 months"))
+# df_og$sex <- factor(df_og$sex, levels = c(0,1),
+#                     labels = c("Male","Female"))
+# df_og$cg_relationship <- factor(df_og$cg_relationship, levels = c(1,2,3,4,5,6,7,8,9,10),
+#                                 labels = c("Mother and Father","Mother and Grandmother","Mother only",
+#                                            "Father only", "Grandmother only","Grandfather only","Sibling",
+#                                            "Other family member","Community member", "Other"))
+# df_og$visit_rsn_illness <- factor(df_og$visit_rsn_illness,levels = c(0,1), 
+#                                  labels =c("FALSE","TRUE")) #Visited due to illness
+# df_og$visit_reason___2 <- factor(df_og$visit_reason___2,levels = c(0,1),
+#                                  labels =c("FALSE","TRUE")) #Visited due to immunization
+# df_og$visit_reason___3 <- factor(df_og$visit_reason___3,levels = c(0,1),
+#                                  labels =c("FALSE","TRUE")) #Visited due to routine monitoring
+# df_og$visit_reason___4 <- factor(df_og$visit_reason___4,levels = c(0,1),
+#                                  labels =c("FALSE","TRUE")) #Visited due to trauma
+# df_og$visit_reason___5 <- factor(df_og$visit_reason___5,levels = c(0,1),
+#                                  labels =c("FALSE","TRUE")) #Visited due to admission at the facility
+# df_og$visit_reason_ill_sxs___1 <- factor(df_og$visit_reason_ill_sxs___1,levels = c(0,1),
+#                                          labels =c("FALSE","TRUE")) #Cough
+# df_og$visit_reason_ill_sxs___2 <- factor(df_og$visit_reason_ill_sxs___2,levels = c(0,1),
+#                                          labels =c("FALSE","TRUE")) #Difficulty/rapid breathing
+# df_og$visit_reason_ill_sxs___3 <- factor(df_og$visit_reason_ill_sxs___3,levels = c(0,1),
+#                                          labels =c("FALSE","TRUE")) #Fever
+# df_og$visit_reason_ill_sxs___4 <- factor(df_og$visit_reason_ill_sxs___4,levels = c(0,1),
+#                                          labels =c("FALSE","TRUE")) #Diarrhea
+# df_og$visit_reason_ill_sxs___5 <- factor(df_og$visit_reason_ill_sxs___5,levels = c(0,1),
+#                                          labels =c("FALSE","TRUE")) #Vomiting
+# df_og$visit_reason_ill_sxs___6 <- factor(df_og$visit_reason_ill_sxs___6,levels = c(0,1),
+#                                          labels =c("FALSE","TRUE")) ##Other
+# df_og$received_dx <- factor(df_og$received_dx,levels = c(0,1),
+#                             labels = c("FALSE","TRUE")) #was a diagnosis received
+# df_og$reported_dx___1 <- factor(df_og$reported_dx___1,levels = c(0,1),
+#                                 labels =c("FALSE","TRUE")) #Dehydration
+# df_og$reported_dx___2 <- factor(df_og$reported_dx___2,levels = c(0,1),
+#                                 labels =c("FALSE","TRUE")) #Respiratory
+# df_og$reported_dx___3 <- factor(df_og$reported_dx___3,levels = c(0,1),
+#                                 labels =c("FALSE","TRUE")) #Digestive
+# df_og$reported_dx___4 <- factor(df_og$reported_dx___4,levels = c(0,1),
+#                                 labels =c("FALSE","TRUE")) #Malaria
+# df_og$reported_dx___5 <- factor(df_og$reported_dx___5,levels = c(0,1),
+#                                 labels =c("FALSE","TRUE")) #Fever
+# df_og$reported_dx___6 <- factor(df_og$reported_dx___6,levels = c(0,1),
+#                                 labels =c("FALSE","TRUE")) #Measles
+# df_og$reported_dx___7 <- factor(df_og$reported_dx___7,levels = c(0,1),
+#                                 labels =c("FALSE","TRUE")) #Ear infection
+# df_og$reported_dx___8 <- factor(df_og$reported_dx___8,levels = c(0,1),
+#                                 labels =c("FALSE","TRUE")) #Throat infection
+# df_og$reported_dx___9 <- factor(df_og$reported_dx___9,levels = c(0,1),
+#                                 labels =c("FALSE","TRUE")) #Other
+# df_og$recieved_txt <- factor(df_og$recieved_txt, levels = c(0,1),
+#                              labels = c("FALSE", "TRUE"))
+# df_og$reported_tx___1 <- factor(df_og$reported_tx___1, levels = c(0, 1),
+#                                 labels = c("FALSE", "TRUE"))
+# df_og$reported_tx___2 <- factor(df_og$reported_tx___2, levels = c(0, 1),
+#                                 labels = c("FALSE", "TRUE"))
+# df_og$reported_tx___3 <- factor(df_og$reported_tx___3, levels = c(0, 1),
+#                                 labels = c("FALSE", "TRUE"))
+# df_og$reported_tx___4 <- factor(df_og$reported_tx___4, levels = c(0, 1),
+#                                 labels = c("FALSE", "TRUE"))
+# df_og$reported_tx___5 <- factor(df_og$reported_tx___5, levels = c(0, 1),
+#                                 labels = c("FALSE", "TRUE"))
 
 ## Create an object "cat_var" with all categorical variables
 
@@ -360,10 +414,10 @@ myVars <- c("age_cat", "sex","cg_relationship",
 
 ## Use CreateTableOne function to generate output
 
-CreateTableOne(vars = myVars,
-               data = df_og,
-               factorVars = cat_var,
-               strata = "facility_name")
+#CreateTableOne(vars = myVars,
+#               data = df_og,
+#               factorVars = cat_var,
+ #              strata = "facility_name")
 ```
 
 ## List of free responses entered for 'other' fields {.tabset}
@@ -407,28 +461,67 @@ Leila
 # Section 3: Bland Altman Plots {.tabset}
 Anmol
 
--- RG Note: let's see if we can find a way to get M1, M2, and M3 all on the same plot and perhaps distinguish them by color?
-Example code:
 ```{r}
-# @Anmol - I think I found a solution to get all the measurements on one plot...it required reshaping the data, which I added to the beginning prep section of the document. There are now both long and wide formats of the data, and if we use the long format for the plots and switch the graphical system to base instead of ggplot, it seems like it will work -- see sample code below
-
-bland.altman.plot(m_tdf$ref_o2, m_tdf$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (0-1 month)", col = c("black", "blue", "green"), pch=19)
-legend("topleft", legend = levels(m_tdf$grp), col = c("black", "blue", "green"), pch = 19)
-
+# @Anmol - I think I found a solution to get all the measurements on one plot...it required reshaping the data, which I added to the beginning prep section of the document. There are now both long and wide formats of the data, and if we use the long format for the plots and switch the graphical system to base instead of ggplot, it seems like it will work -- see Rad-G code below
 ```
 
 ## Rad-G Temp (Masimo) {.tabset}
-```{r echo=FALSE, include=FALSE}
-
-```
 
 ### Temperature
+```{r echo=FALSE, results='hide', fig.keep='last'}
+bland.altman.plot(df_radg_cat1_l$ref_temp, df_radg_cat1_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Temperature (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=19)
+legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+```
+```{r echo=FALSE, results='hide', fig.keep='last'}
+bland.altman.plot(df_radg_cat2_l$ref_temp, df_radg_cat2_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Temperature (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=19)
+legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+```
+```{r echo=FALSE, results='hide', fig.keep='last'}
+bland.altman.plot(df_radg_cat3_l$ref_temp, df_radg_cat3_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Temperature (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=19)
+legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+```
 
 ### Oxygen
+```{r echo=FALSE, results='hide', fig.keep='last'}
+bland.altman.plot(df_radg_cat1_l$ref_o2, df_radg_cat1_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=19)
+legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+```
+```{r echo=FALSE, results='hide', fig.keep='last'}
+bland.altman.plot(df_radg_cat2_l$ref_o2, df_radg_cat2_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=19)
+legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+```
+```{r echo=FALSE, results='hide', fig.keep='last'}
+bland.altman.plot(df_radg_cat3_l$ref_o2, df_radg_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=19)
+legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+```
 
 ### Profusion Index
+```{r echo=FALSE, results='hide', fig.keep='last'}
+bland.altman.plot(df_radg_cat1_l$ref_pi, df_radg_cat1_l$index_pi, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Profusion Index (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=19)
+legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+```
+```{r echo=FALSE, results='hide', fig.keep='last'}
+bland.altman.plot(df_radg_cat2_l$ref_pi, df_radg_cat2_l$index_pi, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Profusion Index (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=19)
+legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+```
+```{r echo=FALSE, results='hide', fig.keep='last'}
+bland.altman.plot(df_radg_cat3_l$ref_pi, df_radg_cat3_l$index_pi, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Profusion Index (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=19)
+legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+```
 
 ### Pulse Rate
+```{r echo=FALSE, results='hide', fig.keep='last'}
+bland.altman.plot(df_radg_cat1_l$ref_pr, df_radg_cat1_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Pulse Rate (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=19)
+legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+```
+```{r echo=FALSE, results='hide', fig.keep='last'}
+bland.altman.plot(df_radg_cat2_l$ref_pr, df_radg_cat2_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Pulse Rate (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=19)
+legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+```
+```{r echo=FALSE, results='hide', fig.keep='last'}
+bland.altman.plot(df_radg_cat3_l$ref_pr, df_radg_cat3_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Pulse Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=19)
+legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+```
 
 ### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
 
@@ -458,7 +551,7 @@ legend("topleft", legend = levels(m_tdf$grp), col = c("black", "blue", "green"),
 
 ## Onyx PO+RR (Nonin) {.tabset}
 ```{r echo=FALSE, include=FALSE}
-df <- df_onyx
+
 ```
 
 ## Scanbo v8 (Scanbo) {.tabset}
@@ -476,14 +569,16 @@ df <- df_onyx
 
 # Section 4: Intraclass Correlation Coefficients {.tabset}
 Reporting information:
+
 - Model: Two-way mixed effects [NOTE: no functional difference between 2-way random and mixed effects...seems the difference is more conceptual than mathematical but should confirm w/Laina]
--- Justification: Repeated measurements cannot be considered random samples.
+  - Justification: Repeated measurements cannot be considered random samples.
 - Type: Single measurement
--- Justification: In clinical practice, a single measurement rather than the mean of multiple measurements is considered as the unit of analysis.
+  - Justification: In clinical practice, a single measurement rather than the mean of multiple measurements is considered as the unit of analysis.
 - Definition: Absolute agreement
--- Justification: This is the only appropriate definition for a test-retest analysis, as the device of interest would be meaningless without agreement between repeated measures.
+  - Justification: This is the only appropriate definition for a test-retest analysis, as the device of interest would be meaningless without agreement between repeated measures.
 
 How to interpret the ICC:
+
 -	<0.5: Poor reliability
 -	0.5<0.75: Moderate reliability
 -	0.75<0.9: Good reliability
@@ -494,68 +589,68 @@ How to interpret the ICC:
 
 # -- Rad-G
 ## Rad-G, Age Cat 1
-df_radg_cat1_temp <- df_radg_cat1 %>% select(colnames(df_radg_cat1[grepl("+index_temp", names(df_radg_cat1))]))
-df_radg_cat1_o2 <- df_radg_cat1 %>% select(colnames(df_radg_cat1[grepl("+index_o2", names(df_radg_cat1))]))
-df_radg_cat1_pi <- df_radg_cat1 %>% select(colnames(df_radg_cat1[grepl("+index_pi", names(df_radg_cat1))]))
-df_radg_cat1_pr <- df_radg_cat1 %>% select(colnames(df_radg_cat1[grepl("+index_pr", names(df_radg_cat1))]))
-df_radg_cat1_rr <- df_radg_cat1 %>% select(colnames(df_radg_cat1[grepl("+index_rr", names(df_radg_cat1))]))
+df_radg_cat1_temp <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("+index_temp", names(df_radg_cat1_w))]))
+df_radg_cat1_o2 <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("+index_o2", names(df_radg_cat1_w))]))
+df_radg_cat1_pi <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("+index_pi", names(df_radg_cat1_w))]))
+df_radg_cat1_pr <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("+index_pr", names(df_radg_cat1_w))]))
+df_radg_cat1_rr <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("+index_rr", names(df_radg_cat1_w))]))
 ## Rad-G, Age Cat 2
-df_radg_cat2_temp <- df_radg_cat2 %>% select(colnames(df_radg_cat2[grepl("+index_temp", names(df_radg_cat2))]))
-df_radg_cat2_o2 <- df_radg_cat2 %>% select(colnames(df_radg_cat2[grepl("+index_o2", names(df_radg_cat2))]))
-df_radg_cat2_pi <- df_radg_cat2 %>% select(colnames(df_radg_cat2[grepl("+index_pi", names(df_radg_cat2))]))
-df_radg_cat2_pr <- df_radg_cat2 %>% select(colnames(df_radg_cat2[grepl("+index_pr", names(df_radg_cat2))]))
-df_radg_cat2_rr <- df_radg_cat2 %>% select(colnames(df_radg_cat2[grepl("+index_rr", names(df_radg_cat2))]))
+df_radg_cat2_temp <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("+index_temp", names(df_radg_cat2_w))]))
+df_radg_cat2_o2 <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("+index_o2", names(df_radg_cat2_w))]))
+df_radg_cat2_pi <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("+index_pi", names(df_radg_cat2_w))]))
+df_radg_cat2_pr <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("+index_pr", names(df_radg_cat2_w))]))
+df_radg_cat2_rr <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("+index_rr", names(df_radg_cat2_w))]))
 ## Rad-G, Age Cat 3
-df_radg_cat3_temp <- df_radg_cat3 %>% select(colnames(df_radg_cat3[grepl("+index_temp", names(df_radg_cat3))]))
-df_radg_cat3_o2 <- df_radg_cat3 %>% select(colnames(df_radg_cat3[grepl("+index_o2", names(df_radg_cat3))]))
-df_radg_cat3_pi <- df_radg_cat3 %>% select(colnames(df_radg_cat3[grepl("+index_pi", names(df_radg_cat3))]))
-df_radg_cat3_pr <- df_radg_cat3 %>% select(colnames(df_radg_cat3[grepl("+index_pr", names(df_radg_cat3))]))
-df_radg_cat3_rr <- df_radg_cat3 %>% select(colnames(df_radg_cat3[grepl("+index_rr", names(df_radg_cat3))]))
+df_radg_cat3_temp <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("+index_temp", names(df_radg_cat3_w))]))
+df_radg_cat3_o2 <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("+index_o2", names(df_radg_cat3_w))]))
+df_radg_cat3_pi <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("+index_pi", names(df_radg_cat3_w))]))
+df_radg_cat3_pr <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("+index_pr", names(df_radg_cat3_w))]))
+df_radg_cat3_rr <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("+index_rr", names(df_radg_cat3_w))]))
 
 # -- Biolight
 ## Biolight, Age Cat 1
-df_bio_cat1_o2 <- df_bio_cat1 %>% select(colnames(df_bio_cat1[grepl("+index_o2", names(df_bio_cat1))]))
-df_bio_cat1_pr <- df_bio_cat1 %>% select(colnames(df_bio_cat1[grepl("+index_pr", names(df_bio_cat1))]))
-df_bio_cat1_rr <- df_bio_cat1 %>% select(colnames(df_bio_cat1[grepl("+index_rr", names(df_bio_cat1))]))
+df_bio_cat1_o2 <- df_bio_cat1_w %>% select(colnames(df_bio_cat1_w[grepl("+index_o2", names(df_bio_cat1_w))]))
+df_bio_cat1_pr <- df_bio_cat1_w %>% select(colnames(df_bio_cat1_w[grepl("+index_pr", names(df_bio_cat1_w))]))
+df_bio_cat1_rr <- df_bio_cat1_w %>% select(colnames(df_bio_cat1_w[grepl("+index_rr", names(df_bio_cat1_w))]))
 ## Biolight, Age Cat 2
-df_bio_cat2_o2 <- df_bio_cat2 %>% select(colnames(df_bio_cat2[grepl("+index_o2", names(df_bio_cat2))]))
-df_bio_cat2_pr <- df_bio_cat2 %>% select(colnames(df_bio_cat2[grepl("+index_pr", names(df_bio_cat2))]))
-df_bio_cat2_rr <- df_bio_cat2 %>% select(colnames(df_bio_cat2[grepl("+index_rr", names(df_bio_cat2))]))
+df_bio_cat2_o2 <- df_bio_cat2_w %>% select(colnames(df_bio_cat2_w[grepl("+index_o2", names(df_bio_cat2_w))]))
+df_bio_cat2_pr <- df_bio_cat2_w %>% select(colnames(df_bio_cat2_w[grepl("+index_pr", names(df_bio_cat2_w))]))
+df_bio_cat2_rr <- df_bio_cat2_w %>% select(colnames(df_bio_cat2_w[grepl("+index_rr", names(df_bio_cat2_w))]))
 ## Biolight, Age Cat 3
-df_bio_cat3_o2 <- df_bio_cat3 %>% select(colnames(df_bio_cat3[grepl("+index_o2", names(df_bio_cat3))]))
-df_bio_cat3_pr <- df_bio_cat3 %>% select(colnames(df_bio_cat3[grepl("+index_pr", names(df_bio_cat3))]))
-df_bio_cat3_rr <- df_bio_cat3 %>% select(colnames(df_bio_cat3[grepl("+index_rr", names(df_bio_cat3))]))
+df_bio_cat3_o2 <- df_bio_cat3_w %>% select(colnames(df_bio_cat3_w[grepl("+index_o2", names(df_bio_cat3_w))]))
+df_bio_cat3_pr <- df_bio_cat3_w %>% select(colnames(df_bio_cat3_w[grepl("+index_pr", names(df_bio_cat3_w))]))
+df_bio_cat3_rr <- df_bio_cat3_w %>% select(colnames(df_bio_cat3_w[grepl("+index_rr", names(df_bio_cat3_w))]))
 
 # -- NeoGuard
 ## NeoGuard, Age Cat 1
-df_neo_cat1_temp <- df_neo_cat1 %>% select(colnames(df_neo_cat1[grepl("+index_temp", names(df_neo_cat1))]))
-df_neo_cat1_o2 <- df_neo_cat1 %>% select(colnames(df_neo_cat1[grepl("+index_o2", names(df_neo_cat1))]))
-df_neo_cat1_pr <- df_neo_cat1 %>% select(colnames(df_neo_cat1[grepl("+index_pr", names(df_neo_cat1))]))
-df_neo_cat1_rr <- df_neo_cat1 %>% select(colnames(df_neo_cat1[grepl("+index_rr", names(df_neo_cat1))]))
+df_neo_cat1_temp <- df_neo_cat1_w %>% select(colnames(df_neo_cat1_w[grepl("+index_temp", names(df_neo_cat1_w))]))
+df_neo_cat1_o2 <- df_neo_cat1_w %>% select(colnames(df_neo_cat1_w[grepl("+index_o2", names(df_neo_cat1_w))]))
+df_neo_cat1_pr <- df_neo_cat1_w %>% select(colnames(df_neo_cat1_w[grepl("+index_pr", names(df_neo_cat1_w))]))
+df_neo_cat1_rr <- df_neo_cat1_w %>% select(colnames(df_neo_cat1_w[grepl("+index_rr", names(df_neo_cat1_w))]))
 ## NeoGuard, Age Cat 2
-df_neo_cat2_temp <- df_neo_cat2 %>% select(colnames(df_neo_cat2[grepl("+index_temp", names(df_neo_cat2))]))
-df_neo_cat2_o2 <- df_neo_cat2 %>% select(colnames(df_neo_cat2[grepl("+index_o2", names(df_neo_cat2))]))
-df_neo_cat2_pr <- df_neo_cat2 %>% select(colnames(df_neo_cat2[grepl("+index_pr", names(df_neo_cat2))]))
-df_neo_cat2_rr <- df_neo_cat2 %>% select(colnames(df_neo_cat2[grepl("+index_rr", names(df_neo_cat2))]))
+df_neo_cat2_temp <- df_neo_cat2_w %>% select(colnames(df_neo_cat2_w[grepl("+index_temp", names(df_neo_cat2_w))]))
+df_neo_cat2_o2 <- df_neo_cat2_w %>% select(colnames(df_neo_cat2_w[grepl("+index_o2", names(df_neo_cat2_w))]))
+df_neo_cat2_pr <- df_neo_cat2_w %>% select(colnames(df_neo_cat2_w[grepl("+index_pr", names(df_neo_cat2_w))]))
+df_neo_cat2_rr <- df_neo_cat2_w %>% select(colnames(df_neo_cat2_w[grepl("+index_rr", names(df_neo_cat2_w))]))
 ## NeoGuard, Age Cat 3
-df_neo_cat3_temp <- df_neo_cat3 %>% select(colnames(df_neo_cat3[grepl("+index_temp", names(df_neo_cat3))]))
-df_neo_cat3_o2 <- df_neo_cat3 %>% select(colnames(df_neo_cat3[grepl("+index_o2", names(df_neo_cat3))]))
-df_neo_cat3_pr <- df_neo_cat3 %>% select(colnames(df_neo_cat3[grepl("+index_pr", names(df_neo_cat3))]))
-df_neo_cat3_rr <- df_neo_cat3 %>% select(colnames(df_neo_cat3[grepl("+index_rr", names(df_neo_cat3))]))
+df_neo_cat3_temp <- df_neo_cat3_w %>% select(colnames(df_neo_cat3_w[grepl("+index_temp", names(df_neo_cat3_w))]))
+df_neo_cat3_o2 <- df_neo_cat3_w %>% select(colnames(df_neo_cat3_w[grepl("+index_o2", names(df_neo_cat3_w))]))
+df_neo_cat3_pr <- df_neo_cat3_w %>% select(colnames(df_neo_cat3_w[grepl("+index_pr", names(df_neo_cat3_w))]))
+df_neo_cat3_rr <- df_neo_cat3_w %>% select(colnames(df_neo_cat3_w[grepl("+index_rr", names(df_neo_cat3_w))]))
 
 # -- Scanbo
 ## Scanbo, Age Cat 3
-df_scan_cat3_temp <- df_scan_cat3 %>% select(colnames(df_scan_cat3[grepl("+index_temp", names(df_scan_cat3))]))
-df_scan_cat3_sp02 <- df_scan_cat3 %>% select(colnames(df_scan_cat3[grepl("+index_sp02", names(df_scan_cat3))]))
-df_scan_cat3_o2 <- df_scan_cat3 %>% select(colnames(df_scan_cat3[grepl("+index_o2", names(df_scan_cat3))]))
-df_scan_cat3_pr <- df_scan_cat3 %>% select(colnames(df_scan_cat3[grepl("+index_pr", names(df_scan_cat3))]))
-df_scan_cat3_rr <- df_scan_cat3 %>% select(colnames(df_scan_cat3[grepl("+index_rr", names(df_scan_cat3))]))
+df_scan_cat3_temp <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("+index_temp", names(df_scan_cat3_w))]))
+df_scan_cat3_sp02 <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("+index_sp02", names(df_scan_cat3_w))]))
+df_scan_cat3_o2 <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("+index_o2", names(df_scan_cat3_w))]))
+df_scan_cat3_pr <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("+index_pr", names(df_scan_cat3_w))]))
+df_scan_cat3_rr <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("+index_rr", names(df_scan_cat3_w))]))
 
 # -- Onyx
 ## Onyx, Age Cat 3
-df_onyx_cat3_o2 <- df_onyx_cat3 %>% select(colnames(df_onyx_cat3[grepl("+index_o2", names(df_onyx_cat3))]))
-df_onyx_cat3_pr <- df_onyx_cat3 %>% select(colnames(df_onyx_cat3[grepl("+index_pr", names(df_onyx_cat3))]))
-df_onyx_cat3_rr <- df_onyx_cat3 %>% select(colnames(df_onyx_cat3[grepl("+index_rr", names(df_onyx_cat3))]))
+df_onyx_cat3_o2 <- df_onyx_cat3_w %>% select(colnames(df_onyx_cat3_w[grepl("+index_o2", names(df_onyx_cat3_w))]))
+df_onyx_cat3_pr <- df_onyx_cat3_w %>% select(colnames(df_onyx_cat3_w[grepl("+index_pr", names(df_onyx_cat3_w))]))
+df_onyx_cat3_rr <- df_onyx_cat3_w %>% select(colnames(df_onyx_cat3_w[grepl("+index_rr", names(df_onyx_cat3_w))]))
 ```
 
 ```{r echo=FALSE, include=FALSE}
@@ -736,27 +831,274 @@ Clinical thresholds used in the section are as follows:
 - Tachycardia: <12 months (>179 bpm); 12-60 months (>139 bpm)
 - Fever: >37C (≥100.4F)
 
+*NOTE: Where different, clinical age categories are used in this section (and the next) in place of the study age categories.*
+
 ```{r echo=FALSE, include=FALSE}
-# @ Samwel, I didn't get as far on this as I'd hoped but I did get the data structured properly -- for the 2x2's, we'll want to use the long format so we can look at all the measurements together. For the percent agreement, we'll want to calculate for each M1-M3 separately and then look at them all in the same table -- let me know if you want me to take that section since I know you're quite busy with the data from the main TIMCI study. I'll have some time Monday/Tuesday next week to work on this as well if that would be helpful!
+# @ Samwel, I had some time today (Monday) and built out the 2x2's, happy to work on the percent agreement section this week as well since I know you're quite busy with the data from the main TIMCI study. For that section, we'll want to calculate for each M1-M3 separately as well as overall and then look at them all in the same table.
 ```
 
 ```{r echo=FALSE, include=FALSE}
 # key functions: addmargins(table()), prop.table
 ```
 
-## Rad-G Temp (Masimo)
+## Rad-G Temp (Masimo) {.tabset}
 
+### Hypoxia
+```{r echo=FALSE}
+a <- addmargins(table(df_radg_cat1_l$ref_hypoxic, df_radg_cat1_l$index_hypoxic))
+rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 
-## m800 (Biolight)
+b <- addmargins(table(df_radg_cat2_l$ref_hypoxic, df_radg_cat2_l$index_hypoxic))
+rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**2-11 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
 
+c <- addmargins(table(df_radg_cat3_l$ref_hypoxic, df_radg_cat3_l$index_hypoxic))
+rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+```
 
-## NeoGuard (Neopenda)
+### Fever
+```{r echo=FALSE}
+a <- addmargins(table(df_radg_cat1_l$ref_fever, df_radg_cat1_l$index_fever))
+rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 
+b <- addmargins(table(df_radg_cat2_l$ref_fever, df_radg_cat2_l$index_fever))
+rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**2-11 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
 
-## Onyx PO+RR (Nonin)
+c <- addmargins(table(df_radg_cat3_l$ref_fever, df_radg_cat3_l$index_fever))
+rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+```
 
+### Fast Breathing
+```{r echo=FALSE}
+a <- addmargins(table(df_radg_cat1fb_l$ref_fastbreath_12mo, df_radg_cat1fb_l$index_fastbreath_12mo))
+rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 
-## Scanbo v8 (Scanbo)
+b <- addmargins(table(df_radg_cat2fb_l$ref_fastbreath_35mo, df_radg_cat2fb_l$index_fastbreath_35mo))
+rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-35 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+
+c <- addmargins(table(df_radg_cat3fb_l$ref_fastbreath_59mo, df_radg_cat3fb_l$index_fastbreath_59mo))
+rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**36-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+```
+
+### Tachycardia
+```{r echo=FALSE}
+a <- addmargins(table(df_radg_cat1tachy_l$ref_tachycardic_12mo, df_radg_cat1tachy_l$index_tachycardic_12mo))
+rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+
+b <- addmargins(table(df_radg_cat2tachy_l$ref_tachycardic_59mo, df_radg_cat2tachy_l$index_tachycardic_59mo))
+rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+```
+
+## m800 (Biolight) {.tabset}
+
+### Hypoxia
+```{r echo=FALSE}
+a <- addmargins(table(df_bio_cat1_l$ref_hypoxic, df_bio_cat1_l$index_hypoxic))
+rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+
+b <- addmargins(table(df_bio_cat2_l$ref_hypoxic, df_bio_cat2_l$index_hypoxic))
+rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**2-11 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+
+c <- addmargins(table(df_bio_cat3_l$ref_hypoxic, df_bio_cat3_l$index_hypoxic))
+rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+```
+
+### Fast Breathing
+```{r echo=FALSE}
+a <- addmargins(table(df_bio_cat1fb_l$ref_fastbreath_12mo, df_bio_cat1fb_l$index_fastbreath_12mo))
+rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+
+b <- addmargins(table(df_bio_cat2fb_l$ref_fastbreath_35mo, df_bio_cat2fb_l$index_fastbreath_35mo))
+rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-35 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+
+c <- addmargins(table(df_bio_cat3fb_l$ref_fastbreath_59mo, df_bio_cat3fb_l$index_fastbreath_59mo))
+rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**36-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+```
+
+### Tachycardia
+```{r echo=FALSE}
+a <- addmargins(table(df_bio_cat1tachy_l$ref_tachycardic_12mo, df_bio_cat1tachy_l$index_tachycardic_12mo))
+rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+
+b <- addmargins(table(df_bio_cat2tachy_l$ref_tachycardic_59mo, df_bio_cat2tachy_l$index_tachycardic_59mo))
+rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+```
+
+## NeoGuard (Neopenda) {.tabset}
+
+### Hypoxia
+```{r echo=FALSE}
+a <- addmargins(table(df_neo_cat1_l$ref_hypoxic, df_neo_cat1_l$index_hypoxic))
+rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+
+b <- addmargins(table(df_neo_cat2_l$ref_hypoxic, df_neo_cat2_l$index_hypoxic))
+rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**2-11 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+
+c <- addmargins(table(df_neo_cat3_l$ref_hypoxic, df_neo_cat3_l$index_hypoxic))
+rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+```
+
+### Fever
+```{r echo=FALSE}
+a <- addmargins(table(df_neo_cat1_l$ref_fever, df_neo_cat1_l$index_fever))
+rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+
+b <- addmargins(table(df_neo_cat2_l$ref_fever, df_neo_cat2_l$index_fever))
+rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**2-11 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+
+c <- addmargins(table(df_neo_cat3_l$ref_fever, df_neo_cat3_l$index_fever))
+rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+```
+
+### Fast Breathing
+```{r echo=FALSE}
+a <- addmargins(table(df_neo_cat1fb_l$ref_fastbreath_12mo, df_neo_cat1fb_l$index_fastbreath_12mo))
+rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+
+b <- addmargins(table(df_neo_cat2fb_l$ref_fastbreath_35mo, df_neo_cat2fb_l$index_fastbreath_35mo))
+rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-35 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+
+c <- addmargins(table(df_neo_cat3fb_l$ref_fastbreath_59mo, df_neo_cat3fb_l$index_fastbreath_59mo))
+rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**36-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+```
+
+### Tachycardia
+```{r echo=FALSE}
+a <- addmargins(table(df_neo_cat1tachy_l$ref_tachycardic_12mo, df_neo_cat1tachy_l$index_tachycardic_12mo))
+rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+
+b <- addmargins(table(df_neo_cat2tachy_l$ref_tachycardic_59mo, df_neo_cat2tachy_l$index_tachycardic_59mo))
+rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+```
+
+## Onyx PO+RR (Nonin) {.tabset}
+
+### Hypoxia
+```{r echo=FALSE}
+c <- addmargins(table(df_onyx_cat3_l$ref_hypoxic, df_onyx_cat3_l$index_hypoxic))
+rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+```
+
+### Fast Breathing
+```{r echo=FALSE}
+b <- addmargins(table(df_onyx_cat2fb_l$ref_fastbreath_35mo, df_onyx_cat2fb_l$index_fastbreath_35mo))
+rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-35 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+
+c <- addmargins(table(df_onyx_cat3fb_l$ref_fastbreath_59mo, df_onyx_cat3fb_l$index_fastbreath_59mo))
+rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**36-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+```
+
+### Tachycardia
+```{r echo=FALSE}
+b <- addmargins(table(df_onyx_cat2tachy_l$ref_tachycardic_59mo, df_onyx_cat2tachy_l$index_tachycardic_59mo))
+rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+```
+
+## Scanbo v8 (Scanbo) {.tabset}
+
+### Hypoxia
+```{r echo=FALSE}
+c <- addmargins(table(df_scan_cat3_l$ref_hypoxic, df_scan_cat3_l$index_hypoxic))
+rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+```
+
+### Fever
+```{r echo=FALSE}
+c <- addmargins(table(df_scan_cat3_l$ref_fever, df_scan_cat3_l$index_fever))
+rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+```
+
+### Fast Breathing
+```{r echo=FALSE}
+b <- addmargins(table(df_scan_cat2fb_l$ref_fastbreath_35mo, df_scan_cat2fb_l$index_fastbreath_35mo))
+rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-35 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+
+c <- addmargins(table(df_scan_cat3fb_l$ref_fastbreath_59mo, df_scan_cat3fb_l$index_fastbreath_59mo))
+rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**36-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+```
+
+### Tachycardia
+```{r echo=FALSE}
+b <- addmargins(table(df_scan_cat2tachy_l$ref_tachycardic_59mo, df_scan_cat2tachy_l$index_tachycardic_59mo))
+rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+```
 
 # Section 6: Percent Agreement {.tabset}
 Samwel (Rebecca can take this if helpful)
