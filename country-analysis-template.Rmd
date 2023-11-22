@@ -272,26 +272,6 @@ This report contains data from **`r COUNTRY`**.
 Leila
 
 ## Table 1: Participant Characteristics Overall and by Facility
-```{r echo=FALSE, include=FALSE}
-# consider using the CreateTableOne function from the tableone package, example:
-## Define row labels (optional): t1lab <- c("N", "Age category", "Sex = Male (%)", ...)
-## Define all variables: vars <- c("age_cat2", "sex", ...)
-## Define the variables you want it to treat as factors (useful if they could be perceived as continuous): fvar <- c("age_cat2", sex", ...)
-
-## create the tableone object: out1 <- CreateTableOne(vars = vars,
-#                                       factorVars = fvar,
-#                                       strata = "health_facility",
-#                                       data = df)
-# print as table: t1 <- print(out1)
-# assign rownames defined above (optional - would recommend only doing this once the rows are set so you know what each one is): rownames(t1) <- c(t1lab)
-
-# kable formatting if you want to get fancy: 
-#  t1 <- kable(out1) %>%
-#  kable_styling(position = "center") %>%
-#  add_indent(c(3:5))
-
-#`r t1`
-```
 
 ```{r}
 
