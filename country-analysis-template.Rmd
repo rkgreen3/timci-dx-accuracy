@@ -23,6 +23,7 @@ library(tableone)
 library(kableExtra)
 library(BlandAltmanLeh)
 library(irr)
+library(exactci)
 library(reshape2)
 library(ggplot2)
 
@@ -833,131 +834,194 @@ Clinical thresholds used in the section are as follows:
 
 *NOTE: Where different, clinical age categories are used in this section (and the next) in place of the study age categories.*
 
-```{r echo=FALSE, include=FALSE}
-# @ Samwel, I had some time today (Monday) and built out the 2x2's, happy to work on the percent agreement section this week as well since I know you're quite busy with the data from the main TIMCI study. For that section, we'll want to calculate for each M1-M3 separately as well as overall and then look at them all in the same table.
-```
-
-```{r echo=FALSE, include=FALSE}
-# key functions: addmargins(table()), prop.table
-```
-
 ## Rad-G Temp (Masimo) {.tabset}
+```{r echo=FALSE, include=FALSE}
+# create 2x2 table objects with margins to display (to display overall only)
+# create 2x2 table objects with margins for each measurement number (for use in next section)
+# these objects are needed for percent agreement calculation in next section, object naming convention follows device_clinicalmeasure# where # = age category
+```
 
 ### Hypoxia
 ```{r echo=FALSE}
-a <- addmargins(table(df_radg_cat1_l$ref_hypoxic, df_radg_cat1_l$index_hypoxic))
-rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
+# Long format (overall)
+radg_hypoxia1 <- addmargins(table(df_radg_cat1_l$ref_hypoxic, df_radg_cat1_l$index_hypoxic))
+rownames(radg_hypoxia1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(radg_hypoxia1, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 
-b <- addmargins(table(df_radg_cat2_l$ref_hypoxic, df_radg_cat2_l$index_hypoxic))
-rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**2-11 months**") %>% 
+radg_hypoxia2 <- addmargins(table(df_radg_cat2_l$ref_hypoxic, df_radg_cat2_l$index_hypoxic))
+rownames(radg_hypoxia2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(radg_hypoxia2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**2-11 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
 
-c <- addmargins(table(df_radg_cat3_l$ref_hypoxic, df_radg_cat3_l$index_hypoxic))
-rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
-  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+radg_hypoxia3 <- addmargins(table(df_radg_cat3_l$ref_hypoxic, df_radg_cat3_l$index_hypoxic))
+rownames(radg_hypoxia3) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(radg_hypoxia3, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+
+# Wide format, M1-3
+radg_hypoxia1_m1 <- addmargins(table(df_radg_cat1_w$m1_ref_hypoxic, df_radg_cat1_w$m1_index_hypoxic))
+radg_hypoxia1_m2 <- addmargins(table(df_radg_cat1_w$m2_ref_hypoxic, df_radg_cat1_w$m2_index_hypoxic))
+radg_hypoxia1_m3 <- addmargins(table(df_radg_cat1_w$m3_ref_hypoxic, df_radg_cat1_w$m3_index_hypoxic))
+
+radg_hypoxia2_m1 <- addmargins(table(df_radg_cat2_w$m1_ref_hypoxic, df_radg_cat2_w$m1_index_hypoxic))
+radg_hypoxia2_m2 <- addmargins(table(df_radg_cat2_w$m2_ref_hypoxic, df_radg_cat2_w$m2_index_hypoxic))
+radg_hypoxia2_m3 <- addmargins(table(df_radg_cat2_w$m3_ref_hypoxic, df_radg_cat2_w$m3_index_hypoxic))
+
+radg_hypoxia3_m1 <- addmargins(table(df_radg_cat3_w$m1_ref_hypoxic, df_radg_cat3_w$m1_index_hypoxic))
+radg_hypoxia3_m2 <- addmargins(table(df_radg_cat3_w$m2_ref_hypoxic, df_radg_cat3_w$m2_index_hypoxic))
+radg_hypoxia3_m3 <- addmargins(table(df_radg_cat3_w$m3_ref_hypoxic, df_radg_cat3_w$m3_index_hypoxic))
 ```
 
 ### Fever
 ```{r echo=FALSE}
-a <- addmargins(table(df_radg_cat1_l$ref_fever, df_radg_cat1_l$index_fever))
-rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
+# Long format (overall)
+radg_fever1 <- addmargins(table(df_radg_cat1_l$ref_fever, df_radg_cat1_l$index_fever))
+rownames(radg_fever1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(radg_fever1, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 
-b <- addmargins(table(df_radg_cat2_l$ref_fever, df_radg_cat2_l$index_fever))
-rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**2-11 months**") %>% 
+radg_fever2 <- addmargins(table(df_radg_cat2_l$ref_fever, df_radg_cat2_l$index_fever))
+rownames(radg_fever2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(radg_fever2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**2-11 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
 
-c <- addmargins(table(df_radg_cat3_l$ref_fever, df_radg_cat3_l$index_fever))
-rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+radg_fever3 <- addmargins(table(df_radg_cat3_l$ref_fever, df_radg_cat3_l$index_fever))
+rownames(radg_fever3) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(radg_fever3, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+
+# Wide format, M1-3
+radg_fever1_m1 <- addmargins(table(df_radg_cat1_w$m1_ref_fever, df_radg_cat1_w$m1_index_fever))
+radg_fever1_m2 <- addmargins(table(df_radg_cat1_w$m2_ref_fever, df_radg_cat1_w$m2_index_fever))
+radg_fever1_m3 <- addmargins(table(df_radg_cat1_w$m3_ref_fever, df_radg_cat1_w$m3_index_fever))
+
+radg_fever2_m1 <- addmargins(table(df_radg_cat2_w$m1_ref_fever, df_radg_cat2_w$m1_index_fever))
+radg_fever2_m2 <- addmargins(table(df_radg_cat2_w$m2_ref_fever, df_radg_cat2_w$m2_index_fever))
+radg_fever2_m3 <- addmargins(table(df_radg_cat2_w$m3_ref_fever, df_radg_cat2_w$m3_index_fever))
+
+radg_fever3_m1 <- addmargins(table(df_radg_cat3_w$m1_ref_fever, df_radg_cat3_w$m1_index_fever))
+radg_fever3_m2 <- addmargins(table(df_radg_cat3_w$m2_ref_fever, df_radg_cat3_w$m2_index_fever))
+radg_fever3_m3 <- addmargins(table(df_radg_cat3_w$m3_ref_fever, df_radg_cat3_w$m3_index_fever))
 ```
 
 ### Fast Breathing
 ```{r echo=FALSE}
-a <- addmargins(table(df_radg_cat1fb_l$ref_fastbreath_12mo, df_radg_cat1fb_l$index_fastbreath_12mo))
-rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
+# Long format
+radg_fb1 <- addmargins(table(df_radg_cat1fb_l$ref_fastbreath_12mo, df_radg_cat1fb_l$index_fastbreath_12mo))
+rownames(radg_fb1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(radg_fb1, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 
-b <- addmargins(table(df_radg_cat2fb_l$ref_fastbreath_35mo, df_radg_cat2fb_l$index_fastbreath_35mo))
-rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-35 months**") %>% 
+radg_fb2 <- addmargins(table(df_radg_cat2fb_l$ref_fastbreath_35mo, df_radg_cat2fb_l$index_fastbreath_35mo))
+rownames(radg_fb2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(radg_fb2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-35 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
 
-c <- addmargins(table(df_radg_cat3fb_l$ref_fastbreath_59mo, df_radg_cat3fb_l$index_fastbreath_59mo))
-rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**36-59 months**") %>% 
+radg_fb3 <- addmargins(table(df_radg_cat3fb_l$ref_fastbreath_59mo, df_radg_cat3fb_l$index_fastbreath_59mo))
+rownames(radg_fb3) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(radg_fb3, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**36-59 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+
+# Wide format
+radg_fb1_m1 <- addmargins(table(df_radg_cat1fb_w$m1_ref_fastbreath_12mo, df_radg_cat1fb_w$m1_index_fastbreath_12mo))
+radg_fb1_m2 <- addmargins(table(df_radg_cat1fb_w$m2_ref_fastbreath_12mo, df_radg_cat1fb_w$m2_index_fastbreath_12mo))
+radg_fb1_m3 <- addmargins(table(df_radg_cat1fb_w$m3_ref_fastbreath_12mo, df_radg_cat1fb_w$m3_index_fastbreath_12mo))
+
+radg_fb2_m1 <- addmargins(table(df_radg_cat2fb_w$m1_ref_fastbreath_35mo, df_radg_cat2fb_w$m1_index_fastbreath_35mo))
+radg_fb2_m2 <- addmargins(table(df_radg_cat2fb_w$m2_ref_fastbreath_35mo, df_radg_cat2fb_w$m2_index_fastbreath_35mo))
+radg_fb2_m3 <- addmargins(table(df_radg_cat2fb_w$m3_ref_fastbreath_35mo, df_radg_cat2fb_w$m3_index_fastbreath_35mo))
+
+radg_fb3_m1 <- addmargins(table(df_radg_cat3fb_w$m1_ref_fastbreath_59mo, df_radg_cat3fb_w$m1_index_fastbreath_59mo))
+radg_fb3_m2 <- addmargins(table(df_radg_cat3fb_w$m2_ref_fastbreath_59mo, df_radg_cat3fb_w$m2_index_fastbreath_59mo))
+radg_fb3_m3 <- addmargins(table(df_radg_cat3fb_w$m3_ref_fastbreath_59mo, df_radg_cat3fb_w$m3_index_fastbreath_59mo))
 ```
 
 ### Tachycardia
 ```{r echo=FALSE}
-a <- addmargins(table(df_radg_cat1tachy_l$ref_tachycardic_12mo, df_radg_cat1tachy_l$index_tachycardic_12mo))
-rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
+# Long
+radg_tachy1 <- addmargins(table(df_radg_cat1tachy_l$ref_tachycardic_12mo, df_radg_cat1tachy_l$index_tachycardic_12mo))
+rownames(radg_tachy1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(radg_tachy1, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 
-b <- addmargins(table(df_radg_cat2tachy_l$ref_tachycardic_59mo, df_radg_cat2tachy_l$index_tachycardic_59mo))
-rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+radg_tachy2 <- addmargins(table(df_radg_cat2tachy_l$ref_tachycardic_59mo, df_radg_cat2tachy_l$index_tachycardic_59mo))
+rownames(radg_tachy2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(radg_tachy2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+
+# Wide
+radg_tachy1_m1 <- addmargins(table(df_radg_cat1tachy_w$m1_ref_tachycardic_12mo, df_radg_cat1tachy_w$m1_index_tachycardic_12mo))
+radg_tachy1_m2 <- addmargins(table(df_radg_cat1tachy_w$m2_ref_tachycardic_12mo, df_radg_cat1tachy_w$m2_index_tachycardic_12mo))
+radg_tachy1_m3 <- addmargins(table(df_radg_cat1tachy_w$m3_ref_tachycardic_12mo, df_radg_cat1tachy_w$m3_index_tachycardic_12mo))
+
+radg_tachy2_m1 <- addmargins(table(df_radg_cat2tachy_w$m1_ref_tachycardic_59mo, df_radg_cat2tachy_w$m1_index_tachycardic_59mo))
+radg_tachy2_m2 <- addmargins(table(df_radg_cat2tachy_w$m2_ref_tachycardic_59mo, df_radg_cat2tachy_w$m2_index_tachycardic_59mo))
+radg_tachy2_m3 <- addmargins(table(df_radg_cat2tachy_w$m3_ref_tachycardic_59mo, df_radg_cat2tachy_w$m3_index_tachycardic_59mo))
 ```
 
 ## m800 (Biolight) {.tabset}
 
 ### Hypoxia
 ```{r echo=FALSE}
-a <- addmargins(table(df_bio_cat1_l$ref_hypoxic, df_bio_cat1_l$index_hypoxic))
-rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
+# Long
+bio_hypoxia1 <- addmargins(table(df_bio_cat1_l$ref_hypoxic, df_bio_cat1_l$index_hypoxic))
+rownames(bio_hypoxia1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(bio_hypoxia1, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 
-b <- addmargins(table(df_bio_cat2_l$ref_hypoxic, df_bio_cat2_l$index_hypoxic))
-rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**2-11 months**") %>% 
+bio_hypoxia2 <- addmargins(table(df_bio_cat2_l$ref_hypoxic, df_bio_cat2_l$index_hypoxic))
+rownames(bio_hypoxia2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(bio_hypoxia2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**2-11 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
 
-c <- addmargins(table(df_bio_cat3_l$ref_hypoxic, df_bio_cat3_l$index_hypoxic))
-rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+bio_hypoxia3 <- addmargins(table(df_bio_cat3_l$ref_hypoxic, df_bio_cat3_l$index_hypoxic))
+rownames(bio_hypoxia3) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(bio_hypoxia3, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+
+# Wide
+bio_hypoxia1_m1 <- addmargins(table(df_bio_cat1_w$m1_ref_hypoxic, df_bio_cat1_w$m1_index_hypoxic))
+bio_hypoxia1_m2 <- addmargins(table(df_bio_cat1_w$m2_ref_hypoxic, df_bio_cat1_w$m2_index_hypoxic))
+bio_hypoxia1_m3 <- addmargins(table(df_bio_cat1_w$m3_ref_hypoxic, df_bio_cat1_w$m3_index_hypoxic))
+
+bio_hypoxia2_m1 <- addmargins(table(df_bio_cat2_w$m1_ref_hypoxic, df_bio_cat2_w$m1_index_hypoxic))
+bio_hypoxia2_m2 <- addmargins(table(df_bio_cat2_w$m2_ref_hypoxic, df_bio_cat2_w$m2_index_hypoxic))
+bio_hypoxia2_m3 <- addmargins(table(df_bio_cat2_w$m3_ref_hypoxic, df_bio_cat2_w$m3_index_hypoxic))
+
+bio_hypoxia3_m1 <- addmargins(table(df_bio_cat3_w$m1_ref_hypoxic, df_bio_cat3_w$m1_index_hypoxic))
+bio_hypoxia3_m2 <- addmargins(table(df_bio_cat3_w$m2_ref_hypoxic, df_bio_cat3_w$m2_index_hypoxic))
+bio_hypoxia3_m3 <- addmargins(table(df_bio_cat3_w$m3_ref_hypoxic, df_bio_cat3_w$m3_index_hypoxic))
 ```
 
 ### Fast Breathing
 ```{r echo=FALSE}
-a <- addmargins(table(df_bio_cat1fb_l$ref_fastbreath_12mo, df_bio_cat1fb_l$index_fastbreath_12mo))
-rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
+bio_fb1 <- addmargins(table(df_bio_cat1fb_l$ref_fastbreath_12mo, df_bio_cat1fb_l$index_fastbreath_12mo))
+rownames(bio_fb1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(bio_fb1, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 
-b <- addmargins(table(df_bio_cat2fb_l$ref_fastbreath_35mo, df_bio_cat2fb_l$index_fastbreath_35mo))
-rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-35 months**") %>% 
+bio_fb2 <- addmargins(table(df_bio_cat2fb_l$ref_fastbreath_35mo, df_bio_cat2fb_l$index_fastbreath_35mo))
+rownames(bio_fb2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(bio_fb2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-35 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
 
-c <- addmargins(table(df_bio_cat3fb_l$ref_fastbreath_59mo, df_bio_cat3fb_l$index_fastbreath_59mo))
-rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**36-59 months**") %>% 
+bio_fb3 <- addmargins(table(df_bio_cat3fb_l$ref_fastbreath_59mo, df_bio_cat3fb_l$index_fastbreath_59mo))
+rownames(bio_fb3) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(bio_fb3, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**36-59 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 ```
 
 ### Tachycardia
 ```{r echo=FALSE}
-a <- addmargins(table(df_bio_cat1tachy_l$ref_tachycardic_12mo, df_bio_cat1tachy_l$index_tachycardic_12mo))
-rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
+bio_tachy1 <- addmargins(table(df_bio_cat1tachy_l$ref_tachycardic_12mo, df_bio_cat1tachy_l$index_tachycardic_12mo))
+rownames(bio_tachy1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(bio_tachy1, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 
-b <- addmargins(table(df_bio_cat2tachy_l$ref_tachycardic_59mo, df_bio_cat2tachy_l$index_tachycardic_59mo))
-rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+bio_tachy2 <- addmargins(table(df_bio_cat2tachy_l$ref_tachycardic_59mo, df_bio_cat2tachy_l$index_tachycardic_59mo))
+rownames(bio_tachy2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(bio_tachy2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
 ```
 
@@ -965,68 +1029,82 @@ kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abn
 
 ### Hypoxia
 ```{r echo=FALSE}
-a <- addmargins(table(df_neo_cat1_l$ref_hypoxic, df_neo_cat1_l$index_hypoxic))
-rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
+# Long
+neo_hypoxia1 <- addmargins(table(df_neo_cat1_l$ref_hypoxic, df_neo_cat1_l$index_hypoxic))
+rownames(neo_hypoxia1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(neo_hypoxia1, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 
-b <- addmargins(table(df_neo_cat2_l$ref_hypoxic, df_neo_cat2_l$index_hypoxic))
-rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**2-11 months**") %>% 
+neo_hypoxia2 <- addmargins(table(df_neo_cat2_l$ref_hypoxic, df_neo_cat2_l$index_hypoxic))
+rownames(neo_hypoxia2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(neo_hypoxia2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**2-11 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
 
-c <- addmargins(table(df_neo_cat3_l$ref_hypoxic, df_neo_cat3_l$index_hypoxic))
-rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+neo_hypoxia3 <- addmargins(table(df_neo_cat3_l$ref_hypoxic, df_neo_cat3_l$index_hypoxic))
+rownames(neo_hypoxia3) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(neo_hypoxia3, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+
+# Wide
+neo_hypoxia1_m1 <- addmargins(table(df_neo_cat1_w$m1_ref_hypoxic, df_neo_cat1_w$m1_index_hypoxic))
+neo_hypoxia1_m2 <- addmargins(table(df_neo_cat1_w$m2_ref_hypoxic, df_neo_cat1_w$m2_index_hypoxic))
+neo_hypoxia1_m3 <- addmargins(table(df_neo_cat1_w$m3_ref_hypoxic, df_neo_cat1_w$m3_index_hypoxic))
+
+neo_hypoxia2_m1 <- addmargins(table(df_neo_cat2_w$m1_ref_hypoxic, df_neo_cat2_w$m1_index_hypoxic))
+neo_hypoxia2_m2 <- addmargins(table(df_neo_cat2_w$m2_ref_hypoxic, df_neo_cat2_w$m2_index_hypoxic))
+neo_hypoxia2_m3 <- addmargins(table(df_neo_cat2_w$m3_ref_hypoxic, df_neo_cat2_w$m3_index_hypoxic))
+
+neo_hypoxia3_m1 <- addmargins(table(df_neo_cat3_w$m1_ref_hypoxic, df_neo_cat3_w$m1_index_hypoxic))
+neo_hypoxia3_m2 <- addmargins(table(df_neo_cat3_w$m2_ref_hypoxic, df_neo_cat3_w$m2_index_hypoxic))
+neo_hypoxia3_m3 <- addmargins(table(df_neo_cat3_w$m3_ref_hypoxic, df_neo_cat3_w$m3_index_hypoxic))
 ```
 
 ### Fever
 ```{r echo=FALSE}
-a <- addmargins(table(df_neo_cat1_l$ref_fever, df_neo_cat1_l$index_fever))
-rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
+neo_fever1 <- addmargins(table(df_neo_cat1_l$ref_fever, df_neo_cat1_l$index_fever))
+rownames(neo_fever1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(neo_fever1, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 
-b <- addmargins(table(df_neo_cat2_l$ref_fever, df_neo_cat2_l$index_fever))
-rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**2-11 months**") %>% 
+neo_fever2 <- addmargins(table(df_neo_cat2_l$ref_fever, df_neo_cat2_l$index_fever))
+rownames(neo_fever2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(neo_fever2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**2-11 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
 
-c <- addmargins(table(df_neo_cat3_l$ref_fever, df_neo_cat3_l$index_fever))
-rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+neo_fever3 <- addmargins(table(df_neo_cat3_l$ref_fever, df_neo_cat3_l$index_fever))
+rownames(neo_fever3) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(neo_fever3, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 ```
 
 ### Fast Breathing
 ```{r echo=FALSE}
-a <- addmargins(table(df_neo_cat1fb_l$ref_fastbreath_12mo, df_neo_cat1fb_l$index_fastbreath_12mo))
-rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
+neo_fb1 <- addmargins(table(df_neo_cat1fb_l$ref_fastbreath_12mo, df_neo_cat1fb_l$index_fastbreath_12mo))
+rownames(neo_fb1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(neo_fb1, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 
-b <- addmargins(table(df_neo_cat2fb_l$ref_fastbreath_35mo, df_neo_cat2fb_l$index_fastbreath_35mo))
-rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-35 months**") %>% 
+neo_fb2 <- addmargins(table(df_neo_cat2fb_l$ref_fastbreath_35mo, df_neo_cat2fb_l$index_fastbreath_35mo))
+rownames(neo_fb2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(neo_fb2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-35 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
 
-c <- addmargins(table(df_neo_cat3fb_l$ref_fastbreath_59mo, df_neo_cat3fb_l$index_fastbreath_59mo))
-rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**36-59 months**") %>% 
+neo_fb3 <- addmargins(table(df_neo_cat3fb_l$ref_fastbreath_59mo, df_neo_cat3fb_l$index_fastbreath_59mo))
+rownames(neo_fb3) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(neo_fb3, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**36-59 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 ```
 
 ### Tachycardia
 ```{r echo=FALSE}
-a <- addmargins(table(df_neo_cat1tachy_l$ref_tachycardic_12mo, df_neo_cat1tachy_l$index_tachycardic_12mo))
-rownames(a) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(a, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
+neo_tachy1 <- addmargins(table(df_neo_cat1tachy_l$ref_tachycardic_12mo, df_neo_cat1tachy_l$index_tachycardic_12mo))
+rownames(neo_tachy1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(neo_tachy1, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 
-b <- addmargins(table(df_neo_cat2tachy_l$ref_tachycardic_59mo, df_neo_cat2tachy_l$index_tachycardic_59mo))
-rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+neo_tachy2 <- addmargins(table(df_neo_cat2tachy_l$ref_tachycardic_59mo, df_neo_cat2tachy_l$index_tachycardic_59mo))
+rownames(neo_tachy2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(neo_tachy2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
 ```
 
@@ -1034,30 +1112,36 @@ kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abn
 
 ### Hypoxia
 ```{r echo=FALSE}
-c <- addmargins(table(df_onyx_cat3_l$ref_hypoxic, df_onyx_cat3_l$index_hypoxic))
-rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+# Long
+onyx_hypoxia3 <- addmargins(table(df_onyx_cat3_l$ref_hypoxic, df_onyx_cat3_l$index_hypoxic))
+rownames(onyx_hypoxia3) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(onyx_hypoxia3, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+
+# Wide
+onyx_hypoxia3_m1 <- addmargins(table(df_onyx_cat3_w$m1_ref_hypoxic, df_onyx_cat3_w$m1_index_hypoxic))
+onyx_hypoxia3_m2 <- addmargins(table(df_onyx_cat3_w$m2_ref_hypoxic, df_onyx_cat3_w$m2_index_hypoxic))
+onyx_hypoxia3_m3 <- addmargins(table(df_onyx_cat3_w$m3_ref_hypoxic, df_onyx_cat3_w$m3_index_hypoxic))
 ```
 
 ### Fast Breathing
 ```{r echo=FALSE}
-b <- addmargins(table(df_onyx_cat2fb_l$ref_fastbreath_35mo, df_onyx_cat2fb_l$index_fastbreath_35mo))
-rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-35 months**") %>% 
+onyx_fb2 <- addmargins(table(df_onyx_cat2fb_l$ref_fastbreath_35mo, df_onyx_cat2fb_l$index_fastbreath_35mo))
+rownames(onyx_fb2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(onyx_fb2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-35 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
 
-c <- addmargins(table(df_onyx_cat3fb_l$ref_fastbreath_59mo, df_onyx_cat3fb_l$index_fastbreath_59mo))
-rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**36-59 months**") %>% 
+onyx_fb3 <- addmargins(table(df_onyx_cat3fb_l$ref_fastbreath_59mo, df_onyx_cat3fb_l$index_fastbreath_59mo))
+rownames(onyx_fb3) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(onyx_fb3, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**36-59 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 ```
 
 ### Tachycardia
 ```{r echo=FALSE}
-b <- addmargins(table(df_onyx_cat2tachy_l$ref_tachycardic_59mo, df_onyx_cat2tachy_l$index_tachycardic_59mo))
-rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+onyx_tachy2 <- addmargins(table(df_onyx_cat2tachy_l$ref_tachycardic_59mo, df_onyx_cat2tachy_l$index_tachycardic_59mo))
+rownames(onyx_tachy2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(onyx_tachy2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
 ```
 
@@ -1065,40 +1149,241 @@ kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abn
 
 ### Hypoxia
 ```{r echo=FALSE}
-c <- addmargins(table(df_scan_cat3_l$ref_hypoxic, df_scan_cat3_l$index_hypoxic))
-rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+# Long
+scan_hypoxia3 <- addmargins(table(df_scan_cat3_l$ref_hypoxic, df_scan_cat3_l$index_hypoxic))
+rownames(scan_hypoxia3) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(scan_hypoxia3, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
+
+# Wide
+scan_hypoxia3_m1 <- addmargins(table(df_scan_cat3_w$m1_ref_hypoxic, df_scan_cat3_w$m1_index_hypoxic))
+scan_hypoxia3_m2 <- addmargins(table(df_scan_cat3_w$m2_ref_hypoxic, df_scan_cat3_w$m2_index_hypoxic))
+scan_hypoxia3_m3 <- addmargins(table(df_scan_cat3_w$m3_ref_hypoxic, df_scan_cat3_w$m3_index_hypoxic))
 ```
 
 ### Fever
 ```{r echo=FALSE}
-c <- addmargins(table(df_scan_cat3_l$ref_fever, df_scan_cat3_l$index_fever))
-rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+scan_fever3 <- addmargins(table(df_scan_cat3_l$ref_fever, df_scan_cat3_l$index_fever))
+rownames(scan_fever3) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(scan_fever3, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 ```
 
 ### Fast Breathing
 ```{r echo=FALSE}
-b <- addmargins(table(df_scan_cat2fb_l$ref_fastbreath_35mo, df_scan_cat2fb_l$index_fastbreath_35mo))
-rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-35 months**") %>% 
+scan_fb2 <- addmargins(table(df_scan_cat2fb_l$ref_fastbreath_35mo, df_scan_cat2fb_l$index_fastbreath_35mo))
+rownames(scan_fb2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(scan_fb2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-35 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
 
-c <- addmargins(table(df_scan_cat3fb_l$ref_fastbreath_59mo, df_scan_cat3fb_l$index_fastbreath_59mo))
-rownames(c) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(c, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**36-59 months**") %>% 
+scan_fb3 <- addmargins(table(df_scan_cat3fb_l$ref_fastbreath_59mo, df_scan_cat3fb_l$index_fastbreath_59mo))
+rownames(scan_fb3) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(scan_fb3, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**36-59 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") 
 ```
 
 ### Tachycardia
 ```{r echo=FALSE}
-b <- addmargins(table(df_scan_cat2tachy_l$ref_tachycardic_59mo, df_scan_cat2tachy_l$index_tachycardic_59mo))
-rownames(b) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-kable(b, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
+scan_tachy2 <- addmargins(table(df_scan_cat2tachy_l$ref_tachycardic_59mo, df_scan_cat2tachy_l$index_tachycardic_59mo))
+rownames(scan_tachy2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
+kable(scan_tachy2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
 ```
 
 # Section 6: Percent Agreement {.tabset}
 Samwel (Rebecca can take this if helpful)
+
+```{r echo=FALSE, include=FALSE}
+# use binom.exact function from exactci package to calculate percent agreement and associated 95% CI's for each device/measurement/age category
+# store cacluations in object to call in subsequent sections and display in table
+
+# Rad-G
+## Overall
+pa_radg_hypoxia1 <- binom.exact(x = sum(radg_hypoxia1[1,1], radg_hypoxia1[2,2]), n = radg_hypoxia1[3,3])
+pa_radg_hypoxia2 <- binom.exact(x = sum(radg_hypoxia2[1,1], radg_hypoxia2[2,2]), n = radg_hypoxia2[3,3])
+pa_radg_hypoxia3 <- binom.exact(x = sum(radg_hypoxia3[1,1], radg_hypoxia3[2,2]), n = radg_hypoxia3[3,3])
+
+pa_radg_fever1 <- binom.exact(x = sum(radg_fever1[1,1], radg_fever1[2,2]), n = radg_fever1[3,3])
+pa_radg_fever2 <- binom.exact(x = sum(radg_fever2[1,1], radg_fever2[2,2]), n = radg_fever2[3,3])
+pa_radg_fever3 <- binom.exact(x = sum(radg_fever3[1,1], radg_fever3[2,2]), n = radg_fever3[3,3])
+
+pa_radg_fb1 <- binom.exact(x = sum(radg_fb1[1,1], radg_fb1[2,2]), n = radg_fb1[3,3])
+pa_radg_fb2 <- binom.exact(x = sum(radg_fb2[1,1], radg_fb2[2,2]), n = radg_fb2[3,3])
+pa_radg_fb3 <- binom.exact(x = sum(radg_fb3[1,1], radg_fb3[2,2]), n = radg_fb3[3,3])
+
+pa_radg_tachy1 <- binom.exact(x = sum(radg_tachy1[1,1], radg_tachy1[2,2]), n = radg_tachy1[3,3])
+pa_radg_tachy2 <- binom.exact(x = sum(radg_tachy2[1,1], radg_tachy2[2,2]), n = radg_tachy2[3,3])
+
+## M1-3
+### Hypoxia
+pa_radg_hypoxia1_m1 <- binom.exact(x = radg_hypoxia1_m1[1,1], n = sum(radg_hypoxia1_m1[1,1], radg_hypoxia1_m1[2,1])) # Intentionally updated to reflect issues with underlying 2x2
+pa_radg_hypoxia1_m2 <- binom.exact(x = sum(radg_hypoxia1_m2[1,1], radg_hypoxia1_m2[2,2]), n = radg_hypoxia1_m2[3,3])
+pa_radg_hypoxia1_m3 <- binom.exact(x = sum(radg_hypoxia1_m3[1,1], radg_hypoxia1_m3[2,2]), n = radg_hypoxia1_m3[3,3])
+
+pa_radg_hypoxia2_m1 <- binom.exact(x = radg_hypoxia2_m1[1,1], n = sum(radg_hypoxia2_m1[1,1], radg_hypoxia2_m1[2,1])) # Intentionally updated to reflect issues with underlying 2x2
+pa_radg_hypoxia2_m2 <- binom.exact(x = sum(radg_hypoxia2_m2[1,1], radg_hypoxia2_m2[2,2]), n = radg_hypoxia2_m2[3,3])
+pa_radg_hypoxia2_m3 <- binom.exact(x = sum(radg_hypoxia2_m3[1,1], radg_hypoxia2_m3[2,2]), n = radg_hypoxia2_m3[3,3])
+
+pa_radg_hypoxia3_m1 <- binom.exact(x = radg_hypoxia3_m1[1,1], n = sum(radg_hypoxia3_m1[1,1], radg_hypoxia3_m1[1,2])) # Intentionally updated to reflect issues with underlying 2x2
+pa_radg_hypoxia3_m2 <- binom.exact(x = sum(radg_hypoxia3_m2[1,1], radg_hypoxia3_m2[2,2]), n = radg_hypoxia3_m2[3,3])
+pa_radg_hypoxia3_m3 <- binom.exact(x = sum(radg_hypoxia3_m3[1,1], radg_hypoxia3_m3[2,2]), n = radg_hypoxia3_m3[3,3])
+
+### Fever
+
+### Fast breathing
+
+### Tachycardia
+
+# Biolight
+## Overall
+pa_bio_hypoxia1 <- binom.exact(x = sum(bio_hypoxia1[1,1], bio_hypoxia1[2,2]), n = bio_hypoxia1[3,3])
+pa_bio_hypoxia2 <- binom.exact(x = sum(bio_hypoxia2[1,1], bio_hypoxia2[2,2]), n = bio_hypoxia2[3,3])
+pa_bio_hypoxia3 <- binom.exact(x = sum(bio_hypoxia3[1,1], bio_hypoxia3[2,2]), n = bio_hypoxia3[3,3])
+
+pa_bio_fever1 <- binom.exact(x = sum(bio_fever1[1,1], bio_fever1[2,2]), n = bio_fever1[3,3])
+pa_bio_fever2 <- binom.exact(x = sum(bio_fever2[1,1], bio_fever2[2,2]), n = bio_fever2[3,3])
+pa_bio_fever3 <- binom.exact(x = sum(bio_fever3[1,1], bio_fever3[2,2]), n = bio_fever3[3,3])
+
+pa_bio_fb1 <- binom.exact(x = sum(bio_fb1[1,1], bio_fb1[2,2]), n = bio_fb1[3,3])
+pa_bio_fb2 <- binom.exact(x = sum(bio_fb2[1,1], bio_fb2[2,2]), n = bio_fb2[3,3])
+pa_bio_fb3 <- binom.exact(x = sum(bio_fb3[1,1], bio_fb3[2,2]), n = bio_fb3[3,3])
+
+pa_bio_tachy1 <- binom.exact(x = sum(bio_tachy1[1,1], bio_tachy1[2,2]), n = bio_tachy1[3,3])
+pa_bio_tachy2 <- binom.exact(x = sum(bio_tachy2[1,1], bio_tachy2[2,2]), n = bio_tachy2[3,3])
+
+## M1-3
+### Hypoxia
+pa_bio_hypoxia1_m1 <- binom.exact(x = sum(bio_hypoxia1_m1[1,1], bio_hypoxia1_m1[2,2]), n = bio_hypoxia1_m1[3,3])
+pa_bio_hypoxia1_m2 <- binom.exact(x = sum(bio_hypoxia1_m2[1,1], bio_hypoxia1_m2[2,2]), n = bio_hypoxia1_m2[3,3])
+pa_bio_hypoxia1_m3 <- binom.exact(x = sum(bio_hypoxia1_m3[1,1], bio_hypoxia1_m3[2,2]), n = bio_hypoxia1_m3[3,3])
+
+pa_bio_hypoxia2_m1 <- binom.exact(x = sum(bio_hypoxia2_m1[1,1], bio_hypoxia2_m1[2,2]), n = bio_hypoxia2_m1[3,3])
+pa_bio_hypoxia2_m2 <- binom.exact(x = sum(bio_hypoxia2_m2[1,1], bio_hypoxia2_m2[2,2]), n = bio_hypoxia2_m2[3,3])
+pa_bio_hypoxia2_m3 <- binom.exact(x = sum(bio_hypoxia2_m3[1,1], bio_hypoxia2_m3[2,2]), n = bio_hypoxia2_m3[3,3])
+
+pa_bio_hypoxia3_m1 <- binom.exact(x = sum(bio_hypoxia3_m1[1,1], bio_hypoxia3_m1[2,2]), n = bio_hypoxia3_m1[3,3])
+pa_bio_hypoxia3_m2 <- binom.exact(x = bio_hypoxia3_m2[1,1], n = sum(bio_hypoxia3_m2[1,1], bio_hypoxia3_m2[1,2])) # Intentionally updated to reflect issues with underlying 2x2
+pa_bio_hypoxia3_m3 <- binom.exact(x = bio_hypoxia3_m3[1,1], n = sum(bio_hypoxia3_m3[1,1], bio_hypoxia3_m3[1,2])) # Intentionally updated to reflect issues with underlying 2x2
+
+### Fever
+
+### Fast breathing
+
+### Tachycardia
+
+# Neopenda
+## Overall
+pa_neo_hypoxia1 <- binom.exact(x = sum(neo_hypoxia1[1,1], neo_hypoxia1[2,2]), n = neo_hypoxia1[3,3])
+pa_neo_hypoxia2 <- binom.exact(x = sum(neo_hypoxia2[1,1], neo_hypoxia2[2,2]), n = neo_hypoxia2[3,3])
+pa_neo_hypoxia3 <- binom.exact(x = sum(neo_hypoxia3[1,1], neo_hypoxia3[2,2]), n = neo_hypoxia3[3,3])
+
+pa_neo_fever1 <- binom.exact(x = sum(neo_fever1[1,1], neo_fever1[2,2]), n = neo_fever1[3,3])
+pa_neo_fever2 <- binom.exact(x = sum(neo_fever2[1,1], neo_fever2[2,2]), n = neo_fever2[3,3])
+pa_neo_fever3 <- binom.exact(x = sum(neo_fever3[1,1], neo_fever3[2,2]), n = neo_fever3[3,3])
+
+pa_neo_fb1 <- binom.exact(x = sum(neo_fb1[1,1], neo_fb1[2,2]), n = neo_fb1[3,3])
+pa_neo_fb2 <- binom.exact(x = sum(neo_fb2[1,1], neo_fb2[2,2]), n = neo_fb2[3,3])
+pa_neo_fb3 <- binom.exact(x = sum(neo_fb3[1,1], neo_fb3[2,2]), n = neo_fb3[3,3])
+
+pa_neo_tachy1 <- binom.exact(x = sum(neo_tachy1[1,1], neo_tachy1[2,2]), n = neo_tachy1[3,3])
+pa_neo_tachy2 <- binom.exact(x = sum(neo_tachy2[1,1], neo_tachy2[2,2]), n = neo_tachy2[3,3])
+
+## M1-3
+### Hypoxia
+pa_neo_hypoxia1_m1 <- binom.exact(x = sum(neo_hypoxia1_m1[1,1], neo_hypoxia1_m1[2,2]), n = neo_hypoxia1_m1[3,3])
+pa_neo_hypoxia1_m2 <- binom.exact(x = sum(neo_hypoxia1_m2[1,1], neo_hypoxia1_m2[2,2]), n = neo_hypoxia1_m2[3,3])
+pa_neo_hypoxia1_m3 <- binom.exact(x = sum(neo_hypoxia1_m3[1,1], neo_hypoxia1_m3[2,2]), n = neo_hypoxia1_m3[3,3])
+
+pa_neo_hypoxia2_m1 <- binom.exact(x = sum(neo_hypoxia2_m1[1,1], neo_hypoxia2_m1[2,2]), n = neo_hypoxia2_m1[3,3])
+pa_neo_hypoxia2_m2 <- binom.exact(x = sum(neo_hypoxia2_m2[1,1], neo_hypoxia2_m2[2,2]), n = neo_hypoxia2_m2[3,3])
+pa_neo_hypoxia2_m3 <- binom.exact(x = sum(neo_hypoxia2_m3[1,1], neo_hypoxia2_m3[2,2]), n = neo_hypoxia2_m3[3,3])
+
+pa_neo_hypoxia3_m1 <- binom.exact(x = sum(neo_hypoxia3_m1[1,1], neo_hypoxia3_m1[2,2]), n = neo_hypoxia3_m1[3,3])
+pa_neo_hypoxia3_m2 <- binom.exact(x = sum(neo_hypoxia3_m2[1,1], neo_hypoxia3_m2[2,2]), n = neo_hypoxia3_m2[3,3])
+pa_neo_hypoxia3_m3 <- binom.exact(x = sum(neo_hypoxia3_m3[1,1], neo_hypoxia3_m3[2,2]), n = neo_hypoxia3_m3[3,3])
+
+### Fever
+
+### Fast breathing
+
+### Tachycardia
+
+# Onyx
+## Overall
+pa_onyx_hypoxia3 <- binom.exact(x = sum(onyx_hypoxia3[1,1], onyx_hypoxia3[2,2]), n = onyx_hypoxia3[3,3])
+
+pa_onyx_fb2 <- binom.exact(x = sum(onyx_fb2[1,1], onyx_fb2[2,2]), n = onyx_fb2[3,3])
+pa_onyx_fb3 <- binom.exact(x = sum(onyx_fb3[1,1], onyx_fb3[2,2]), n = onyx_fb3[3,3])
+
+pa_onyx_tachy2 <- binom.exact(x = sum(onyx_tachy2[1,1], onyx_tachy2[2,2]), n = onyx_tachy2[3,3])
+
+## M1-3
+### Hypoxia
+pa_onyx_hypoxia3_m1 <- binom.exact(x = onyx_hypoxia3_m1[1,1], n = sum(onyx_hypoxia3_m1[1,1], onyx_hypoxia3_m1[2,1])) # Intentionally updated to reflect issues with underlying 2x2
+pa_onyx_hypoxia3_m2 <- binom.exact(x = onyx_hypoxia3_m2[1,1], n = sum(onyx_hypoxia3_m2[1,1], onyx_hypoxia3_m2[2,1])) # Intentionally updated to reflect issues with underlying 2x2
+pa_onyx_hypoxia3_m3 <- binom.exact(x = onyx_hypoxia3_m3[1,1], n = sum(onyx_hypoxia3_m3[1,1], onyx_hypoxia3_m3[2,1])) # Intentionally updated to reflect issues with underlying 2x2
+
+### Fever
+
+### Fast breathing
+
+### Tachycardia
+
+# Scanbo
+## Overall
+pa_scan_hypoxia3 <- binom.exact(x = sum(scan_hypoxia3[1,1], scan_hypoxia3[2,2]), n = scan_hypoxia3[3,3])
+
+pa_scan_fever3 <- binom.exact(x = sum(scan_fever3[1,1], scan_fever3[2,2]), n = scan_fever3[3,3])
+
+pa_scan_fb2 <- binom.exact(x = sum(scan_fb2[1,1], scan_fb2[2,2]), n = scan_fb2[3,3])
+pa_scan_fb3 <- binom.exact(x = sum(scan_fb3[1,1], scan_fb3[2,2]), n = scan_fb3[3,3])
+
+pa_scan_tachy2 <- binom.exact(x = sum(scan_tachy2[1,1], scan_tachy2[2,2]), n = scan_tachy2[3,3])
+
+## M1-3
+### Hypoxia
+pa_scan_hypoxia3_m1 <- binom.exact(x = scan_hypoxia3_m1[1,1], n = sum(scan_hypoxia3_m1[1,1], scan_hypoxia3_m1[2,1])) # Intentionally updated to reflect issues with underlying 2x2
+pa_scan_hypoxia3_m2 <- binom.exact(x = scan_hypoxia3_m2[1,1], n = sum(scan_hypoxia3_m2[1,1], scan_hypoxia3_m2[2,1])) # Intentionally updated to reflect issues with underlying 2x2
+pa_scan_hypoxia3_m3 <- binom.exact(x = scan_hypoxia3_m3[1,1], n = sum(scan_hypoxia3_m3[1,1], scan_hypoxia3_m3[2,1])) # Intentionally updated to reflect issues with underlying 2x2
+
+### Fever
+
+### Fast breathing
+
+### Tachycardia
+```
+
+## Hypoxia
+```{r}
+#need to add other devices
+out_hypoxia <- data.frame(col1 = c("", "", "Rad-G", "Biolight", "Neopenda", "Onyx", "Scanbo"),
+                    col2 = c("0-1 month", "*Overall*", paste(round(pa_radg_hypoxia1$estimate, 2), "(", round(pa_radg_hypoxia1$conf.int[1], 2)," - ", round(pa_radg_hypoxia1$conf.int[2], 2),")", sep = " ")),
+                    col3 = c("0-1 month", "M1", paste(round(pa_radg_hypoxia1_m1$estimate, 2), "(", round(pa_radg_hypoxia1_m1$conf.int[1], 2)," - ", round(pa_radg_hypoxia1_m1$conf.int[2], 2),")", sep = " ")),
+                    col4 = c("0-1 month", "M2", paste(round(pa_radg_hypoxia1_m2$estimate, 2), "(", round(pa_radg_hypoxia1_m2$conf.int[1], 2)," - ", round(pa_radg_hypoxia1_m2$conf.int[2], 2),")", sep = " ")),
+                    col5 = c("0-1 month", "M3", paste(round(pa_radg_hypoxia1_m3$estimate, 2), "(", round(pa_radg_hypoxia1_m3$conf.int[1], 2)," - ", round(pa_radg_hypoxia1_m3$conf.int[2], 2),")", sep = " ")),
+                    col6 = c("2-11 months", "*Overall*", paste(round(pa_radg_hypoxia2$estimate, 2), "(", round(pa_radg_hypoxia2$conf.int[1], 2)," - ", round(pa_radg_hypoxia2$conf.int[2], 2),")", sep = " ")),
+                    col7 = c("2-11 months", "M1", paste(round(pa_radg_hypoxia2_m1$estimate, 2), "(", round(pa_radg_hypoxia2_m1$conf.int[1], 2)," - ", round(pa_radg_hypoxia2_m1$conf.int[2], 2),")", sep = " ")),
+                    col8 = c("2-11 months", "M2", paste(round(pa_radg_hypoxia2_m2$estimate, 2), "(", round(pa_radg_hypoxia2_m2$conf.int[1], 2)," - ", round(pa_radg_hypoxia2_m2$conf.int[2], 2),")", sep = " ")),
+                    col9 = c("2-11 months", "M3", paste(round(pa_radg_hypoxia2_m3$estimate, 2), "(", round(pa_radg_hypoxia2_m3$conf.int[1], 2)," - ", round(pa_radg_hypoxia2_m3$conf.int[2], 2),")", sep = " ")),
+                    col10 = c("12-59 months", "*Overall*", paste(round(pa_radg_hypoxia3$estimate, 2), "(", round(pa_radg_hypoxia3$conf.int[1], 2)," - ", round(pa_radg_hypoxia3$conf.int[2], 2),")", sep = " ")),
+                    col11 = c("12-59 months", "M1", paste(round(pa_radg_hypoxia3_m1$estimate, 2), "(", round(pa_radg_hypoxia3_m1$conf.int[1], 2)," - ", round(pa_radg_hypoxia3_m1$conf.int[2], 2),")", sep = " ")),
+                    col12 = c("12-59 months", "M2", paste(round(pa_radg_hypoxia3_m2$estimate, 2), "(", round(pa_radg_hypoxia3_m2$conf.int[1], 2)," - ", round(pa_radg_hypoxia3_m2$conf.int[2], 2),")", sep = " ")),
+                    col13 = c("12-59 months", "M3", paste(round(pa_radg_hypoxia3_m3$estimate, 2), "(", round(pa_radg_hypoxia3_m3$conf.int[1], 2)," - ", round(pa_radg_hypoxia3_m3$conf.int[2], 2),")", sep = " "))
+                    )
+#to be updated
+hypoxia_pa <- kable(out_hypoxia, col.names = c("","Rad-G Temp (Masimo)", "M800 (Biolight)", "NeoGuard (Neopenda)")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
+  pack_rows("Temperature", 1, 2) %>%
+  pack_rows("Oxygen", 3, 4) %>%
+  pack_rows("Profusion Index", 5, 6) %>%
+  pack_rows("Pulse Rate", 7, 8) %>%
+  pack_rows("Respiratory Rate", 9, 10) %>%
+  add_header_above(c(" ", "Intraclass correlation coefficient for clinical measures across devices for participantss aged 0-1 month (95%CI)" = 3))
+```
+
+
+## Fever
+
+## Fast Breathing
+
+## Tachycardia
