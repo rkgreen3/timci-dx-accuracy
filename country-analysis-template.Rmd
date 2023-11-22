@@ -273,7 +273,7 @@ Leila
 
 ## Table 1: Participant Characteristics Overall and by Facility
 
-```{r}
+```{r echo=FALSE, include = FALSE}
 
 # @ Leila and team - would recommend using the cleaned check box variables (have been added to the codebook), also just an fyi that you don't need to explicitly create factored variables for the CreateTableOne to treat them as categorical, as long as they're included in your factorVars list they'll be handled as categorical even if they're numeric
 
@@ -285,7 +285,7 @@ factorVars <- c("age_cat", "sex","cg_relationship",
                 "ill_sxs_diarrhea", "ill_sxs_vomit", "ill_sxs_other",
                 "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
                 "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_other",
-                "recieved_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
+                "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
                 "tx_other")
 
 # Create 3 new variables for the mean of the reference spo2, pr, and temp across all 3 measurements per row in order to compute summary 
@@ -310,23 +310,25 @@ myVars <- c("age_cat", "sex","cg_relationship",
             "ill_sxs_diarrhea", "ill_sxs_vomit", "ill_sxs_other",
             "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
             "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_other",
-            "recieved_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
+            "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
             "tx_other", "height", "weight", "muac", "hemocue_hb", "head_circumference", "mean_ref_spo2", "mean_ref_pr", "mean_ref_temp")
 
 # CreateTableOne Overall:
 
 out1 <- CreateTableOne(vars = myVars,
-               data = timci_clean,
+               data = df_og,
                factorVars = factorVars,
-               test = FALSE)
+               strata = "facility_name",
+               test = FALSE,
+               addOverall = TRUE)
 
 t1_overall <- print(out1,
             cramVars = "sex")
 
-# CreateTableOne stratified by faccility
+# CreateTableOne stratified by facility -- RG Note: I added a parameter to the object above so you don't need to create a second object
 
 out2 <- CreateTableOne(vars = myVars,
-               data = timci_clean,
+               data = df_og,
                factorVars = factorVars,
                strata = "facility_name",
                test = FALSE)
@@ -336,8 +338,20 @@ t1_by_facility <- print(out2,
 
 # Summary statistics of the continuous variables
 
-summary(out1$contTable)
+summary(out1$contTable) # RG Note: what is this meant to do?
+
+# RG Suggestion: Since we'll be outputting to html (at least to start), see if you can get it to output as an html table when you knit the document. You may also want to add rownames to make the output more intuitive to the reader (e.g., define what cg_relationship 1-10 actually means). Here's some sample code to get you started:
+
+# suggest releveling age category to appear in order
+
+t1lab <- c("N", "Age Category", "0-1 month", ...)
+rownames(t1_overall) <- c(t1lab)
+
+t1 <- kable(t1_overall) %>%
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
+  add_indent(c(3:5))
 ```
+`r t1`
 
 ## List of free responses entered for 'other' fields {.tabset}
 
