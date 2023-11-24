@@ -1,6 +1,19 @@
+
+# R related files
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+.Renviron
 timci-dx-accuracy.Rproj
+
+# Analysis output
 country-analysis-template.html
+
+# Data files
+*.csv
+*.xlsx
+*.xlx
+
+# Image files
+*.png

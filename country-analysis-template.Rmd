@@ -16,6 +16,10 @@ The primary objective of this study is to determine the performance of available
 
 ```{r setup, include=FALSE}
 rm(list = ls())
+
+# Rmd setup (since we echo all code)
+knitr::opts_chunk$set(echo = FALSE)
+
 # install these packages if not already on your computer
 library(plyr)
 library(dplyr)
@@ -27,15 +31,24 @@ library(exactci)
 library(reshape2)
 library(ggplot2)
 
-# Read in (cleaned) data using file choose
-filename <- file.choose()
+# Read in (cleaned) data 
+# Create a text file with the name ".Renviron", then define the variables as defined below
+# filename = "dx-accuracy-data_clean_2023-11-17.csv"
+# COUNTRY = "Tanzania"
+# After adding the file and content restart R session and you are good to go
+# The Renviron will be ingored when pushing changes to Github
+
+filename <- Sys.getenv("filename")
 df_og <- read.csv(filename)
 df_og <- df_og %>% select(-c("X"))
 
 # Define country and subset
-COUNTRY <- "Kenya" # Kenya, Tanzania, India -- USER INPUT HERE
+# COUNTRY <- "Kenya" # Kenya, Tanzania, India -- USER INPUT HERE
+COUNTRY <- Sys.getenv("COUNTRY")
 df_og <- subset(df_og, df_og$country==COUNTRY)
+```
 
+```{r long_dfs}
 # --- SECTION 1: CREATING LONG DF
 # Create reshaped df's
 ## use regular expressions to identify measurement-related columns and trim to only variables needed
@@ -122,7 +135,9 @@ mdf_reshaped$age_cat_fastbreathe <- case_when(mdf_reshaped$age_months<12 ~ "0-11
                                               mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 ~ "12-35 months",
                                               mdf_reshaped$age_months>35 ~ "36-59 months")
 mdf_reshaped$grp <- as.factor(mdf_reshaped$grp)
+```
 
+```{r device_dfs}
 # --- SECTION 2: CREATING DEVICE DF'S
 # Create a df for each device (in both wide and long format) -- note: any variable formatting (e.g., converting to factors) or additional variable creation should happen prior to creating these little dataframes
 
@@ -263,8 +278,9 @@ df_scan_cat3_w <- subset(df_scan_w, age_cat=="12-59 months")
 df_scan_cat2tachy_w <- subset(df_scan_w, age_cat_tachy=="12-59 months")
 df_scan_cat2fb_w <- subset(df_scan_w, age_cat_fastbreathe=="12-35 months")
 df_scan_cat3fb_w <- subset(df_scan_w, age_cat_fastbreathe=="36-59 months")
-
 ```
+
+
 
 This report contains data from **`r COUNTRY`**.
 
@@ -273,7 +289,7 @@ Leila
 
 ## Table 1: Participant Characteristics Overall and by Facility
 
-```{r echo=FALSE, include = FALSE}
+```{r include = FALSE}
 
 # @ Leila and team - would recommend using the cleaned check box variables (have been added to the codebook), also just an fyi that you don't need to explicitly create factored variables for the CreateTableOne to treat them as categorical, as long as they're included in your factorVars list they'll be handled as categorical even if they're numeric
 
@@ -344,8 +360,8 @@ summary(out1$contTable) # RG Note: what is this meant to do?
 
 # suggest releveling age category to appear in order
 
-t1lab <- c("N", "Age Category", "0-1 month", ...)
-rownames(t1_overall) <- c(t1lab)
+# t1lab <- c("N", "Age Category", "0-1 month")
+# rownames(t1_overall) <- c(t1lab)
 
 t1 <- kable(t1_overall) %>%
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
@@ -356,15 +372,15 @@ t1 <- kable(t1_overall) %>%
 ## List of free responses entered for 'other' fields {.tabset}
 
 ### Symptoms
-```{r echo=FALSE}
+```{r}
 df_og[df_og$ill_sxs_other==1,c("ppt_id", "visit_reason_ill_sxs_oth")]
 ```
 ### Diagnosis
-```{r echo=FALSE}
+```{r}
 df_og[df_og$dx_other==1,c("ppt_id", "reported_dx_oth")]
 ```
 ### Treatment
-```{r echo=FALSE}
+```{r}
 df_og[df_og$tx_other==1,c("ppt_id", "reported_tx_oth")]
 ```
 
@@ -372,7 +388,7 @@ df_og[df_og$tx_other==1,c("ppt_id", "reported_tx_oth")]
 Leila
 
 ## Reference
-```{r echo=FALSE, include=FALSE}
+```{r, include=FALSE}
 
 ```
 
@@ -401,57 +417,57 @@ Anmol
 ## Rad-G Temp (Masimo) {.tabset}
 
 ### Temperature
-```{r echo=FALSE, results='hide', fig.keep='last'}
+```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat1_l$ref_temp, df_radg_cat1_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Temperature (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=19)
 legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
 ```
-```{r echo=FALSE, results='hide', fig.keep='last'}
+```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat2_l$ref_temp, df_radg_cat2_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Temperature (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=19)
 legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
 ```
-```{r echo=FALSE, results='hide', fig.keep='last'}
+```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat3_l$ref_temp, df_radg_cat3_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Temperature (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=19)
 legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
 ```
 
 ### Oxygen
-```{r echo=FALSE, results='hide', fig.keep='last'}
+```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat1_l$ref_o2, df_radg_cat1_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=19)
 legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
 ```
-```{r echo=FALSE, results='hide', fig.keep='last'}
+```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat2_l$ref_o2, df_radg_cat2_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=19)
 legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
 ```
-```{r echo=FALSE, results='hide', fig.keep='last'}
+```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat3_l$ref_o2, df_radg_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=19)
 legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
 ```
 
 ### Profusion Index
-```{r echo=FALSE, results='hide', fig.keep='last'}
+```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat1_l$ref_pi, df_radg_cat1_l$index_pi, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Profusion Index (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=19)
 legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
 ```
-```{r echo=FALSE, results='hide', fig.keep='last'}
+```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat2_l$ref_pi, df_radg_cat2_l$index_pi, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Profusion Index (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=19)
 legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
 ```
-```{r echo=FALSE, results='hide', fig.keep='last'}
+```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat3_l$ref_pi, df_radg_cat3_l$index_pi, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Profusion Index (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=19)
 legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
 ```
 
 ### Pulse Rate
-```{r echo=FALSE, results='hide', fig.keep='last'}
+```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat1_l$ref_pr, df_radg_cat1_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Pulse Rate (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=19)
 legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
 ```
-```{r echo=FALSE, results='hide', fig.keep='last'}
+```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat2_l$ref_pr, df_radg_cat2_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Pulse Rate (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=19)
 legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
 ```
-```{r echo=FALSE, results='hide', fig.keep='last'}
+```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat3_l$ref_pr, df_radg_cat3_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Pulse Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=19)
 legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
 ```
@@ -459,7 +475,7 @@ legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864
 ### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
 
 ## m800 (Biolight) {.tabset}
-```{r echo=FALSE, include=FALSE}
+```{r, include=FALSE}
 
 ```
 
@@ -470,7 +486,7 @@ legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864
 ### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
 
 ## NeoGuard (Neopenda) {.tabset}
-```{r echo=FALSE, include=FALSE}
+```{r, include=FALSE}
 
 ```
 
@@ -483,12 +499,12 @@ legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864
 ### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
 
 ## Onyx PO+RR (Nonin) {.tabset}
-```{r echo=FALSE, include=FALSE}
+```{r, include=FALSE}
 
 ```
 
 ## Scanbo v8 (Scanbo) {.tabset}
-```{r echo=FALSE, include=FALSE}
+```{r, include=FALSE}
 
 ```
 
@@ -517,7 +533,7 @@ How to interpret the ICC:
 -	0.75<0.9: Good reliability
 -	≥0.9: Excellent reliability
 
-```{r echo=FALSE, include=FALSE}
+```{r, include=FALSE}
 # Create M1-3 matrices by age category, device, and measurement type
 
 # -- Rad-G
@@ -586,7 +602,7 @@ df_onyx_cat3_pr <- df_onyx_cat3_w %>% select(colnames(df_onyx_cat3_w[grepl("+ind
 df_onyx_cat3_rr <- df_onyx_cat3_w %>% select(colnames(df_onyx_cat3_w[grepl("+index_rr", names(df_onyx_cat3_w))]))
 ```
 
-```{r echo=FALSE, include=FALSE}
+```{r, include=FALSE}
 # Create ICC objects for each age category, device, and measurement type
 
 # Rad-G ICC objects
@@ -655,7 +671,7 @@ icc_onyx_cat3_pr <- icc(df_onyx_cat3_pr, model = "twoway", type = "agreement", u
 icc_onyx_cat3_rr <- icc(df_onyx_cat3_rr, model = "twoway", type = "agreement", unit = "single")
 ```
 
-```{r echo=FALSE, include=FALSE}
+```{r, include=FALSE}
 # Build a table of ICC [95%CI] for each age category
 # $value = icc point estimate; $lbound = lower bound of CI; $ubound = upper bound of CI
 
@@ -767,14 +783,14 @@ Clinical thresholds used in the section are as follows:
 *NOTE: Where different, clinical age categories are used in this section (and the next) in place of the study age categories.*
 
 ## Rad-G Temp (Masimo) {.tabset}
-```{r echo=FALSE, include=FALSE}
+```{r, include=FALSE}
 # create 2x2 table objects with margins to display (to display overall only)
 # create 2x2 table objects with margins for each measurement number (for use in next section)
 # these objects are needed for percent agreement calculation in next section, object naming convention follows device_clinicalmeasure# where # = age category
 ```
 
 ### Hypoxia
-```{r echo=FALSE}
+```{r}
 # Long format (overall)
 radg_hypoxia1 <- addmargins(table(df_radg_cat1_l$ref_hypoxic, df_radg_cat1_l$index_hypoxic))
 rownames(radg_hypoxia1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
@@ -806,7 +822,7 @@ radg_hypoxia3_m3 <- addmargins(table(df_radg_cat3_w$m3_ref_hypoxic, df_radg_cat3
 ```
 
 ### Fever
-```{r echo=FALSE}
+```{r}
 # Long format (overall)
 radg_fever1 <- addmargins(table(df_radg_cat1_l$ref_fever, df_radg_cat1_l$index_fever))
 rownames(radg_fever1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
@@ -838,7 +854,7 @@ radg_fever3_m3 <- addmargins(table(df_radg_cat3_w$m3_ref_fever, df_radg_cat3_w$m
 ```
 
 ### Fast Breathing
-```{r echo=FALSE}
+```{r}
 # Long format
 radg_fb1 <- addmargins(table(df_radg_cat1fb_l$ref_fastbreath_12mo, df_radg_cat1fb_l$index_fastbreath_12mo))
 rownames(radg_fb1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
@@ -870,7 +886,7 @@ radg_fb3_m3 <- addmargins(table(df_radg_cat3fb_w$m3_ref_fastbreath_59mo, df_radg
 ```
 
 ### Tachycardia
-```{r echo=FALSE}
+```{r}
 # Long
 radg_tachy1 <- addmargins(table(df_radg_cat1tachy_l$ref_tachycardic_12mo, df_radg_cat1tachy_l$index_tachycardic_12mo))
 rownames(radg_tachy1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
@@ -895,7 +911,7 @@ radg_tachy2_m3 <- addmargins(table(df_radg_cat2tachy_w$m3_ref_tachycardic_59mo, 
 ## m800 (Biolight) {.tabset}
 
 ### Hypoxia
-```{r echo=FALSE}
+```{r}
 # Long
 bio_hypoxia1 <- addmargins(table(df_bio_cat1_l$ref_hypoxic, df_bio_cat1_l$index_hypoxic))
 rownames(bio_hypoxia1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
@@ -927,7 +943,7 @@ bio_hypoxia3_m3 <- addmargins(table(df_bio_cat3_w$m3_ref_hypoxic, df_bio_cat3_w$
 ```
 
 ### Fast Breathing
-```{r echo=FALSE}
+```{r}
 bio_fb1 <- addmargins(table(df_bio_cat1fb_l$ref_fastbreath_12mo, df_bio_cat1fb_l$index_fastbreath_12mo))
 rownames(bio_fb1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
 kable(bio_fb1, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
@@ -945,7 +961,7 @@ kable(bio_fb3, format = "html", row.names = T, col.names = c("", "Normal (Index)
 ```
 
 ### Tachycardia
-```{r echo=FALSE}
+```{r}
 bio_tachy1 <- addmargins(table(df_bio_cat1tachy_l$ref_tachycardic_12mo, df_bio_cat1tachy_l$index_tachycardic_12mo))
 rownames(bio_tachy1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
 kable(bio_tachy1, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
@@ -960,7 +976,7 @@ kable(bio_tachy2, format = "html", row.names = T, col.names = c("", "Normal (Ind
 ## NeoGuard (Neopenda) {.tabset}
 
 ### Hypoxia
-```{r echo=FALSE}
+```{r}
 # Long
 neo_hypoxia1 <- addmargins(table(df_neo_cat1_l$ref_hypoxic, df_neo_cat1_l$index_hypoxic))
 rownames(neo_hypoxia1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
@@ -992,7 +1008,7 @@ neo_hypoxia3_m3 <- addmargins(table(df_neo_cat3_w$m3_ref_hypoxic, df_neo_cat3_w$
 ```
 
 ### Fever
-```{r echo=FALSE}
+```{r}
 neo_fever1 <- addmargins(table(df_neo_cat1_l$ref_fever, df_neo_cat1_l$index_fever))
 rownames(neo_fever1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
 kable(neo_fever1, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
@@ -1010,7 +1026,7 @@ kable(neo_fever3, format = "html", row.names = T, col.names = c("", "Normal (Ind
 ```
 
 ### Fast Breathing
-```{r echo=FALSE}
+```{r}
 neo_fb1 <- addmargins(table(df_neo_cat1fb_l$ref_fastbreath_12mo, df_neo_cat1fb_l$index_fastbreath_12mo))
 rownames(neo_fb1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
 kable(neo_fb1, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
@@ -1028,7 +1044,7 @@ kable(neo_fb3, format = "html", row.names = T, col.names = c("", "Normal (Index)
 ```
 
 ### Tachycardia
-```{r echo=FALSE}
+```{r}
 neo_tachy1 <- addmargins(table(df_neo_cat1tachy_l$ref_tachycardic_12mo, df_neo_cat1tachy_l$index_tachycardic_12mo))
 rownames(neo_tachy1) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
 kable(neo_tachy1, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**0-11 months**") %>% 
@@ -1043,7 +1059,7 @@ kable(neo_tachy2, format = "html", row.names = T, col.names = c("", "Normal (Ind
 ## Onyx PO+RR (Nonin) {.tabset}
 
 ### Hypoxia
-```{r echo=FALSE}
+```{r}
 # Long
 onyx_hypoxia3 <- addmargins(table(df_onyx_cat3_l$ref_hypoxic, df_onyx_cat3_l$index_hypoxic))
 rownames(onyx_hypoxia3) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
@@ -1057,7 +1073,7 @@ onyx_hypoxia3_m3 <- addmargins(table(df_onyx_cat3_w$m3_ref_hypoxic, df_onyx_cat3
 ```
 
 ### Fast Breathing
-```{r echo=FALSE}
+```{r}
 onyx_fb2 <- addmargins(table(df_onyx_cat2fb_l$ref_fastbreath_35mo, df_onyx_cat2fb_l$index_fastbreath_35mo))
 rownames(onyx_fb2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
 kable(onyx_fb2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-35 months**") %>% 
@@ -1070,7 +1086,7 @@ kable(onyx_fb3, format = "html", row.names = T, col.names = c("", "Normal (Index
 ```
 
 ### Tachycardia
-```{r echo=FALSE}
+```{r}
 onyx_tachy2 <- addmargins(table(df_onyx_cat2tachy_l$ref_tachycardic_59mo, df_onyx_cat2tachy_l$index_tachycardic_59mo))
 rownames(onyx_tachy2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
 kable(onyx_tachy2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
@@ -1080,7 +1096,7 @@ kable(onyx_tachy2, format = "html", row.names = T, col.names = c("", "Normal (In
 ## Scanbo v8 (Scanbo) {.tabset}
 
 ### Hypoxia
-```{r echo=FALSE}
+```{r}
 # Long
 scan_hypoxia3 <- addmargins(table(df_scan_cat3_l$ref_hypoxic, df_scan_cat3_l$index_hypoxic))
 rownames(scan_hypoxia3) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
@@ -1094,7 +1110,7 @@ scan_hypoxia3_m3 <- addmargins(table(df_scan_cat3_w$m3_ref_hypoxic, df_scan_cat3
 ```
 
 ### Fever
-```{r echo=FALSE}
+```{r}
 scan_fever3 <- addmargins(table(df_scan_cat3_l$ref_fever, df_scan_cat3_l$index_fever))
 rownames(scan_fever3) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
 kable(scan_fever3, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
@@ -1102,7 +1118,7 @@ kable(scan_fever3, format = "html", row.names = T, col.names = c("", "Normal (In
 ```
 
 ### Fast Breathing
-```{r echo=FALSE}
+```{r}
 scan_fb2 <- addmargins(table(df_scan_cat2fb_l$ref_fastbreath_35mo, df_scan_cat2fb_l$index_fastbreath_35mo))
 rownames(scan_fb2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
 kable(scan_fb2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-35 months**") %>% 
@@ -1115,7 +1131,7 @@ kable(scan_fb3, format = "html", row.names = T, col.names = c("", "Normal (Index
 ```
 
 ### Tachycardia
-```{r echo=FALSE}
+```{r}
 scan_tachy2 <- addmargins(table(df_scan_cat2tachy_l$ref_tachycardic_59mo, df_scan_cat2tachy_l$index_tachycardic_59mo))
 rownames(scan_tachy2) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
 kable(scan_tachy2, format = "html", row.names = T, col.names = c("", "Normal (Index)","Abnormal (Index)","Sum"), caption = "**12-59 months**") %>% 
@@ -1125,7 +1141,7 @@ kable(scan_tachy2, format = "html", row.names = T, col.names = c("", "Normal (In
 # Section 6: Percent Agreement {.tabset}
 Samwel (Rebecca can take this if helpful)
 
-```{r echo=FALSE, include=FALSE}
+```{r, include=FALSE}
 # use binom.exact function from exactci package to calculate percent agreement and associated 95% CI's for each device/measurement/age category
 # store cacluations in object to call in subsequent sections and display in table
 
