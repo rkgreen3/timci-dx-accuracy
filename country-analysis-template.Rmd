@@ -142,9 +142,9 @@ mdf_reshaped$grp <- as.factor(mdf_reshaped$grp)
 
 ## Long format (M1-M3 are levels of one variable)
 df_radg_l <- subset(mdf_reshaped, index_device_name=="Rad-G Temp (Masimo)")
-df_radg_cat1_l <- subset(df_radg_l, age_cat=="1")
-df_radg_cat2_l <- subset(df_radg_l, age_cat=="2")
-df_radg_cat3_l <- subset(df_radg_l, age_cat=="3")
+df_radg_cat1_l <- subset(df_radg_l, age_cat=="0-1 month")
+df_radg_cat2_l <- subset(df_radg_l, age_cat=="2-11 months")
+df_radg_cat3_l <- subset(df_radg_l, age_cat=="12-59 months")
 df_radg_cat1tachy_l <- subset(df_radg_l, age_cat_tachy=="0-11 months")
 df_radg_cat2tachy_l <- subset(df_radg_l, age_cat_tachy=="12-59 months")
 df_radg_cat1fb_l <- subset(df_radg_l, age_cat_fastbreathe=="0-11 months")
@@ -152,9 +152,9 @@ df_radg_cat2fb_l <- subset(df_radg_l, age_cat_fastbreathe=="12-35 months")
 df_radg_cat3fb_l <- subset(df_radg_l, age_cat_fastbreathe=="36-59 months")
 
 df_bio_l <- subset(mdf_reshaped, index_device_name=="m800 (Biolight)")
-df_bio_cat1_l <- subset(df_bio_l, age_cat=="1")
-df_bio_cat2_l <- subset(df_bio_l, age_cat=="2")
-df_bio_cat3_l <- subset(df_bio_l, age_cat=="3")
+df_bio_cat1_l <- subset(df_bio_l, age_cat=="0-1 month")
+df_bio_cat2_l <- subset(df_bio_l, age_cat=="2-11 months")
+df_bio_cat3_l <- subset(df_bio_l, age_cat=="12-59 months")
 df_bio_cat1tachy_l <- subset(df_bio_l, age_cat_tachy=="0-11 months")
 df_bio_cat2tachy_l <- subset(df_bio_l, age_cat_tachy=="12-59 months")
 df_bio_cat1fb_l <- subset(df_bio_l, age_cat_fastbreathe=="0-11 months")
@@ -162,9 +162,9 @@ df_bio_cat2fb_l <- subset(df_bio_l, age_cat_fastbreathe=="12-35 months")
 df_bio_cat3fb_l <- subset(df_bio_l, age_cat_fastbreathe=="36-59 months")
 
 df_neo_l <- subset(mdf_reshaped, index_device_name=="NeoGuard (Neopenda)")
-df_neo_cat1_l <- subset(df_neo_l, age_cat=="1")
-df_neo_cat2_l <- subset(df_neo_l, age_cat=="2")
-df_neo_cat3_l <- subset(df_neo_l, age_cat=="3")
+df_neo_cat1_l <- subset(df_neo_l, age_cat=="0-1 month")
+df_neo_cat2_l <- subset(df_neo_l, age_cat=="2-11 months")
+df_neo_cat3_l <- subset(df_neo_l, age_cat=="12-59 months")
 df_neo_cat1tachy_l <- subset(df_neo_l, age_cat_tachy=="0-11 months")
 df_neo_cat2tachy_l <- subset(df_neo_l, age_cat_tachy=="12-59 months")
 df_neo_cat1fb_l <- subset(df_neo_l, age_cat_fastbreathe=="0-11 months")
@@ -172,13 +172,13 @@ df_neo_cat2fb_l <- subset(df_neo_l, age_cat_fastbreathe=="12-35 months")
 df_neo_cat3fb_l <- subset(df_neo_l, age_cat_fastbreathe=="36-59 months")
 
 df_onyx_l <- subset(mdf_reshaped, index_device_name=="Onyx PO+RR (Nonin)")
-df_onyx_cat3_l <- subset(df_onyx_l, age_cat=="3")
+df_onyx_cat3_l <- subset(df_onyx_l, age_cat=="12-59 months")
 df_onyx_cat2tachy_l <- subset(df_onyx_l, age_cat_tachy=="12-59 months")
 df_onyx_cat2fb_l <- subset(df_onyx_l, age_cat_fastbreathe=="12-35 months")
 df_onyx_cat3fb_l <- subset(df_onyx_l, age_cat_fastbreathe=="36-59 months")
 
 df_scan_l <- subset(mdf_reshaped, index_device_name=="Scanbo v8 (Scanbo)")
-df_scan_cat3_l <- subset(df_scan_l, age_cat=="3")
+df_scan_cat3_l <- subset(df_scan_l, age_cat=="12-59 months")
 df_scan_cat2tachy_l <- subset(df_scan_l, age_cat_tachy=="12-59 months")
 df_scan_cat2fb_l <- subset(df_scan_l, age_cat_fastbreathe=="12-35 months")
 df_scan_cat3fb_l <- subset(df_scan_l, age_cat_fastbreathe=="36-59 months")
@@ -237,9 +237,9 @@ df_og$age_cat_fastbreathe <- case_when(df_og$age_months<12 ~ "0-11 months",
 
 ## Wide format device df's (M1-M3 are variables)
 df_radg_w <- subset(df_og, index_device_name=="Rad-G Temp (Masimo)")
-df_radg_cat1_w <- subset(df_radg_w, age_cat=="1")
-df_radg_cat2_w <- subset(df_radg_w, age_cat=="2")
-df_radg_cat3_w <- subset(df_radg_w, age_cat=="3")
+df_radg_cat1_w <- subset(df_radg_w, age_cat=="0-1 month")
+df_radg_cat2_w <- subset(df_radg_w, age_cat=="2-11 months")
+df_radg_cat3_w <- subset(df_radg_w, age_cat=="12-59 months")
 df_radg_cat1tachy_w <- subset(df_radg_w, age_cat_tachy=="0-11 months")
 df_radg_cat2tachy_w <- subset(df_radg_w, age_cat_tachy=="12-59 months")
 df_radg_cat1fb_w <- subset(df_radg_w, age_cat_fastbreathe=="0-11 months")
@@ -247,9 +247,9 @@ df_radg_cat2fb_w <- subset(df_radg_w, age_cat_fastbreathe=="12-35 months")
 df_radg_cat3fb_w <- subset(df_radg_w, age_cat_fastbreathe=="36-59 months")
 
 df_bio_w <- subset(df_og, index_device_name=="m800 (Biolight)")
-df_bio_cat1_w <- subset(df_bio_w, age_cat=="1")
-df_bio_cat2_w <- subset(df_bio_w, age_cat=="2")
-df_bio_cat3_w <- subset(df_bio_w, age_cat=="3")
+df_bio_cat1_w <- subset(df_bio_w, age_cat=="0-1 month")
+df_bio_cat2_w <- subset(df_bio_w, age_cat=="2-11 months")
+df_bio_cat3_w <- subset(df_bio_w, age_cat=="12-59 months")
 df_bio_cat1tachy_w <- subset(df_bio_w, age_cat_tachy=="0-11 months")
 df_bio_cat2tachy_w <- subset(df_bio_w, age_cat_tachy=="12-59 months")
 df_bio_cat1fb_w <- subset(df_bio_w, age_cat_fastbreathe=="0-11 months")
@@ -257,9 +257,9 @@ df_bio_cat2fb_w <- subset(df_bio_w, age_cat_fastbreathe=="12-35 months")
 df_bio_cat3fb_w <- subset(df_bio_w, age_cat_fastbreathe=="36-59 months")
 
 df_neo_w <- subset(df_og, index_device_name=="NeoGuard (Neopenda)")
-df_neo_cat1_w <- subset(df_neo_w, age_cat=="1")
-df_neo_cat2_w <- subset(df_neo_w, age_cat=="2")
-df_neo_cat3_w <- subset(df_neo_w, age_cat=="3")
+df_neo_cat1_w <- subset(df_neo_w, age_cat=="0-1 month")
+df_neo_cat2_w <- subset(df_neo_w, age_cat=="2-11 months")
+df_neo_cat3_w <- subset(df_neo_w, age_cat=="12-59 months")
 df_neo_cat1tachy_w <- subset(df_neo_w, age_cat_tachy=="0-11 months")
 df_neo_cat2tachy_w <- subset(df_neo_w, age_cat_tachy=="12-59 months")
 df_neo_cat1fb_w <- subset(df_neo_w, age_cat_fastbreathe=="0-11 months")
@@ -267,13 +267,13 @@ df_neo_cat2fb_w <- subset(df_neo_w, age_cat_fastbreathe=="12-35 months")
 df_neo_cat3fb_w <- subset(df_neo_w, age_cat_fastbreathe=="36-59 months")
 
 df_onyx_w <- subset(df_og, index_device_name=="Onyx PO+RR (Nonin)")
-df_onyx_cat3_w <- subset(df_onyx_w, age_cat=="3")
+df_onyx_cat3_w <- subset(df_onyx_w, age_cat=="12-59 months")
 df_onyx_cat2tachy_w <- subset(df_onyx_w, age_cat_tachy=="12-59 months")
 df_onyx_cat2fb_w <- subset(df_onyx_w, age_cat_fastbreathe=="12-35 months")
 df_onyx_cat3fb_w <- subset(df_onyx_w, age_cat_fastbreathe=="36-59 months")
 
 df_scan_w <- subset(df_og, index_device_name=="Scanbo v8 (Scanbo)")
-df_scan_cat3_w <- subset(df_scan_w, age_cat=="3")
+df_scan_cat3_w <- subset(df_scan_w, age_cat=="12-59 months")
 df_scan_cat2tachy_w <- subset(df_scan_w, age_cat_tachy=="12-59 months")
 df_scan_cat2fb_w <- subset(df_scan_w, age_cat_fastbreathe=="12-35 months")
 df_scan_cat3fb_w <- subset(df_scan_w, age_cat_fastbreathe=="36-59 months")
@@ -421,58 +421,58 @@ Anmol
 
 ### Temperature
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_radg_cat1_l$ref_temp, df_radg_cat1_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Temperature (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=19)
-legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+bland.altman.plot(df_radg_cat1_l$ref_temp, df_radg_cat1_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Temperature (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_radg_cat2_l$ref_temp, df_radg_cat2_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Temperature (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=19)
-legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+bland.altman.plot(df_radg_cat2_l$ref_temp, df_radg_cat2_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Temperature (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_radg_cat3_l$ref_temp, df_radg_cat3_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Temperature (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=19)
-legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+bland.altman.plot(df_radg_cat3_l$ref_temp, df_radg_cat3_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Temperature (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 
 ### Oxygen
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_radg_cat1_l$ref_o2, df_radg_cat1_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=19)
-legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+bland.altman.plot(df_radg_cat1_l$ref_o2, df_radg_cat1_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_radg_cat2_l$ref_o2, df_radg_cat2_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=19)
-legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+bland.altman.plot(df_radg_cat2_l$ref_o2, df_radg_cat2_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_radg_cat3_l$ref_o2, df_radg_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=19)
-legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+bland.altman.plot(df_radg_cat3_l$ref_o2, df_radg_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 
 ### Profusion Index
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_radg_cat1_l$ref_pi, df_radg_cat1_l$index_pi, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Profusion Index (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=19)
-legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+bland.altman.plot(df_radg_cat1_l$ref_pi, df_radg_cat1_l$index_pi, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Profusion Index (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_radg_cat2_l$ref_pi, df_radg_cat2_l$index_pi, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Profusion Index (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=19)
-legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+bland.altman.plot(df_radg_cat2_l$ref_pi, df_radg_cat2_l$index_pi, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Profusion Index (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_radg_cat3_l$ref_pi, df_radg_cat3_l$index_pi, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Profusion Index (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=19)
-legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+bland.altman.plot(df_radg_cat3_l$ref_pi, df_radg_cat3_l$index_pi, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Profusion Index (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 
 ### Pulse Rate
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_radg_cat1_l$ref_pr, df_radg_cat1_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Pulse Rate (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=19)
-legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+bland.altman.plot(df_radg_cat1_l$ref_pr, df_radg_cat1_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Pulse Rate (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_radg_cat2_l$ref_pr, df_radg_cat2_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Pulse Rate (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=19)
-legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+bland.altman.plot(df_radg_cat2_l$ref_pr, df_radg_cat2_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Pulse Rate (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_radg_cat3_l$ref_pr, df_radg_cat3_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Pulse Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=19)
-legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = 19)
+bland.altman.plot(df_radg_cat3_l$ref_pr, df_radg_cat3_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Pulse Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 
 ### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
