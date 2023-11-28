@@ -43,7 +43,6 @@ df_og <- read.csv(filename)
 df_og <- df_og %>% select(-c("X"))
 
 # Define country and subset
-# COUNTRY <- "Kenya" # Kenya, Tanzania, India -- USER INPUT HERE
 COUNTRY <- Sys.getenv("COUNTRY")
 df_og <- subset(df_og, df_og$country==COUNTRY)
 ```
@@ -280,8 +279,6 @@ df_scan_cat2fb_w <- subset(df_scan_w, age_cat_fastbreathe=="12-35 months")
 df_scan_cat3fb_w <- subset(df_scan_w, age_cat_fastbreathe=="36-59 months")
 ```
 
-
-
 This report contains data from **`r COUNTRY`**.
 
 # Section 1: Participant Characteristics {.tabset}
@@ -316,7 +313,7 @@ df_og <- df_og %>%
 
 # Specify the continuous variables
 
-contVars <- c("height", "weight", "muac", "hemocue_hb", "head_circumference", "mean_ref_spo2", "mean_ref_pr", "mean_ref_temp")
+contVars <- c("height", "weight", "muac", "head_circumference", "hemocue_hb", "mean_ref_spo2", "mean_ref_pr", "mean_ref_temp")
 
 # Specify all the variables to include in table 1 (both continuous and categorical)
 
@@ -327,7 +324,7 @@ myVars <- c("age_cat", "sex","cg_relationship",
             "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
             "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_other",
             "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
-            "tx_other", "height", "weight", "muac", "hemocue_hb", "head_circumference", "mean_ref_spo2", "mean_ref_pr", "mean_ref_temp")
+            "tx_other", "height", "weight", "muac", "head_circumference", "hemocue_hb", "mean_ref_spo2", "mean_ref_pr", "mean_ref_temp")
 
 # CreateTableOne Overall:
 
@@ -365,7 +362,13 @@ summary(out1$contTable) # RG Note: what is this meant to do?
 
 t1 <- kable(t1_overall) %>%
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
-  add_indent(c(3:5))
+  add_indent(c(3:5, 8:16, 29:37, 39:43)) %>%
+  pack_rows("Visit Reason", 17, 21) %>%
+  pack_rows("Symptoms Present", 22, 27) %>%
+  pack_rows("Diagnosis", 28, 37) %>%
+  pack_rows("Treatment", 38, 43) %>%
+  pack_rows("Physical Characteristics", 44, 47) %>%
+  pack_rows("Reference Measurements", 48, 51)
 ```
 `r t1`
 
