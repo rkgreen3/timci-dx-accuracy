@@ -45,6 +45,57 @@ df_og <- df_og %>% select(-c("X"))
 # Define country and subset
 COUNTRY <- Sys.getenv("COUNTRY")
 df_og <- subset(df_og, df_og$country==COUNTRY)
+
+# Create variables for the mean, SD, min, max, and %CV of reference and index measures across all 3 measurements per row (to be used in Table 1 and Section 2 tables)
+## Reference values
+df_og <- df_og %>% 
+  mutate(mean_ref_o2 = round(rowMeans(select(df_og, c(m1_ref_o2, m2_ref_o2, m3_ref_o2)), na.rm = TRUE), 1),
+         mean_ref_pr = round(rowMeans(select(df_og, c(m1_ref_pr, m2_ref_pr, m3_ref_pr)), na.rm = TRUE), 1),
+         mean_ref_temp = round(rowMeans(select(df_og, c(m1_therm_skin_temp, m2_therm_skin_temp, m3_therm_skin_temp)), na.rm = TRUE), 1),
+         mean_ref_pi = round(rowMeans(select(df_og, c(m1_ref_pi, m2_ref_pi, m3_ref_pi)), na.rm = TRUE), 1)) %>%
+  rowwise() %>%
+  mutate(sd_ref_o2 = round(sd(c(m1_ref_o2, m2_ref_o2, m3_ref_o2), na.rm = TRUE), 1),
+         sd_ref_pr = round(sd(c(m1_ref_pr, m2_ref_pr, m3_ref_pr), na.rm = TRUE), 1),
+         sd_ref_temp = round(sd(c(m1_therm_skin_temp, m2_therm_skin_temp, m3_therm_skin_temp), na.rm = TRUE), 1),
+         sd_ref_pi = round(sd(c(m1_ref_pi, m2_ref_pi, m3_ref_pi), na.rm = TRUE), 1)) %>%
+  mutate(min_ref_o2 = min(c(m1_ref_o2, m2_ref_o2, m3_ref_o2), na.rm = TRUE),
+         min_ref_pr = min(c(m1_ref_pr, m2_ref_pr, m3_ref_pr), na.rm = TRUE),
+         min_ref_temp = min(c(m1_therm_skin_temp, m2_therm_skin_temp, m3_therm_skin_temp), na.rm = TRUE),
+         min_ref_pi = min(c(m1_ref_pi, m2_ref_pi, m3_ref_pi), na.rm = TRUE)) %>%
+  mutate(max_ref_o2 = max(c(m1_ref_o2, m2_ref_o2, m3_ref_o2), na.rm = TRUE),
+         max_ref_pr = max(c(m1_ref_pr, m2_ref_pr, m3_ref_pr), na.rm = TRUE),
+         max_ref_temp = max(c(m1_therm_skin_temp, m2_therm_skin_temp, m3_therm_skin_temp), na.rm = TRUE),
+         max_ref_pi = max(c(m1_ref_pi, m2_ref_pi, m3_ref_pi), na.rm = TRUE))
+df_og <- df_og %>%
+  mutate(cv_ref_o2 = round(sd_ref_o2/mean_ref_o2, 1)*100,
+         cv_ref_pr = round(sd_ref_pr/mean_ref_pr, 1)*100,
+         cv_ref_temp = round(sd_ref_temp/mean_ref_temp, 1)*100,
+         cv_ref_pi = round(sd_ref_pi/mean_ref_pi, 1)*100)
+## Index values
+df_og <- df_og %>% 
+  mutate(mean_index_o2 = round(rowMeans(select(df_og, c(m1_index_o2, m2_index_o2, m3_index_o2)), na.rm = TRUE), 1),
+         mean_index_pr = round(rowMeans(select(df_og, c(m1_index_pr, m2_index_pr, m3_index_pr)), na.rm = TRUE), 1),
+         mean_index_temp = round(rowMeans(select(df_og, c(m1_therm_skin_temp, m2_therm_skin_temp, m3_therm_skin_temp)), na.rm = TRUE), 1),
+         mean_index_pi = round(rowMeans(select(df_og, c(m1_index_pi, m2_index_pi, m3_index_pi)), na.rm = TRUE), 1)) %>%
+  rowwise() %>%
+  mutate(sd_index_o2 = round(sd(c(m1_index_o2, m2_index_o2, m3_index_o2), na.rm = TRUE), 1),
+         sd_index_pr = round(sd(c(m1_index_pr, m2_index_pr, m3_index_pr), na.rm = TRUE), 1),
+         sd_index_temp = round(sd(c(m1_index_temp, m2_index_temp, m3_index_temp), na.rm = TRUE), 1),
+         sd_index_pi = round(sd(c(m1_index_pi, m2_index_pi, m3_index_pi), na.rm = TRUE), 1)) %>%
+  mutate(min_index_o2 = min(c(m1_index_o2, m2_index_o2, m3_index_o2), na.rm = TRUE),
+         min_index_pr = min(c(m1_index_pr, m2_index_pr, m3_index_pr), na.rm = TRUE),
+         min_index_temp = min(c(m1_index_temp, m2_index_temp, m3_index_temp), na.rm = TRUE),
+         min_index_pi = min(c(m1_index_pi, m2_index_pi, m3_index_pi), na.rm = TRUE)) %>%
+  mutate(max_index_o2 = max(c(m1_index_o2, m2_index_o2, m3_index_o2), na.rm = TRUE),
+         max_index_pr = max(c(m1_index_pr, m2_index_pr, m3_index_pr), na.rm = TRUE),
+         max_index_temp = max(c(m1_index_temp, m2_index_temp, m3_index_temp), na.rm = TRUE),
+         max_index_pi = max(c(m1_index_pi, m2_index_pi, m3_index_pi), na.rm = TRUE))
+df_og <- df_og %>%
+  mutate(cv_index_o2 = round(sd_index_o2/mean_index_o2, 1)*100,
+         cv_index_pr = round(sd_index_pr/mean_index_pr, 1)*100,
+         cv_index_temp = round(sd_index_temp/mean_index_temp, 1)*100,
+         cv_index_pi = round(sd_index_pi/mean_index_pi, 1)*100)
+
 ```
 
 ```{r long_dfs}
@@ -285,6 +336,7 @@ This report contains data from **`r COUNTRY`**.
 Leila
 
 ## Table 1: Participant Characteristics Overall and by Facility
+Note: Reference measure summaries presented in this table (for measurements obtained at more than one time point) are the population mean/SD of the summarized measures (i.e., mean of the mean of M1-3).
 
 ```{r include = FALSE}
 
@@ -301,16 +353,6 @@ factorVars <- c("age_cat", "sex","cg_relationship",
                 "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
                 "tx_other")
 
-# Create 3 new variables for the mean of the reference spo2, pr, and temp across all 3 measurements per row in order to compute summary 
-
-df_og <- df_og %>% 
-  mutate(mean_ref_spo2 = rowMeans(select(df_og, c(m1_ref_o2, m2_ref_o2, m3_ref_o2)),
-                                  na.rm = TRUE)) %>% 
-  mutate(mean_ref_pr = rowMeans(select(df_og, c(m1_ref_pr, m2_ref_pr, m3_ref_pr)),
-                                na.rm = TRUE)) %>%
-  mutate(mean_ref_temp = rowMeans(select(df_og, c(m1_therm_skin_temp, m2_therm_skin_temp, m3_therm_skin_temp)),
-                                  na.rm = TRUE))
-
 # Specify the continuous variables
 
 contVars <- c("height", "weight", "muac", "head_circumference", "hemocue_hb", "mean_ref_spo2", "mean_ref_pr", "mean_ref_temp")
@@ -324,7 +366,7 @@ myVars <- c("age_cat", "sex","cg_relationship",
             "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
             "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_other",
             "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
-            "tx_other", "height", "weight", "muac", "head_circumference", "hemocue_hb", "mean_ref_spo2", "mean_ref_pr", "mean_ref_temp")
+            "tx_other", "height", "weight", "muac", "head_circumference", "hemocue_hb", "mean_ref_o2", "mean_ref_pr", "mean_ref_temp", "mean_ref_pi")
 
 # CreateTableOne Overall:
 
@@ -368,7 +410,7 @@ t1 <- kable(t1_overall) %>%
   pack_rows("Diagnosis", 28, 37) %>%
   pack_rows("Treatment", 38, 43) %>%
   pack_rows("Physical Characteristics", 44, 47) %>%
-  pack_rows("Reference Measurements", 48, 51)
+  pack_rows("Reference Measurements", 48, 52)
 ```
 `r t1`
 
