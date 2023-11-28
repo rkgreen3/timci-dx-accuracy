@@ -65,8 +65,8 @@ df_og <- df_og %>%
   mutate(max_ref_o2 = max(c(m1_ref_o2, m2_ref_o2, m3_ref_o2), na.rm = TRUE),
          max_ref_pr = max(c(m1_ref_pr, m2_ref_pr, m3_ref_pr), na.rm = TRUE),
          max_ref_temp = max(c(m1_therm_skin_temp, m2_therm_skin_temp, m3_therm_skin_temp), na.rm = TRUE),
-         max_ref_pi = max(c(m1_ref_pi, m2_ref_pi, m3_ref_pi), na.rm = TRUE))
-df_og <- df_og %>%
+         max_ref_pi = max(c(m1_ref_pi, m2_ref_pi, m3_ref_pi), na.rm = TRUE)) %>%
+  ungroup() %>%
   mutate(cv_ref_o2 = round(sd_ref_o2/mean_ref_o2, 1)*100,
          cv_ref_pr = round(sd_ref_pr/mean_ref_pr, 1)*100,
          cv_ref_temp = round(sd_ref_temp/mean_ref_temp, 1)*100,
@@ -89,8 +89,8 @@ df_og <- df_og %>%
   mutate(max_index_o2 = max(c(m1_index_o2, m2_index_o2, m3_index_o2), na.rm = TRUE),
          max_index_pr = max(c(m1_index_pr, m2_index_pr, m3_index_pr), na.rm = TRUE),
          max_index_temp = max(c(m1_index_temp, m2_index_temp, m3_index_temp), na.rm = TRUE),
-         max_index_pi = max(c(m1_index_pi, m2_index_pi, m3_index_pi), na.rm = TRUE))
-df_og <- df_og %>%
+         max_index_pi = max(c(m1_index_pi, m2_index_pi, m3_index_pi), na.rm = TRUE)) %>%
+  ungroup() %>%
   mutate(cv_index_o2 = round(sd_index_o2/mean_index_o2, 1)*100,
          cv_index_pr = round(sd_index_pr/mean_index_pr, 1)*100,
          cv_index_temp = round(sd_index_temp/mean_index_temp, 1)*100,
@@ -98,7 +98,7 @@ df_og <- df_og %>%
 
 ```
 
-```{r long_dfs}
+```{r long_dfs, warning=FALSE}
 # --- SECTION 1: CREATING LONG DF
 # Create reshaped df's
 ## use regular expressions to identify measurement-related columns and trim to only variables needed
@@ -187,7 +187,7 @@ mdf_reshaped$age_cat_fastbreathe <- case_when(mdf_reshaped$age_months<12 ~ "0-11
 mdf_reshaped$grp <- as.factor(mdf_reshaped$grp)
 ```
 
-```{r device_dfs}
+```{r device_dfs, warning=FALSE}
 # --- SECTION 2: CREATING DEVICE DF'S
 # Create a df for each device (in both wide and long format) -- note: any variable formatting (e.g., converting to factors) or additional variable creation should happen prior to creating these little dataframes
 
@@ -287,6 +287,10 @@ df_og$age_cat_fastbreathe <- case_when(df_og$age_months<12 ~ "0-11 months",
                                         df_og$age_months>35 ~ "36-59 months")
 
 ## Wide format device df's (M1-M3 are variables)
+df_ref_cat1_w <- subset(df_og, age_cat=="0-1 month")
+df_ref_cat2_w <- subset(df_og, age_cat=="2-11 months")
+df_ref_cat3_w <- subset(df_og, age_cat=="12-59 months")
+
 df_radg_w <- subset(df_og, index_device_name=="Rad-G Temp (Masimo)")
 df_radg_cat1_w <- subset(df_radg_w, age_cat=="0-1 month")
 df_radg_cat2_w <- subset(df_radg_w, age_cat=="2-11 months")
@@ -432,10 +436,47 @@ df_og[df_og$tx_other==1,c("ppt_id", "reported_tx_oth")]
 # Section 2: Measurement Characteristics & Precision {.tabset}
 Leila
 
-## Reference
+## Reference {.tabset}
 ```{r, include=FALSE}
+# Age Cat 1
+cat1_df <- df_ref_cat1_w %>% select(ppt_id) %>% 
+  mutate(temp = paste(df_ref_cat1_w$mean_ref_temp, " (", df_ref_cat1_w$sd_ref_temp, ")", " [", df_ref_cat1_w$min_ref_temp, ",", df_ref_cat1_w$max_ref_temp, "] ", df_ref_cat1_w$cv_ref_temp, "%", sep = ""),
+         oxygen = paste(df_ref_cat1_w$mean_ref_o2, " (", df_ref_cat1_w$sd_ref_o2, ")", " [", df_ref_cat1_w$min_ref_o2, ",", df_ref_cat1_w$max_ref_o2, "] ", df_ref_cat1_w$cv_ref_o2, "%", sep = ""),
+         pr = paste(df_ref_cat1_w$mean_ref_pr, " (", df_ref_cat1_w$sd_ref_pr, ")", " [", df_ref_cat1_w$min_ref_pr, ",", df_ref_cat1_w$max_ref_pr, "] ", df_ref_cat1_w$cv_ref_pr, "%", sep = ""),
+         pi = paste(df_ref_cat1_w$mean_ref_pi, " (", df_ref_cat1_w$sd_ref_pi, ")", " [", df_ref_cat1_w$min_ref_pi, ",", df_ref_cat1_w$max_ref_pi, "] ", df_ref_cat1_w$cv_ref_pi, "%", sep = ""))
+ref1_t2 <- kable(cat1_df, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate", "Profusion Index")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
 
+# Age Cat 2
+cat2_df <- df_ref_cat2_w %>% select(ppt_id) %>% 
+  mutate(temp = paste(df_ref_cat2_w$mean_ref_temp, " (", df_ref_cat2_w$sd_ref_temp, ")", " [", df_ref_cat2_w$min_ref_temp, ",", df_ref_cat2_w$max_ref_temp, "] ", df_ref_cat2_w$cv_ref_temp, "%", sep = ""),
+         oxygen = paste(df_ref_cat2_w$mean_ref_o2, " (", df_ref_cat2_w$sd_ref_o2, ")", " [", df_ref_cat2_w$min_ref_o2, ",", df_ref_cat2_w$max_ref_o2, "] ", df_ref_cat2_w$cv_ref_o2, "%", sep = ""),
+         pr = paste(df_ref_cat2_w$mean_ref_pr, " (", df_ref_cat2_w$sd_ref_pr, ")", " [", df_ref_cat2_w$min_ref_pr, ",", df_ref_cat2_w$max_ref_pr, "] ", df_ref_cat2_w$cv_ref_pr, "%", sep = ""),
+         pi = paste(df_ref_cat2_w$mean_ref_pi, " (", df_ref_cat2_w$sd_ref_pi, ")", " [", df_ref_cat2_w$min_ref_pi, ",", df_ref_cat2_w$max_ref_pi, "] ", df_ref_cat2_w$cv_ref_pi, "%", sep = ""))
+ref2_t2 <- kable(cat2_df, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate", "Profusion Index")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
+
+# Age Cat 3
+cat3_df <- df_ref_cat3_w %>% select(ppt_id) %>% 
+  mutate(temp = paste(df_ref_cat3_w$mean_ref_temp, " (", df_ref_cat3_w$sd_ref_temp, ")", " [", df_ref_cat3_w$min_ref_temp, ",", df_ref_cat3_w$max_ref_temp, "] ", df_ref_cat3_w$cv_ref_temp, "%", sep = ""),
+         oxygen = paste(df_ref_cat3_w$mean_ref_o2, " (", df_ref_cat3_w$sd_ref_o2, ")", " [", df_ref_cat3_w$min_ref_o2, ",", df_ref_cat3_w$max_ref_o2, "] ", df_ref_cat3_w$cv_ref_o2, "%", sep = ""),
+         pr = paste(df_ref_cat3_w$mean_ref_pr, " (", df_ref_cat3_w$sd_ref_pr, ")", " [", df_ref_cat3_w$min_ref_pr, ",", df_ref_cat3_w$max_ref_pr, "] ", df_ref_cat3_w$cv_ref_pr, "%", sep = ""),
+         pi = paste(df_ref_cat3_w$mean_ref_pi, " (", df_ref_cat3_w$sd_ref_pi, ")", " [", df_ref_cat3_w$min_ref_pi, ",", df_ref_cat3_w$max_ref_pi, "] ", df_ref_cat3_w$cv_ref_pi, "%", sep = ""))
+ref3_t2 <- kable(cat3_df, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate", "Profusion Index")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
 ```
+
+### 0-1 month
+`r ref1_t2`
+
+### 2-11 months
+`r ref2_t2`
+
+### 12-59 months
+`r ref3_t2`
 
 ## Rad-G Temp (Masimo)
 
@@ -1346,77 +1387,77 @@ pa_scan_hypoxia3_m3 <- binom.exact(x = scan_hypoxia3_m3[1,1], n = sum(scan_hypox
 ```{r}
 # create df with all device/age group/measurements
 out_hypoxia <- data.frame(col1 = c("", "", "Rad-G", "Biolight", "Neopenda", "Onyx", "Scanbo"),
-                    col2 = c("0-1 month", "Overall", paste(round(pa_radg_hypoxia1$estimate, 2), "(", round(pa_radg_hypoxia1$conf.int[1], 2)," - ", round(pa_radg_hypoxia1$conf.int[2], 2),")", sep = " "),
-                             paste(round(pa_bio_hypoxia1$estimate, 2), "(", round(pa_bio_hypoxia1$conf.int[1], 2)," - ", round(pa_bio_hypoxia1$conf.int[2], 2),")", sep = " "),
-                             paste(round(pa_neo_hypoxia1$estimate, 2), "(", round(pa_neo_hypoxia1$conf.int[1], 2)," - ", round(pa_neo_hypoxia1$conf.int[2], 2),")", sep = " "),
+                    col2 = c("0-1 month", "Overall", paste(round(pa_radg_hypoxia1$estimate, 2), " (", round(pa_radg_hypoxia1$conf.int[1], 2)," - ", round(pa_radg_hypoxia1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_hypoxia1$estimate, 2), " (", round(pa_bio_hypoxia1$conf.int[1], 2)," - ", round(pa_bio_hypoxia1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_hypoxia1$estimate, 2), " (", round(pa_neo_hypoxia1$conf.int[1], 2)," - ", round(pa_neo_hypoxia1$conf.int[2], 2),")", sep = ""),
                              NA,
                              NA),
                     
-                    col3 = c("0-1 month", "M1", paste(round(pa_radg_hypoxia1_m1$estimate, 2), "(", round(pa_radg_hypoxia1_m1$conf.int[1], 2)," - ", round(pa_radg_hypoxia1_m1$conf.int[2], 2),")", sep = " "),
-                             paste(round(pa_bio_hypoxia1_m1$estimate, 2), "(", round(pa_bio_hypoxia1_m1$conf.int[1], 2)," - ", round(pa_bio_hypoxia1_m1$conf.int[2], 2),")", sep = " "),
-                             paste(round(pa_neo_hypoxia1_m1$estimate, 2), "(", round(pa_neo_hypoxia1_m1$conf.int[1], 2)," - ", round(pa_neo_hypoxia1_m1$conf.int[2], 2),")", sep = " "),
+                    col3 = c("0-1 month", "M1", paste(round(pa_radg_hypoxia1_m1$estimate, 2), " (", round(pa_radg_hypoxia1_m1$conf.int[1], 2)," - ", round(pa_radg_hypoxia1_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_hypoxia1_m1$estimate, 2), " (", round(pa_bio_hypoxia1_m1$conf.int[1], 2)," - ", round(pa_bio_hypoxia1_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_hypoxia1_m1$estimate, 2), " (", round(pa_neo_hypoxia1_m1$conf.int[1], 2)," - ", round(pa_neo_hypoxia1_m1$conf.int[2], 2),")", sep = ""),
                              NA,
                              NA),
                     
-                    col4 = c("0-1 month", "M2", paste(round(pa_radg_hypoxia1_m2$estimate, 2), "(", round(pa_radg_hypoxia1_m2$conf.int[1], 2)," - ", round(pa_radg_hypoxia1_m2$conf.int[2], 2),")", sep = " "),
-                             paste(round(pa_bio_hypoxia1_m2$estimate, 2), "(", round(pa_bio_hypoxia1_m2$conf.int[1], 2)," - ", round(pa_bio_hypoxia1_m2$conf.int[2], 2),")", sep = " "),
-                             paste(round(pa_neo_hypoxia1_m2$estimate, 2), "(", round(pa_neo_hypoxia1_m2$conf.int[1], 2)," - ", round(pa_neo_hypoxia1_m2$conf.int[2], 2),")", sep = " "),
+                    col4 = c("0-1 month", "M2", paste(round(pa_radg_hypoxia1_m2$estimate, 2), " (", round(pa_radg_hypoxia1_m2$conf.int[1], 2)," - ", round(pa_radg_hypoxia1_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_hypoxia1_m2$estimate, 2), " (", round(pa_bio_hypoxia1_m2$conf.int[1], 2)," - ", round(pa_bio_hypoxia1_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_hypoxia1_m2$estimate, 2), " (", round(pa_neo_hypoxia1_m2$conf.int[1], 2)," - ", round(pa_neo_hypoxia1_m2$conf.int[2], 2),")", sep = ""),
                              NA,
                              NA),
                     
-                    col5 = c("0-1 month", "M3", paste(round(pa_radg_hypoxia1_m3$estimate, 2), "(", round(pa_radg_hypoxia1_m3$conf.int[1], 2)," - ", round(pa_radg_hypoxia1_m3$conf.int[2], 2),")", sep = " "),
-                             paste(round(pa_bio_hypoxia1_m3$estimate, 2), "(", round(pa_bio_hypoxia1_m3$conf.int[1], 2)," - ", round(pa_bio_hypoxia1_m3$conf.int[2], 2),")", sep = " "),
-                             paste(round(pa_neo_hypoxia1_m3$estimate, 2), "(", round(pa_neo_hypoxia1_m3$conf.int[1], 2)," - ", round(pa_neo_hypoxia1_m3$conf.int[2], 2),")", sep = " "),
+                    col5 = c("0-1 month", "M3", paste(round(pa_radg_hypoxia1_m3$estimate, 2), " (", round(pa_radg_hypoxia1_m3$conf.int[1], 2)," - ", round(pa_radg_hypoxia1_m3$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_hypoxia1_m3$estimate, 2), " (", round(pa_bio_hypoxia1_m3$conf.int[1], 2)," - ", round(pa_bio_hypoxia1_m3$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_hypoxia1_m3$estimate, 2), " (", round(pa_neo_hypoxia1_m3$conf.int[1], 2)," - ", round(pa_neo_hypoxia1_m3$conf.int[2], 2),")", sep = ""),
                              NA,
                              NA),
                     
-                    col6 = c("2-11 months", "Overall", paste(round(pa_radg_hypoxia2$estimate, 2), "(", round(pa_radg_hypoxia2$conf.int[1], 2)," - ", round(pa_radg_hypoxia2$conf.int[2], 2),")", sep = " "),
-                             paste(round(pa_bio_hypoxia2$estimate, 2), "(", round(pa_bio_hypoxia2$conf.int[1], 2)," - ", round(pa_bio_hypoxia2$conf.int[2], 2),")", sep = " "),
-                             paste(round(pa_neo_hypoxia2$estimate, 2), "(", round(pa_neo_hypoxia2$conf.int[1], 2)," - ", round(pa_neo_hypoxia2$conf.int[2], 2),")", sep = " "),
+                    col6 = c("2-11 months", "Overall", paste(round(pa_radg_hypoxia2$estimate, 2), " (", round(pa_radg_hypoxia2$conf.int[1], 2)," - ", round(pa_radg_hypoxia2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_hypoxia2$estimate, 2), " (", round(pa_bio_hypoxia2$conf.int[1], 2)," - ", round(pa_bio_hypoxia2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_hypoxia2$estimate, 2), " (", round(pa_neo_hypoxia2$conf.int[1], 2)," - ", round(pa_neo_hypoxia2$conf.int[2], 2),")", sep = ""),
                              NA,
                              NA),
                     
-                    col7 = c("2-11 months", "M1", paste(round(pa_radg_hypoxia2_m1$estimate, 2), "(", round(pa_radg_hypoxia2_m1$conf.int[1], 2)," - ", round(pa_radg_hypoxia2_m1$conf.int[2], 2),")", sep = " "),
-                             paste(round(pa_bio_hypoxia2_m1$estimate, 2), "(", round(pa_bio_hypoxia2_m1$conf.int[1], 2)," - ", round(pa_bio_hypoxia2_m1$conf.int[2], 2),")", sep = " "),
-                             paste(round(pa_neo_hypoxia2_m1$estimate, 2), "(", round(pa_neo_hypoxia2_m1$conf.int[1], 2)," - ", round(pa_neo_hypoxia2_m1$conf.int[2], 2),")", sep = " "),
+                    col7 = c("2-11 months", "M1", paste(round(pa_radg_hypoxia2_m1$estimate, 2), " (", round(pa_radg_hypoxia2_m1$conf.int[1], 2)," - ", round(pa_radg_hypoxia2_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_hypoxia2_m1$estimate, 2), " (", round(pa_bio_hypoxia2_m1$conf.int[1], 2)," - ", round(pa_bio_hypoxia2_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_hypoxia2_m1$estimate, 2), " (", round(pa_neo_hypoxia2_m1$conf.int[1], 2)," - ", round(pa_neo_hypoxia2_m1$conf.int[2], 2),")", sep = ""),
                              NA,
                              NA),
                     
-                    col8 = c("2-11 months", "M2", paste(round(pa_radg_hypoxia2_m2$estimate, 2), "(", round(pa_radg_hypoxia2_m2$conf.int[1], 2)," - ", round(pa_radg_hypoxia2_m2$conf.int[2], 2),")", sep = " "),
-                             paste(round(pa_bio_hypoxia2_m2$estimate, 2), "(", round(pa_bio_hypoxia2_m2$conf.int[1], 2)," - ", round(pa_bio_hypoxia2_m2$conf.int[2], 2),")", sep = " "),
-                             paste(round(pa_neo_hypoxia2_m2$estimate, 2), "(", round(pa_neo_hypoxia2_m2$conf.int[1], 2)," - ", round(pa_neo_hypoxia2_m2$conf.int[2], 2),")", sep = " "),
+                    col8 = c("2-11 months", "M2", paste(round(pa_radg_hypoxia2_m2$estimate, 2), " (", round(pa_radg_hypoxia2_m2$conf.int[1], 2)," - ", round(pa_radg_hypoxia2_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_hypoxia2_m2$estimate, 2), " (", round(pa_bio_hypoxia2_m2$conf.int[1], 2)," - ", round(pa_bio_hypoxia2_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_hypoxia2_m2$estimate, 2), " (", round(pa_neo_hypoxia2_m2$conf.int[1], 2)," - ", round(pa_neo_hypoxia2_m2$conf.int[2], 2),")", sep = ""),
                              NA,
                              NA),
                     
-                    col9 = c("2-11 months", "M3", paste(round(pa_radg_hypoxia2_m3$estimate, 2), "(", round(pa_radg_hypoxia2_m3$conf.int[1], 2)," - ", round(pa_radg_hypoxia2_m3$conf.int[2], 2),")", sep = " "),
-                             paste(round(pa_bio_hypoxia2_m3$estimate, 2), "(", round(pa_bio_hypoxia2_m3$conf.int[1], 2)," - ", round(pa_bio_hypoxia2_m3$conf.int[2], 2),")", sep = " "),
-                             paste(round(pa_neo_hypoxia2_m3$estimate, 2), "(", round(pa_neo_hypoxia2_m3$conf.int[1], 2)," - ", round(pa_neo_hypoxia2_m3$conf.int[2], 2),")", sep = " "),
+                    col9 = c("2-11 months", "M3", paste(round(pa_radg_hypoxia2_m3$estimate, 2), " (", round(pa_radg_hypoxia2_m3$conf.int[1], 2)," - ", round(pa_radg_hypoxia2_m3$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_hypoxia2_m3$estimate, 2), " (", round(pa_bio_hypoxia2_m3$conf.int[1], 2)," - ", round(pa_bio_hypoxia2_m3$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_hypoxia2_m3$estimate, 2), " (", round(pa_neo_hypoxia2_m3$conf.int[1], 2)," - ", round(pa_neo_hypoxia2_m3$conf.int[2], 2),")", sep = ""),
                              NA,
                              NA),
                     
-                    col10 = c("12-59 months", "Overall", paste(round(pa_radg_hypoxia3$estimate, 2), "(", round(pa_radg_hypoxia3$conf.int[1], 2)," - ", round(pa_radg_hypoxia3$conf.int[2], 2),")", sep = " "),
-                              paste(round(pa_bio_hypoxia3$estimate, 2), "(", round(pa_bio_hypoxia3$conf.int[1], 2)," - ", round(pa_bio_hypoxia3$conf.int[2], 2),")", sep = " "),
-                              paste(round(pa_neo_hypoxia3$estimate, 2), "(", round(pa_neo_hypoxia3$conf.int[1], 2)," - ", round(pa_neo_hypoxia3$conf.int[2], 2),")", sep = " "),
-                              paste(round(pa_onyx_hypoxia3$estimate, 2), "(", round(pa_onyx_hypoxia3$conf.int[1], 2)," - ", round(pa_onyx_hypoxia3$conf.int[2], 2),")", sep = " "),
-                              paste(round(pa_scan_hypoxia3$estimate, 2), "(", round(pa_scan_hypoxia3$conf.int[1], 2)," - ", round(pa_scan_hypoxia3$conf.int[2], 2),")", sep = " ")),
+                    col10 = c("12-59 months", "Overall", paste(round(pa_radg_hypoxia3$estimate, 2), " (", round(pa_radg_hypoxia3$conf.int[1], 2)," - ", round(pa_radg_hypoxia3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_bio_hypoxia3$estimate, 2), " (", round(pa_bio_hypoxia3$conf.int[1], 2)," - ", round(pa_bio_hypoxia3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_hypoxia3$estimate, 2), " (", round(pa_neo_hypoxia3$conf.int[1], 2)," - ", round(pa_neo_hypoxia3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_hypoxia3$estimate, 2), " (", round(pa_onyx_hypoxia3$conf.int[1], 2)," - ", round(pa_onyx_hypoxia3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_hypoxia3$estimate, 2), " (", round(pa_scan_hypoxia3$conf.int[1], 2)," - ", round(pa_scan_hypoxia3$conf.int[2], 2),")", sep = "")),
                     
-                    col11 = c("12-59 months", "M1", paste(round(pa_radg_hypoxia3_m1$estimate, 2), "(", round(pa_radg_hypoxia3_m1$conf.int[1], 2)," - ", round(pa_radg_hypoxia3_m1$conf.int[2], 2),")", sep = " "),
-                              paste(round(pa_bio_hypoxia3_m1$estimate, 2), "(", round(pa_bio_hypoxia3_m1$conf.int[1], 2)," - ", round(pa_bio_hypoxia3_m1$conf.int[2], 2),")", sep = " "),
-                              paste(round(pa_neo_hypoxia3_m1$estimate, 2), "(", round(pa_neo_hypoxia3_m1$conf.int[1], 2)," - ", round(pa_neo_hypoxia3_m1$conf.int[2], 2),")", sep = " "),
-                              paste(round(pa_onyx_hypoxia3_m1$estimate, 2), "(", round(pa_onyx_hypoxia3_m1$conf.int[1], 2)," - ", round(pa_onyx_hypoxia3_m1$conf.int[2], 2),")", sep = " "),
-                              paste(round(pa_scan_hypoxia3_m1$estimate, 2), "(", round(pa_scan_hypoxia3_m1$conf.int[1], 2)," - ", round(pa_scan_hypoxia3_m1$conf.int[2], 2),")", sep = " ")),
+                    col11 = c("12-59 months", "M1", paste(round(pa_radg_hypoxia3_m1$estimate, 2), " (", round(pa_radg_hypoxia3_m1$conf.int[1], 2)," - ", round(pa_radg_hypoxia3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_bio_hypoxia3_m1$estimate, 2), " (", round(pa_bio_hypoxia3_m1$conf.int[1], 2)," - ", round(pa_bio_hypoxia3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_hypoxia3_m1$estimate, 2), " (", round(pa_neo_hypoxia3_m1$conf.int[1], 2)," - ", round(pa_neo_hypoxia3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_hypoxia3_m1$estimate, 2), " (", round(pa_onyx_hypoxia3_m1$conf.int[1], 2)," - ", round(pa_onyx_hypoxia3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_hypoxia3_m1$estimate, 2), " (", round(pa_scan_hypoxia3_m1$conf.int[1], 2)," - ", round(pa_scan_hypoxia3_m1$conf.int[2], 2),")", sep = "")),
                     
-                    col12 = c("12-59 months", "M2", paste(round(pa_radg_hypoxia3_m2$estimate, 2), "(", round(pa_radg_hypoxia3_m2$conf.int[1], 2)," - ", round(pa_radg_hypoxia3_m2$conf.int[2], 2),")", sep = " "),
-                              paste(round(pa_bio_hypoxia3_m2$estimate, 2), "(", round(pa_bio_hypoxia3_m2$conf.int[1], 2)," - ", round(pa_bio_hypoxia3_m2$conf.int[2], 2),")", sep = " "),
-                              paste(round(pa_neo_hypoxia3_m2$estimate, 2), "(", round(pa_neo_hypoxia3_m2$conf.int[1], 2)," - ", round(pa_neo_hypoxia3_m2$conf.int[2], 2),")", sep = " "),
-                              paste(round(pa_onyx_hypoxia3_m2$estimate, 2), "(", round(pa_onyx_hypoxia3_m2$conf.int[1], 2)," - ", round(pa_onyx_hypoxia3_m2$conf.int[2], 2),")", sep = " "),
-                              paste(round(pa_scan_hypoxia3_m2$estimate, 2), "(", round(pa_scan_hypoxia3_m2$conf.int[1], 2)," - ", round(pa_scan_hypoxia3_m2$conf.int[2], 2),")", sep = " ")),
+                    col12 = c("12-59 months", "M2", paste(round(pa_radg_hypoxia3_m2$estimate, 2), " (", round(pa_radg_hypoxia3_m2$conf.int[1], 2)," - ", round(pa_radg_hypoxia3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_bio_hypoxia3_m2$estimate, 2), " (", round(pa_bio_hypoxia3_m2$conf.int[1], 2)," - ", round(pa_bio_hypoxia3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_hypoxia3_m2$estimate, 2), " (", round(pa_neo_hypoxia3_m2$conf.int[1], 2)," - ", round(pa_neo_hypoxia3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_hypoxia3_m2$estimate, 2), " (", round(pa_onyx_hypoxia3_m2$conf.int[1], 2)," - ", round(pa_onyx_hypoxia3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_hypoxia3_m2$estimate, 2), " (", round(pa_scan_hypoxia3_m2$conf.int[1], 2)," - ", round(pa_scan_hypoxia3_m2$conf.int[2], 2),")", sep = "")),
                     
-                    col13 = c("12-59 months", "M3", paste(round(pa_radg_hypoxia3_m3$estimate, 2), "(", round(pa_radg_hypoxia3_m3$conf.int[1], 2)," - ", round(pa_radg_hypoxia3_m3$conf.int[2], 2),")", sep = " "),
-                              paste(round(pa_bio_hypoxia3_m3$estimate, 2), "(", round(pa_bio_hypoxia3_m3$conf.int[1], 2)," - ", round(pa_bio_hypoxia3_m3$conf.int[2], 2),")", sep = " "),
-                              paste(round(pa_neo_hypoxia3_m3$estimate, 2), "(", round(pa_neo_hypoxia3_m3$conf.int[1], 2)," - ", round(pa_neo_hypoxia3_m3$conf.int[2], 2),")", sep = " "),
-                              paste(round(pa_onyx_hypoxia3_m3$estimate, 2), "(", round(pa_onyx_hypoxia3_m3$conf.int[1], 2)," - ", round(pa_onyx_hypoxia3_m3$conf.int[2], 2),")", sep = " "),
-                              paste(round(pa_scan_hypoxia3_m3$estimate, 2), "(", round(pa_scan_hypoxia3_m3$conf.int[1], 2)," - ", round(pa_scan_hypoxia3_m3$conf.int[2], 2),")", sep = " "))
+                    col13 = c("12-59 months", "M3", paste(round(pa_radg_hypoxia3_m3$estimate, 2), " (", round(pa_radg_hypoxia3_m3$conf.int[1], 2)," - ", round(pa_radg_hypoxia3_m3$conf.int[2], 2),")", sep = " "),
+                              paste(round(pa_bio_hypoxia3_m3$estimate, 2), " (", round(pa_bio_hypoxia3_m3$conf.int[1], 2)," - ", round(pa_bio_hypoxia3_m3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_hypoxia3_m3$estimate, 2), " (", round(pa_neo_hypoxia3_m3$conf.int[1], 2)," - ", round(pa_neo_hypoxia3_m3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_hypoxia3_m3$estimate, 2), " (", round(pa_onyx_hypoxia3_m3$conf.int[1], 2)," - ", round(pa_onyx_hypoxia3_m3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_hypoxia3_m3$estimate, 2), " (", round(pa_scan_hypoxia3_m3$conf.int[1], 2)," - ", round(pa_scan_hypoxia3_m3$conf.int[2], 2),")", sep = ""))
                     )
 out_hypoxia <- out_hypoxia[out_hypoxia[1]!="",] # remove first two rows of labels since labels will be added in kable
 rownames(out_hypoxia) <- NULL # make row names null so numbers don't print in table
