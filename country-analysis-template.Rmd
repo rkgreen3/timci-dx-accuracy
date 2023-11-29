@@ -447,9 +447,11 @@ cat1_df <- df_ref_cat1_w %>% select(ppt_id) %>%
          oxygen = paste(df_ref_cat1_w$mean_ref_o2, " (", df_ref_cat1_w$sd_ref_o2, ")", " [", df_ref_cat1_w$min_ref_o2, ",", df_ref_cat1_w$max_ref_o2, "] ", df_ref_cat1_w$cv_ref_o2, "%", sep = ""),
          pr = paste(df_ref_cat1_w$mean_ref_pr, " (", df_ref_cat1_w$sd_ref_pr, ")", " [", df_ref_cat1_w$min_ref_pr, ",", df_ref_cat1_w$max_ref_pr, "] ", df_ref_cat1_w$cv_ref_pr, "%", sep = ""),
          pi = paste(df_ref_cat1_w$mean_ref_pi, " (", df_ref_cat1_w$sd_ref_pi, ")", " [", df_ref_cat1_w$min_ref_pi, ",", df_ref_cat1_w$max_ref_pi, "] ", df_ref_cat1_w$cv_ref_pi, "%", sep = ""))
+
 ref1_t2 <- kable(cat1_df, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate", "Profusion Index")) %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
   add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
+
 
 # Age Cat 2
 cat2_df <- df_ref_cat2_w %>% select(ppt_id) %>% 
@@ -457,6 +459,7 @@ cat2_df <- df_ref_cat2_w %>% select(ppt_id) %>%
          oxygen = paste(df_ref_cat2_w$mean_ref_o2, " (", df_ref_cat2_w$sd_ref_o2, ")", " [", df_ref_cat2_w$min_ref_o2, ",", df_ref_cat2_w$max_ref_o2, "] ", df_ref_cat2_w$cv_ref_o2, "%", sep = ""),
          pr = paste(df_ref_cat2_w$mean_ref_pr, " (", df_ref_cat2_w$sd_ref_pr, ")", " [", df_ref_cat2_w$min_ref_pr, ",", df_ref_cat2_w$max_ref_pr, "] ", df_ref_cat2_w$cv_ref_pr, "%", sep = ""),
          pi = paste(df_ref_cat2_w$mean_ref_pi, " (", df_ref_cat2_w$sd_ref_pi, ")", " [", df_ref_cat2_w$min_ref_pi, ",", df_ref_cat2_w$max_ref_pi, "] ", df_ref_cat2_w$cv_ref_pi, "%", sep = ""))
+
 ref2_t2 <- kable(cat2_df, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate", "Profusion Index")) %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
   add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
@@ -467,6 +470,7 @@ cat3_df <- df_ref_cat3_w %>% select(ppt_id) %>%
          oxygen = paste(df_ref_cat3_w$mean_ref_o2, " (", df_ref_cat3_w$sd_ref_o2, ")", " [", df_ref_cat3_w$min_ref_o2, ",", df_ref_cat3_w$max_ref_o2, "] ", df_ref_cat3_w$cv_ref_o2, "%", sep = ""),
          pr = paste(df_ref_cat3_w$mean_ref_pr, " (", df_ref_cat3_w$sd_ref_pr, ")", " [", df_ref_cat3_w$min_ref_pr, ",", df_ref_cat3_w$max_ref_pr, "] ", df_ref_cat3_w$cv_ref_pr, "%", sep = ""),
          pi = paste(df_ref_cat3_w$mean_ref_pi, " (", df_ref_cat3_w$sd_ref_pi, ")", " [", df_ref_cat3_w$min_ref_pi, ",", df_ref_cat3_w$max_ref_pi, "] ", df_ref_cat3_w$cv_ref_pi, "%", sep = ""))
+
 ref3_t2 <- kable(cat3_df, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate", "Profusion Index")) %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
   add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
@@ -482,44 +486,175 @@ ref3_t2 <- kable(cat3_df, col.names = c("Participant ID","Temperature", "Oxygen"
 `r ref3_t2`
 
 ## Rad-G Temp (Masimo) {.tabset}
+```{r}
+# Age Cat 1
+cat1_radg <- df_radg_cat1_w %>% select(ppt_id) %>% 
+  mutate(temp = paste(df_radg_cat1_w$mean_ref_temp, " (", df_radg_cat1_w$sd_ref_temp, ")", " [", df_radg_cat1_w$min_ref_temp, ",", df_radg_cat1_w$max_ref_temp, "] ", df_radg_cat1_w$cv_ref_temp, "%", sep = ""),
+         oxygen = paste(df_radg_cat1_w$mean_ref_o2, " (", df_radg_cat1_w$sd_ref_o2, ")", " [", df_radg_cat1_w$min_ref_o2, ",", df_radg_cat1_w$max_ref_o2, "] ", df_radg_cat1_w$cv_ref_o2, "%", sep = ""),
+         pr = paste(df_radg_cat1_w$mean_ref_pr, " (", df_radg_cat1_w$sd_ref_pr, ")", " [", df_radg_cat1_w$min_ref_pr, ",", df_radg_cat1_w$max_ref_pr, "] ", df_radg_cat1_w$cv_ref_pr, "%", sep = ""),
+         pi = paste(df_radg_cat1_w$mean_ref_pi, " (", df_radg_cat1_w$sd_ref_pi, ")", " [", df_radg_cat1_w$min_ref_pi, ",", df_radg_cat1_w$max_ref_pi, "] ", df_radg_cat1_w$cv_ref_pi, "%", sep = ""))
+
+radg1_t2 <- kable(cat1_radg, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate", "Profusion Index")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
+
+# Age Cat 2
+cat2_radg <- df_radg_cat2_w %>% select(ppt_id) %>% 
+  mutate(temp = paste(df_radg_cat2_w$mean_ref_temp, " (", df_radg_cat2_w$sd_ref_temp, ")", " [", df_radg_cat2_w$min_ref_temp, ",", df_radg_cat2_w$max_ref_temp, "] ", df_radg_cat2_w$cv_ref_temp, "%", sep = ""),
+         oxygen = paste(df_radg_cat2_w$mean_ref_o2, " (", df_radg_cat2_w$sd_ref_o2, ")", " [", df_radg_cat2_w$min_ref_o2, ",", df_radg_cat2_w$max_ref_o2, "] ", df_radg_cat2_w$cv_ref_o2, "%", sep = ""),
+         pr = paste(df_radg_cat2_w$mean_ref_pr, " (", df_radg_cat2_w$sd_ref_pr, ")", " [", df_radg_cat2_w$min_ref_pr, ",", df_radg_cat2_w$max_ref_pr, "] ", df_radg_cat2_w$cv_ref_pr, "%", sep = ""),
+         pi = paste(df_radg_cat2_w$mean_ref_pi, " (", df_radg_cat2_w$sd_ref_pi, ")", " [", df_radg_cat2_w$min_ref_pi, ",", df_radg_cat2_w$max_ref_pi, "] ", df_radg_cat2_w$cv_ref_pi, "%", sep = ""))
+
+radg2_t2 <- kable(cat2_radg, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate", "Profusion Index")) %>%
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5)) 
+
+# Age Cat 3
+cat3_radg <- df_radg_cat3_w %>% select(ppt_id) %>% 
+  mutate(temp = paste(df_radg_cat3_w$mean_ref_temp, " (", df_radg_cat3_w$sd_ref_temp, ")", " [", df_radg_cat3_w$min_ref_temp, ",", df_radg_cat3_w$max_ref_temp, "] ", df_radg_cat3_w$cv_ref_temp, "%", sep = ""),
+         oxygen = paste(df_radg_cat3_w$mean_ref_o2, " (", df_radg_cat3_w$sd_ref_o2, ")", " [", df_radg_cat3_w$min_ref_o2, ",", df_radg_cat3_w$max_ref_o2, "] ", df_radg_cat3_w$cv_ref_o2, "%", sep = ""),
+         pr = paste(df_radg_cat3_w$mean_ref_pr, " (", df_radg_cat3_w$sd_ref_pr, ")", " [", df_radg_cat3_w$min_ref_pr, ",", df_radg_cat3_w$max_ref_pr, "] ", df_radg_cat3_w$cv_ref_pr, "%", sep = ""),
+         pi = paste(df_radg_cat3_w$mean_ref_pi, " (", df_radg_cat3_w$sd_ref_pi, ")", " [", df_radg_cat3_w$min_ref_pi, ",", df_radg_cat3_w$max_ref_pi, "] ", df_radg_cat3_w$cv_ref_pi, "%", sep = ""))
+
+radg3_t2 <- kable(cat3_radg, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate", "Profusion Index")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
+```
 
 ### 0-1 month
+`radg1_t2`
 
 ### 2-11 months
+`radg2_t2`
 
 ### 12-59 months
+`radg3_t2`
 
 ## m800 (Biolight) {.tabset}
+```{r}
+# Age Cat 1
+
+cat1_biolight <- df_bio_cat1_w %>% select(ppt_id) %>% 
+  mutate(oxygen = paste(df_bio_cat1_w$mean_ref_o2, " (", df_bio_cat1_w$sd_ref_o2, ")", " [", df_bio_cat1_w$min_ref_o2, ",", df_bio_cat1_w$max_ref_o2, "] ", df_bio_cat1_w$cv_ref_o2, "%", sep = ""),
+         pr = paste(df_bio_cat1_w$mean_ref_pr, " (", df_bio_cat1_w$sd_ref_pr, ")", " [", df_bio_cat1_w$min_ref_pr, ",", df_bio_cat1_w$max_ref_pr, "] ", df_bio_cat1_w$cv_ref_pr, "%", sep = ""))
+
+bio1_t2 <- kable(cat1_biolight, col.names = c("Participant ID","Oxygen", "Pulse Rate")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
+
+# Age Cat 2
+
+cat2_biolight <- df_bio_cat2_w %>% select(ppt_id) %>% 
+  mutate(oxygen = paste(df_bio_cat2_w$mean_ref_o2, " (", df_bio_cat2_w$sd_ref_o2, ")", " [", df_bio_cat2_w$min_ref_o2, ",", df_bio_cat2_w$max_ref_o2, "] ", df_bio_cat2_w$cv_ref_o2, "%", sep = ""),
+         pr = paste(df_bio_cat2_w$mean_ref_pr, " (", df_bio_cat2_w$sd_ref_pr, ")", " [", df_bio_cat2_w$min_ref_pr, ",", df_bio_cat2_w$max_ref_pr, "] ", df_bio_cat2_w$cv_ref_pr, "%", sep = ""))
+
+bio2_t2 <- kable(cat2_biolight, col.names = c("Participant ID","Oxygen", "Pulse Rate")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
+
+# Age Cat 3
+
+cat3_biolight <- df_bio_cat3_w %>% select(ppt_id) %>% 
+  mutate(oxygen = paste(df_bio_cat3_w$mean_ref_o2, " (", df_bio_cat3_w$sd_ref_o2, ")", " [", df_bio_cat3_w$min_ref_o2, ",", df_bio_cat3_w$max_ref_o2, "] ", df_bio_cat3_w$cv_ref_o2, "%", sep = ""),
+         pr = paste(df_bio_cat3_w$mean_ref_pr, " (", df_bio_cat3_w$sd_ref_pr, ")", " [", df_bio_cat3_w$min_ref_pr, ",", df_bio_cat3_w$max_ref_pr, "] ", df_bio_cat3_w$cv_ref_pr, "%", sep = ""))
+
+bio3_t2 <- kable(cat3_biolight, col.names = c("Participant ID","Oxygen", "Pulse Rate")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
+
+```
 
 ### 0-1 month
+`bio1_t2`
 
 ### 2-11 months
+`bio2_t2`
 
 ### 12-59 months
+`bio3_t2`
 
 ## NeoGuard (Neopenda) {.tabset}
+```{r}
+#Age Cat 1
+
+cat1_neo <- df_neo_cat1_w %>% select(ppt_id) %>% 
+  mutate(temp = paste(df_neo_cat1_w$mean_ref_temp, " (", df_neo_cat1_w$sd_ref_temp, ")", " [", df_neo_cat1_w$min_ref_temp, ",", df_neo_cat1_w$max_ref_temp, "] ", df_neo_cat1_w$cv_ref_temp, "%", sep = ""),
+         oxygen = paste(df_neo_cat1_w$mean_ref_o2, " (", df_neo_cat1_w$sd_ref_o2, ")", " [", df_neo_cat1_w$min_ref_o2, ",", df_neo_cat1_w$max_ref_o2, "] ", df_neo_cat1_w$cv_ref_o2, "%", sep = ""),
+         pr = paste(df_neo_cat1_w$mean_ref_pr, " (", df_neo_cat1_w$sd_ref_pr, ")", " [", df_neo_cat1_w$min_ref_pr, ",", df_neo_cat1_w$max_ref_pr, "] ", df_neo_cat1_w$cv_ref_pr, "%", sep = ""))
+
+neo1_t2 <- kable(cat1_neo, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
+
+#Age Cat 2
+
+cat2_neo <- df_neo_cat2_w %>% select(ppt_id) %>% 
+  mutate(temp = paste(df_neo_cat2_w$mean_ref_temp, " (", df_neo_cat2_w$sd_ref_temp, ")", " [", df_neo_cat2_w$min_ref_temp, ",", df_neo_cat2_w$max_ref_temp, "] ", df_neo_cat2_w$cv_ref_temp, "%", sep = ""),
+         oxygen = paste(df_neo_cat2_w$mean_ref_o2, " (", df_neo_cat2_w$sd_ref_o2, ")", " [", df_neo_cat2_w$min_ref_o2, ",", df_neo_cat2_w$max_ref_o2, "] ", df_neo_cat2_w$cv_ref_o2, "%", sep = ""),
+         pr = paste(df_neo_cat2_w$mean_ref_pr, " (", df_neo_cat2_w$sd_ref_pr, ")", " [", df_neo_cat2_w$min_ref_pr, ",", df_neo_cat2_w$max_ref_pr, "] ", df_neo_cat2_w$cv_ref_pr, "%", sep = ""))
+
+neo2_t2 <- kable(cat2_neo, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
+
+#Age Cat 3
+
+cat3_neo <- df_neo_cat3_w %>% select(ppt_id) %>% 
+  mutate(temp = paste(df_neo_cat3_w$mean_ref_temp, " (", df_neo_cat3_w$sd_ref_temp, ")", " [", df_neo_cat3_w$min_ref_temp, ",", df_neo_cat3_w$max_ref_temp, "] ", df_neo_cat3_w$cv_ref_temp, "%", sep = ""),
+         oxygen = paste(df_neo_cat3_w$mean_ref_o2, " (", df_neo_cat3_w$sd_ref_o2, ")", " [", df_neo_cat3_w$min_ref_o2, ",", df_neo_cat3_w$max_ref_o2, "] ", df_neo_cat3_w$cv_ref_o2, "%", sep = ""),
+         pr = paste(df_neo_cat3_w$mean_ref_pr, " (", df_neo_cat3_w$sd_ref_pr, ")", " [", df_neo_cat3_w$min_ref_pr, ",", df_neo_cat3_w$max_ref_pr, "] ", df_neo_cat3_w$cv_ref_pr, "%", sep = ""))
+
+neo3_t2 <- kable(cat3_neo, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
+
+
+```
 
 ### 0-1 month
+`neo1_t2`
 
 ### 2-11 months
+`neo2_t2`
 
 ### 12-59 months
+`neo3_t2`
 
 ## Onyx PO+RR (Nonin) {.tabset}
+```{r}
+# Age Cat 3
 
-### 0-1 month
+cat3_onyx <- df_onyx_cat3_w %>% select(ppt_id) %>% 
+  mutate(oxygen = paste(df_onyx_cat3_w$mean_ref_o2, " (", df_onyx_cat3_w$sd_ref_o2, ")", " [", df_onyx_cat3_w$min_ref_o2, ",", df_onyx_cat3_w$max_ref_o2, "] ", df_onyx_cat3_w$cv_ref_o2, "%", sep = ""),
+         pr = paste(df_onyx_cat3_w$mean_ref_pr, " (", df_onyx_cat3_w$sd_ref_pr, ")", " [", df_onyx_cat3_w$min_ref_pr, ",", df_onyx_cat3_w$max_ref_pr, "] ", df_onyx_cat3_w$cv_ref_pr, "%", sep = ""))
 
-### 2-11 months
+onyx3_t2 <- kable(cat3_onyx, col.names = c("Participant ID", "Oxygen", "Pulse Rate")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 4))
+
+```
 
 ### 12-59 months
+`onyx3_t2`
 
 ## Scanbo v8 (Scanbo) {.tabset}
+```{r}
+# Age Cat 3
 
-### 0-1 month
+cat3_scan <- df_scan_cat3_w %>% select(ppt_id) %>% 
+  mutate(temp = paste(df_scan_cat3_w$mean_ref_temp, " (", df_scan_cat3_w$sd_ref_temp, ")", " [", df_scan_cat3_w$min_ref_temp, ",", df_scan_cat3_w$max_ref_temp, "] ", df_scan_cat3_w$cv_ref_temp, "%", sep = ""),
+         oxygen = paste(df_scan_cat3_w$mean_ref_o2, " (", df_scan_cat3_w$sd_ref_o2, ")", " [", df_scan_cat3_w$min_ref_o2, ",", df_scan_cat3_w$max_ref_o2, "] ", df_scan_cat3_w$cv_ref_o2, "%", sep = ""),
+         pr = paste(df_scan_cat3_w$mean_ref_pr, " (", df_scan_cat3_w$sd_ref_pr, ")", " [", df_scan_cat3_w$min_ref_pr, ",", df_scan_cat3_w$max_ref_pr, "] ", df_scan_cat3_w$cv_ref_pr, "%", sep = ""),
+         pi = paste(df_scan_cat3_w$mean_ref_pi, " (", df_scan_cat3_w$sd_ref_pi, ")", " [", df_scan_cat3_w$min_ref_pi, ",", df_scan_cat3_w$max_ref_pi, "] ", df_scan_cat3_w$cv_ref_pi, "%", sep = ""))
 
-### 2-11 months
+scan3_t2 <- kable(cat3_scan, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate", "Profusion Index")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 6))
+
+```
 
 ### 12-59 months
+`scan3_t2`
 
 # Section 3: Bland Altman Plots {.tabset}
 Anmol
