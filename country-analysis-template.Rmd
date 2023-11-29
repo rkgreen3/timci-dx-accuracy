@@ -344,8 +344,6 @@ Note: Reference measure summaries presented in this table (for measurements obta
 
 ```{r include = FALSE}
 
-# @ Leila and team - would recommend using the cleaned check box variables (have been added to the codebook), also just an fyi that you don't need to explicitly create factored variables for the CreateTableOne to treat them as categorical, as long as they're included in your factorVars list they'll be handled as categorical even if they're numeric
-
 # Specify all the variables you want to treat as factors
 
 factorVars <- c("age_cat", "sex","cg_relationship", 
@@ -357,9 +355,13 @@ factorVars <- c("age_cat", "sex","cg_relationship",
                 "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
                 "tx_other")
 
-# Specify the continuous variables
+# Relevel the age_cat factors
 
-contVars <- c("height", "weight", "muac", "head_circumference", "hemocue_hb", "mean_ref_spo2", "mean_ref_pr", "mean_ref_temp")
+str(df_og$age_cat)
+
+df_og$age_cat <- factor(df_og$age_cat,levels = c("0-1 month","2-11 months","12-59 months"))
+
+levels(df_og$age_cat)
 
 # Specify all the variables to include in table 1 (both continuous and categorical)
 
@@ -372,7 +374,7 @@ myVars <- c("age_cat", "sex","cg_relationship",
             "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
             "tx_other", "height", "weight", "muac", "head_circumference", "hemocue_hb", "mean_ref_o2", "mean_ref_pr", "mean_ref_temp", "mean_ref_pi")
 
-# CreateTableOne Overall:
+# CreateTableOne:
 
 out1 <- CreateTableOne(vars = myVars,
                data = df_og,
@@ -384,37 +386,38 @@ out1 <- CreateTableOne(vars = myVars,
 t1_overall <- print(out1,
             cramVars = "sex")
 
-# CreateTableOne stratified by facility -- RG Note: I added a parameter to the object above so you don't need to create a second object
 
-out2 <- CreateTableOne(vars = myVars,
-               data = df_og,
-               factorVars = factorVars,
-               strata = "facility_name",
-               test = FALSE)
 
-t1_by_facility <- print(out2,
-            cramVars = "sex")
+# RG Suggestion: Since we'll be outputting to html (at least to start), see if you can get it to output as an html table when you knit the document.
+# Create row labels
 
-# Summary statistics of the continuous variables
+t1lab <- c("N", "Age Category", "0-1 month", "2-11 months", "12-59 months", "Sex = Male/ Female",
+           "Relationship of caregiver to child", "Mother and Father", "Mother and Grandmother", "Mother only", "Father only", "Grandmother only", "Grandfather only", "Sibling", "Other family member", "Community Member", "Other",
+           "Visited due to Illness", "Visited for Immunization", "Visited for Routine Monitoring", "Visited due to Trauma", "Admission to inpatient unit of the facility",
+           "Cough", "*Difficulty/Rapid breathing", "Fever", "Diarrhea", "Vomiting", "Other",
+           "Dehydration", "Respiratory", "Digestive", "Malaria", "Fever", "Measles", "Ear infection", "Throat infection", "Other",
+           "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other",
+           "Height (cm)", "Weight (kg)", "MUAC (cm)", "Hemocue (g/dL)", "Head Circumference (cm)", "SpO2 (reference)", "Pulse Rate (reference)", "Temperature (reference)")
 
-summary(out1$contTable) # RG Note: what is this meant to do?
+# Add row labels
 
-# RG Suggestion: Since we'll be outputting to html (at least to start), see if you can get it to output as an html table when you knit the document. You may also want to add rownames to make the output more intuitive to the reader (e.g., define what cg_relationship 1-10 actually means). Here's some sample code to get you started:
+rownames(t1_overall) <- c(t1lab)
 
-# suggest releveling age category to appear in order
-
-# t1lab <- c("N", "Age Category", "0-1 month")
-# rownames(t1_overall) <- c(t1lab)
+# Table formatting
 
 t1 <- kable(t1_overall) %>%
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
-  add_indent(c(3:5, 8:16, 29:37, 39:43)) %>%
-  pack_rows("Visit Reason", 17, 21) %>%
-  pack_rows("Symptoms Present", 22, 27) %>%
-  pack_rows("Diagnosis", 28, 37) %>%
-  pack_rows("Treatment", 38, 43) %>%
-  pack_rows("Physical Characteristics", 44, 47) %>%
-  pack_rows("Reference Measurements", 48, 52)
+  add_indent(c(3:5, 8:17)) %>%
+  #pack_rows("Relationship of caregiver to child", 8, 17) %>%
+  pack_rows("Reason for visit to clinic", 18, 22) %>%
+  pack_rows("Symptoms Present", 23, 28) %>%
+  pack_rows("Diagnosis received", 29, 37) %>%
+  pack_rows("Treatment received", 38, 42) %>%
+  pack_rows("Physical Characteristics", 43, 47) %>%
+  pack_rows("Reference Measurements", 48, 50)
+
+# Output
+ t1
 ```
 `r t1`
 
