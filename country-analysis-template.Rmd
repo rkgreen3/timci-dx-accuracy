@@ -95,7 +95,7 @@ df_og <- df_og %>%
          cv_index_pr = round(sd_index_pr/mean_index_pr, 1)*100,
          cv_index_temp = round(sd_index_temp/mean_index_temp, 1)*100,
          cv_index_pi = round(sd_index_pi/mean_index_pi, 1)*100)
-
+# add index rr measurement
 ```
 
 ```{r long_dfs, warning=FALSE}
@@ -481,20 +481,45 @@ ref3_t2 <- kable(cat3_df, col.names = c("Participant ID","Temperature", "Oxygen"
 ### 12-59 months
 `r ref3_t2`
 
-## Rad-G Temp (Masimo)
+## Rad-G Temp (Masimo) {.tabset}
 
+### 0-1 month
 
-## m800 (Biolight)
+### 2-11 months
 
+### 12-59 months
 
-## NeoGuard (Neopenda)
+## m800 (Biolight) {.tabset}
 
+### 0-1 month
 
-## Onyx PO+RR (Nonin)
+### 2-11 months
 
+### 12-59 months
 
-## Scanbo v8 (Scanbo)
+## NeoGuard (Neopenda) {.tabset}
 
+### 0-1 month
+
+### 2-11 months
+
+### 12-59 months
+
+## Onyx PO+RR (Nonin) {.tabset}
+
+### 0-1 month
+
+### 2-11 months
+
+### 12-59 months
+
+## Scanbo v8 (Scanbo) {.tabset}
+
+### 0-1 month
+
+### 2-11 months
+
+### 12-59 months
 
 # Section 3: Bland Altman Plots {.tabset}
 Anmol
