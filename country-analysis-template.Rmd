@@ -388,60 +388,67 @@ out1 <- CreateTableOne(vars = myVars,
 t1_overall <- print(out1,
             cramVars = "sex")
 
-if (COUNTRY == "Tanzania"){
-  t1lab <- c("N", "Age Category (%)", "0-1 month", "2-11 months", "12-59 months", "Sex = Male/Female (%)",
-           "Relationship of caregiver to child (%)", "Mother and Father", "Mother and Grandmother", "Mother only", "Father only", "Grandmother only",
-           "Visited due to Illness (%)", "Visited for Immunization (%)", "Visited for Routine Monitoring (%)", "Visited due to Trauma=False (%)", "Admission to inpatient unit of the 
-           facility=False (%)",
-           "Cough (%)", "Difficulty/Rapid breathing (%)", "Fever (%)", "Diarrhea (%)", "Vomiting (%)", "Other (%)", 
-           "Received Diagnosis (%)", "Dehydration", "Respiratory", "Digestive", "Malaria", "Fever", "Measles=False", "Ear infection", "Throat infection", "Other",
-           "Received Treatment (%)", "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other",
-           "Height (cm) (mean (SD))", "Weight (kg) (mean (SD))", "MUAC (cm) (mean (SD))", "Head Circumference (cm) (mean (SD))", 
-           "Hemocue (g/dL) (mean (SD))", "SpO2 (reference) (mean (SD))", 
-           "Pulse Rate (reference) (mean (SD))",  "Temperature (reference) (mean (SD))", "Profusion Index (reference) (mean (SD))")
-} else {
-    # Create row labels -- "6-Grandfather only" removed as does not appear as level (at least for Kenya data)
-  t1lab <- c("N", "Age Category (%)", "0-1 month", "2-11 months", "12-59 months", "Sex = Male/Female (%)",
-             "Relationship of caregiver to child (%)", "Mother and Father", "Mother and Grandmother", "Mother only", "Father only", "Grandmother only", "Sibling", "Other family member",
-             "Community Member", "Other",
-             "Visited due to Illness (%)", "Visited for Immunization (%)", "Visited for Routine Monitoring (%)", "Visited due to Trauma=False (%)", "Admission to inpatient unit of the
-             facility=False (%)",
-             "Cough (%)", "Difficulty/Rapid breathing (%)", "Fever (%)", "Diarrhea (%)", "Vomiting (%)", "Other (%)",
-             "Received Diagnosis (%)", "Dehydration", "Respiratory", "Digestive", "Malaria", "Fever", "Measles=False", "Ear infection", "Throat infection", "Other",
-             "Received Treatment (%)", "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other",
-             "Height (cm) (mean (SD))", "Weight (kg) (mean (SD))", "MUAC (cm) (mean (SD))", "Head Circumference (cm) (mean (SD))",
-             "Hemocue (g/dL) (mean (SD))", "SpO2 (reference) (mean (SD))",
-             "Pulse Rate (reference) (mean (SD))",  "Temperature (reference) (mean (SD))", "Profusion Index (reference) (mean (SD))")
-}
+# ---Below code to be retained for final formatting of tables, will be suppressed in drafting version. Tables will be printed as-is without additional formatting for now.
+# if (COUNTRY == "Tanzania"){
+#   t1lab <- c("N", "Age Category (%)", "0-1 month", "2-11 months", "12-59 months", "Sex = Male/Female (%)",
+#            "Relationship of caregiver to child (%)", "Mother and Father", "Mother and Grandmother", "Mother only", "Father only", "Grandmother only",
+#            "Visited due to Illness (%)", "Visited for Immunization (%)", "Visited for Routine Monitoring (%)", "Visited due to Trauma=False (%)", "Admission to inpatient unit of the 
+#            facility=False (%)",
+#            "Cough (%)", "Difficulty/Rapid breathing (%)", "Fever (%)", "Diarrhea (%)", "Vomiting (%)", "Other (%)", 
+#            "Received Diagnosis (%)", "Dehydration", "Respiratory", "Digestive", "Malaria", "Fever", "Measles=False", "Ear infection", "Throat infection", "Other",
+#            "Received Treatment (%)", "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other",
+#            "Height (cm) (mean (SD))", "Weight (kg) (mean (SD))", "MUAC (cm) (mean (SD))", "Head Circumference (cm) (mean (SD))", 
+#            "Hemocue (g/dL) (mean (SD))", "SpO2 (reference) (mean (SD))", 
+#            "Pulse Rate (reference) (mean (SD))",  "Temperature (reference) (mean (SD))", "Profusion Index (reference) (mean (SD))")
+# } else {
+#     # Create row labels -- "6-Grandfather only" removed as does not appear as level (at least for Kenya data)
+#   t1lab <- c("N", "Age Category (%)", "0-1 month", "2-11 months", "12-59 months", "Sex = Male/Female (%)",
+#              "Relationship of caregiver to child (%)", "Mother and Father", "Mother and Grandmother", "Mother only", "Father only", "Grandmother only", "Sibling", "Other family member",
+#              "Community Member", "Other",
+#              "Visited due to Illness (%)", "Visited for Immunization (%)", "Visited for Routine Monitoring (%)", "Visited due to Trauma=False (%)", "Admission to inpatient unit of the
+#              facility=False (%)",
+#              "Cough (%)", "Difficulty/Rapid breathing (%)", "Fever (%)", "Diarrhea (%)", "Vomiting (%)", "Other (%)",
+#              "Received Diagnosis (%)", "Dehydration", "Respiratory", "Digestive", "Malaria", "Fever", "Measles=False", "Ear infection", "Throat infection", "Other",
+#              "Received Treatment (%)", "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other",
+#              "Height (cm) (mean (SD))", "Weight (kg) (mean (SD))", "MUAC (cm) (mean (SD))", "Head Circumference (cm) (mean (SD))",
+#              "Hemocue (g/dL) (mean (SD))", "SpO2 (reference) (mean (SD))",
+#              "Pulse Rate (reference) (mean (SD))",  "Temperature (reference) (mean (SD))", "Profusion Index (reference) (mean (SD))")
+# }
+# 
+# 
+# # Add row labels
+# rownames(t1_overall) <- c(t1lab)
+# 
+# # Table formatting
+# if (COUNTRY == "Tanzania"){
+#   t1 <- kable(t1_overall) %>%
+#   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
+#   add_indent(c(3:5, 8:16)) %>%
+#   pack_rows("Demographic Characteristics", 2, 12) %>%
+#   pack_rows("Reason for visit to clinic", 13, 17) %>%
+#   pack_rows("Symptoms Present", 18, 23) %>%
+#   pack_rows("Diagnosis", 24, 33) %>%
+#   pack_rows("Treatment received", 34, 39) %>%
+#   pack_rows("Physical Characteristics", 40, 43) %>%
+#   pack_rows("Reference Measurements", 44, 48)
+# } else {
+#   t1 <- kable(t1_overall) %>%
+#   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
+#   add_indent(c(3:5, 8:16)) %>%
+#   pack_rows("Demographic Characteristics", 2, 16) %>%
+#   pack_rows("Reason for visit to clinic", 17, 21) %>%
+#   pack_rows("Symptoms Present", 22, 27) %>%
+#   pack_rows("Diagnosis", 28, 37) %>%
+#   pack_rows("Treatment received", 38, 43) %>%
+#   pack_rows("Physical Characteristics", 44, 47) %>%
+#   pack_rows("Reference Measurements", 48, 52)
+# }
 
+# --- End retained section
 
-# Add row labels
-rownames(t1_overall) <- c(t1lab)
-
-# Table formatting
-if (COUNTRY == "Tanzania"){
-  t1 <- kable(t1_overall) %>%
+t1 <- kable(t1_overall) %>%
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
-  add_indent(c(3:5, 8:16)) %>%
-  pack_rows("Demographic Characteristics", 2, 12) %>%
-  pack_rows("Reason for visit to clinic", 13, 17) %>%
-  pack_rows("Symptoms Present", 18, 23) %>%
-  pack_rows("Diagnosis", 24, 33) %>%
-  pack_rows("Treatment received", 34, 39) %>%
-  pack_rows("Physical Characteristics", 40, 43) %>%
-  pack_rows("Reference Measurements", 44, 48)
-} else {
-  t1 <- kable(t1_overall) %>%
-  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
-  add_indent(c(3:5, 8:16)) %>%
-  pack_rows("Demographic Characteristics", 2, 16) %>%
-  pack_rows("Reason for visit to clinic", 17, 21) %>%
-  pack_rows("Symptoms Present", 22, 27) %>%
-  pack_rows("Diagnosis", 28, 37) %>%
-  pack_rows("Treatment received", 38, 43) %>%
-  pack_rows("Physical Characteristics", 44, 47) %>%
-  pack_rows("Reference Measurements", 48, 52)
-}
+  add_indent(c(3:5))
 ```
 `r t1`
 
