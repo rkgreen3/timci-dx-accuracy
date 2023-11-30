@@ -76,25 +76,30 @@ df_og <- df_og %>%
   mutate(mean_index_o2 = round(rowMeans(select(df_og, c(m1_index_o2, m2_index_o2, m3_index_o2)), na.rm = TRUE), 1),
          mean_index_pr = round(rowMeans(select(df_og, c(m1_index_pr, m2_index_pr, m3_index_pr)), na.rm = TRUE), 1),
          mean_index_temp = round(rowMeans(select(df_og, c(m1_therm_skin_temp, m2_therm_skin_temp, m3_therm_skin_temp)), na.rm = TRUE), 1),
-         mean_index_pi = round(rowMeans(select(df_og, c(m1_index_pi, m2_index_pi, m3_index_pi)), na.rm = TRUE), 1)) %>%
+         mean_index_pi = round(rowMeans(select(df_og, c(m1_index_pi, m2_index_pi, m3_index_pi)), na.rm = TRUE), 1),
+         mean_index_rr = round(rowMeans(select(df_og, c(m1_index_rr, m2_index_rr, m3_index_rr)), na.rm = TRUE), 1)) %>%
   rowwise() %>%
   mutate(sd_index_o2 = round(sd(c(m1_index_o2, m2_index_o2, m3_index_o2), na.rm = TRUE), 1),
          sd_index_pr = round(sd(c(m1_index_pr, m2_index_pr, m3_index_pr), na.rm = TRUE), 1),
          sd_index_temp = round(sd(c(m1_index_temp, m2_index_temp, m3_index_temp), na.rm = TRUE), 1),
-         sd_index_pi = round(sd(c(m1_index_pi, m2_index_pi, m3_index_pi), na.rm = TRUE), 1)) %>%
+         sd_index_pi = round(sd(c(m1_index_pi, m2_index_pi, m3_index_pi), na.rm = TRUE), 1),
+         sd_index_rr = round(sd(c(m1_index_rr, m2_index_rr, m3_index_rr), na.rm = TRUE), 1)) %>%
   mutate(min_index_o2 = min(c(m1_index_o2, m2_index_o2, m3_index_o2), na.rm = TRUE),
          min_index_pr = min(c(m1_index_pr, m2_index_pr, m3_index_pr), na.rm = TRUE),
          min_index_temp = min(c(m1_index_temp, m2_index_temp, m3_index_temp), na.rm = TRUE),
-         min_index_pi = min(c(m1_index_pi, m2_index_pi, m3_index_pi), na.rm = TRUE)) %>%
+         min_index_pi = min(c(m1_index_pi, m2_index_pi, m3_index_pi), na.rm = TRUE),
+         min_index_rr = min(c(m1_index_rr, m2_index_rr, m3_index_rr), na.rm = TRUE)) %>%
   mutate(max_index_o2 = max(c(m1_index_o2, m2_index_o2, m3_index_o2), na.rm = TRUE),
          max_index_pr = max(c(m1_index_pr, m2_index_pr, m3_index_pr), na.rm = TRUE),
          max_index_temp = max(c(m1_index_temp, m2_index_temp, m3_index_temp), na.rm = TRUE),
-         max_index_pi = max(c(m1_index_pi, m2_index_pi, m3_index_pi), na.rm = TRUE)) %>%
+         max_index_pi = max(c(m1_index_pi, m2_index_pi, m3_index_pi), na.rm = TRUE),
+         max_index_rr = max(c(m1_index_rr, m2_index_rr, m3_index_rr), na.rm = TRUE)) %>%
   ungroup() %>%
   mutate(cv_index_o2 = round(sd_index_o2/mean_index_o2, 1)*100,
          cv_index_pr = round(sd_index_pr/mean_index_pr, 1)*100,
          cv_index_temp = round(sd_index_temp/mean_index_temp, 1)*100,
-         cv_index_pi = round(sd_index_pi/mean_index_pi, 1)*100)
+         cv_index_pi = round(sd_index_pi/mean_index_pi, 1)*100,
+         cv_index_rr = round(sd_index_rr/mean_index_rr, 1)*100)
 # add index rr measurement
 ```
 
