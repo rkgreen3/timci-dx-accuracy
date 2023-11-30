@@ -364,7 +364,6 @@ df_og$age_cat <- factor(df_og$age_cat,levels = c("0-1 month","2-11 months","12-5
 levels(df_og$age_cat)
 
 # Specify all the variables to include in table 1 (both continuous and categorical)
-
 myVars <- c("age_cat", "sex","cg_relationship", 
             "visit_rsn_illness", "visit_rsn_immunize", "visit_rsn_routine", "visit_rsn_trauma", "visit_rsn_admit",
             "ill_sxs_cough", "ill_sxs_rapidbreathing", "ill_sxs_fever",
@@ -375,7 +374,6 @@ myVars <- c("age_cat", "sex","cg_relationship",
             "tx_other", "height", "weight", "muac", "head_circumference", "hemocue_hb", "mean_ref_o2", "mean_ref_pr", "mean_ref_temp", "mean_ref_pi")
 
 # CreateTableOne:
-
 out1 <- CreateTableOne(vars = myVars,
                data = df_og,
                factorVars = factorVars,
@@ -386,38 +384,34 @@ out1 <- CreateTableOne(vars = myVars,
 t1_overall <- print(out1,
             cramVars = "sex")
 
-
-
-# RG Suggestion: Since we'll be outputting to html (at least to start), see if you can get it to output as an html table when you knit the document.
-# Create row labels
-
-t1lab <- c("N", "Age Category", "0-1 month", "2-11 months", "12-59 months", "Sex = Male/ Female",
-           "Relationship of caregiver to child", "Mother and Father", "Mother and Grandmother", "Mother only", "Father only", "Grandmother only", "Grandfather only", "Sibling", "Other family member", "Community Member", "Other",
-           "Visited due to Illness", "Visited for Immunization", "Visited for Routine Monitoring", "Visited due to Trauma", "Admission to inpatient unit of the facility",
-           "Cough", "*Difficulty/Rapid breathing", "Fever", "Diarrhea", "Vomiting", "Other",
-           "Dehydration", "Respiratory", "Digestive", "Malaria", "Fever", "Measles", "Ear infection", "Throat infection", "Other",
-           "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other",
-           "Height (cm)", "Weight (kg)", "MUAC (cm)", "Hemocue (g/dL)", "Head Circumference (cm)", "SpO2 (reference)", "Pulse Rate (reference)", "Temperature (reference)")
+# Create row labels -- "6-Grandfather only" removed as does not appear as level (at least for Kenya data)
+t1lab <- c("N", "Age Category (%)", "0-1 month", "2-11 months", "12-59 months", "Sex = Male/Female (%)",
+           "Relationship of caregiver to child (%)", "Mother and Father", "Mother and Grandmother", "Mother only", "Father only", "Grandmother only", "Sibling", "Other family member",      
+           "Community Member", "Other",
+           "Visited due to Illness (%)", "Visited for Immunization (%)", "Visited for Routine Monitoring (%)", "Visited due to Trauma=False (%)", "Admission to inpatient unit of the 
+           facility=False (%)",
+           "Cough (%)", "Difficulty/Rapid breathing (%)", "Fever (%)", "Diarrhea (%)", "Vomiting (%)", "Other (%)", 
+           "Received Diagnosis (%)", "Dehydration", "Respiratory", "Digestive", "Malaria", "Fever", "Measles=False", "Ear infection", "Throat infection", "Other",
+           "Received Treatment (%)", "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other",
+           "Height (cm) (mean (SD))", "Weight (kg) (mean (SD))", "MUAC (cm) (mean (SD))", "Head Circumference (cm) (mean (SD))", 
+           "Hemocue (g/dL) (mean (SD))", "SpO2 (reference) (mean (SD))", 
+           "Pulse Rate (reference) (mean (SD))",  "Temperature (reference) (mean (SD))", "Profusion Index (reference) (mean (SD))")
 
 # Add row labels
-
 rownames(t1_overall) <- c(t1lab)
 
 # Table formatting
 
 t1 <- kable(t1_overall) %>%
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
-  add_indent(c(3:5, 8:17)) %>%
-  #pack_rows("Relationship of caregiver to child", 8, 17) %>%
-  pack_rows("Reason for visit to clinic", 18, 22) %>%
-  pack_rows("Symptoms Present", 23, 28) %>%
-  pack_rows("Diagnosis received", 29, 37) %>%
-  pack_rows("Treatment received", 38, 42) %>%
-  pack_rows("Physical Characteristics", 43, 47) %>%
-  pack_rows("Reference Measurements", 48, 50)
-
-# Output
- t1
+  add_indent(c(3:5, 8:16)) %>%
+  pack_rows("Demographic Characteristics", 2, 16) %>%
+  pack_rows("Reason for visit to clinic", 17, 21) %>%
+  pack_rows("Symptoms Present", 22, 27) %>%
+  pack_rows("Diagnosis", 28, 37) %>%
+  pack_rows("Treatment received", 38, 43) %>%
+  pack_rows("Physical Characteristics", 44, 47) %>%
+  pack_rows("Reference Measurements", 48, 52)
 ```
 `r t1`
 
@@ -425,15 +419,18 @@ t1 <- kable(t1_overall) %>%
 
 ### Symptoms
 ```{r}
-df_og[df_og$ill_sxs_other==1,c("ppt_id", "visit_reason_ill_sxs_oth")]
+sxs <- df_og[df_og$ill_sxs_other==1,c("ppt_id", "visit_reason_ill_sxs_oth")]
+print(sxs, n=Inf)
 ```
 ### Diagnosis
 ```{r}
-df_og[df_og$dx_other==1,c("ppt_id", "reported_dx_oth")]
+dxs <- df_og[df_og$dx_other==1,c("ppt_id", "reported_dx_oth")]
+print(dxs, n=Inf)
 ```
 ### Treatment
 ```{r}
-df_og[df_og$tx_other==1,c("ppt_id", "reported_tx_oth")]
+txs <- df_og[df_og$tx_other==1,c("ppt_id", "reported_tx_oth")]
+print(txs, n=Inf)
 ```
 
 # Section 2: Measurement Characteristics & Precision {.tabset}
@@ -522,13 +519,13 @@ radg3_t2 <- kable(cat3_radg, col.names = c("Participant ID","Temperature", "Oxyg
 ```
 
 ### 0-1 month
-`radg1_t2`
+`r radg1_t2`
 
 ### 2-11 months
-`radg2_t2`
+`r radg2_t2`
 
 ### 12-59 months
-`radg3_t2`
+`r radg3_t2`
 
 ## m800 (Biolight) {.tabset}
 ```{r}
@@ -540,7 +537,7 @@ cat1_biolight <- df_bio_cat1_w %>% select(ppt_id) %>%
 
 bio1_t2 <- kable(cat1_biolight, col.names = c("Participant ID","Oxygen", "Pulse Rate")) %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
-  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 3))
 
 # Age Cat 2
 
@@ -550,7 +547,7 @@ cat2_biolight <- df_bio_cat2_w %>% select(ppt_id) %>%
 
 bio2_t2 <- kable(cat2_biolight, col.names = c("Participant ID","Oxygen", "Pulse Rate")) %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
-  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 3))
 
 # Age Cat 3
 
@@ -560,18 +557,18 @@ cat3_biolight <- df_bio_cat3_w %>% select(ppt_id) %>%
 
 bio3_t2 <- kable(cat3_biolight, col.names = c("Participant ID","Oxygen", "Pulse Rate")) %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
-  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 3))
 
 ```
 
 ### 0-1 month
-`bio1_t2`
+`r bio1_t2`
 
 ### 2-11 months
-`bio2_t2`
+`r bio2_t2`
 
 ### 12-59 months
-`bio3_t2`
+`r bio3_t2`
 
 ## NeoGuard (Neopenda) {.tabset}
 ```{r}
@@ -584,7 +581,7 @@ cat1_neo <- df_neo_cat1_w %>% select(ppt_id) %>%
 
 neo1_t2 <- kable(cat1_neo, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate")) %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
-  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 4))
 
 #Age Cat 2
 
@@ -595,7 +592,7 @@ cat2_neo <- df_neo_cat2_w %>% select(ppt_id) %>%
 
 neo2_t2 <- kable(cat2_neo, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate")) %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
-  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 4))
 
 #Age Cat 3
 
@@ -606,19 +603,19 @@ cat3_neo <- df_neo_cat3_w %>% select(ppt_id) %>%
 
 neo3_t2 <- kable(cat3_neo, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate")) %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
-  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 4))
 
 
 ```
 
 ### 0-1 month
-`neo1_t2`
+`r neo1_t2`
 
 ### 2-11 months
-`neo2_t2`
+`r neo2_t2`
 
 ### 12-59 months
-`neo3_t2`
+`r neo3_t2`
 
 ## Onyx PO+RR (Nonin) {.tabset}
 ```{r}
@@ -630,12 +627,12 @@ cat3_onyx <- df_onyx_cat3_w %>% select(ppt_id) %>%
 
 onyx3_t2 <- kable(cat3_onyx, col.names = c("Participant ID", "Oxygen", "Pulse Rate")) %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
-  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 4))
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 3))
 
 ```
 
 ### 12-59 months
-`onyx3_t2`
+`r onyx3_t2`
 
 ## Scanbo v8 (Scanbo) {.tabset}
 ```{r}
@@ -649,19 +646,15 @@ cat3_scan <- df_scan_cat3_w %>% select(ppt_id) %>%
 
 scan3_t2 <- kable(cat3_scan, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate", "Profusion Index")) %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
-  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 6))
+  add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
 
 ```
 
 ### 12-59 months
-`scan3_t2`
+`r scan3_t2`
 
 # Section 3: Bland Altman Plots {.tabset}
 Anmol
-
-```{r}
-# @Anmol - I think I found a solution to get all the measurements on one plot...it required reshaping the data, which I added to the beginning prep section of the document. There are now both long and wide formats of the data, and if we use the long format for the plots and switch the graphical system to base instead of ggplot, it seems like it will work -- see Rad-G code below
-```
 
 ## Rad-G Temp (Masimo) {.tabset}
 
