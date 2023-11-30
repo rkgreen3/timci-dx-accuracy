@@ -661,103 +661,212 @@ Anmol
 ### Temperature
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat1_l$ref_temp, df_radg_cat1_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Temperature (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
-legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+legend("topright", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat2_l$ref_temp, df_radg_cat2_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Temperature (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
-legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+legend("topright", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat3_l$ref_temp, df_radg_cat3_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Temperature (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
-legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+legend("topright", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 
 ### Oxygen
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat1_l$ref_o2, df_radg_cat1_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
-legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+legend("topright", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat2_l$ref_o2, df_radg_cat2_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
-legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+legend("topright", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_radg_cat3_l$ref_o2, df_radg_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
-legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+bland.altman.plot(df_radg_cat3_l$ref_o2, df_radg_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G o2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 
 ### Profusion Index
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat1_l$ref_pi, df_radg_cat1_l$index_pi, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Profusion Index (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
-legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+legend("topright", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat2_l$ref_pi, df_radg_cat2_l$index_pi, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Profusion Index (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
-legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+legend("topright", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat3_l$ref_pi, df_radg_cat3_l$index_pi, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Profusion Index (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
-legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+legend("topright", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 
 ### Pulse Rate
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat1_l$ref_pr, df_radg_cat1_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Pulse Rate (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
-legend("topleft", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+legend("topright", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat2_l$ref_pr, df_radg_cat2_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Pulse Rate (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
-legend("topleft", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+legend("topright", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat3_l$ref_pr, df_radg_cat3_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Pulse Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
-legend("topleft", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+legend("topright", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 
 ### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
-
-## m800 (Biolight) {.tabset}
-```{r, include=FALSE}
-
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_radg_cat1_l$ref_rracoustic, df_radg_cat1_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Respiratory Rate (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_radg_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_radg_cat2_l$ref_rracoustic, df_radg_cat2_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Respiratory Rate (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_radg_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_radg_cat3_l$ref_rracoustic, df_radg_cat3_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Respiratory Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_radg_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+## m800 (Biolight) {.tabset}
 
 ### Oxygen
-
-### Pulse Rate
-
-### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
-
-## NeoGuard (Neopenda) {.tabset}
 ```{r, include=FALSE}
-
+bland.altman.plot(df_bio_cat1_l$ref_o2, df_bio_cat1_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight O2 (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_bio_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_bio_cat2_l$ref_o2, df_bio_cat2_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight o2 (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_bio_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_bio_cat3_l$ref_o2, df_bio_cat3_l$ref_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight o2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_bio_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+### Pulse Rate
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_bio_cat1_l$ref_pr, df_bio_cat1_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight Pulse Rate (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_bio_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_bio_cat2_l$ref_pr, df_bio_cat2_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight Pulse Rate (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_bio_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_bio_cat3_l$ref_pr, df_bio_cat3_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight Pulse Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_bio_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_bio_cat1_l$ref_rracoustic, df_bio_cat1_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight Respiratory Rate (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_bio_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_bio_cat2_l$ref_rracoustic, df_bio_cat2_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight Respiratory Rate (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_bio_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_bio_cat3_l$ref_rracoustic, df_bio_cat3_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight Respiratory Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_bio_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+## NeoGuard (Neopenda) {.tabset}
 
 ### Temperature
-
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_neo_cat1_l$ref_temp, df_neo_cat1_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard Temperature (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_neo_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_neo_cat2_l$ref_temp, df_neo_cat2_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard Temperature (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_neo_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_neo_cat3_l$ref_temp, df_neo_cat3_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard Temperature (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_neo_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
 ### Oxygen
-
-### Pulse Rate
-
-### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
-
-## Onyx PO+RR (Nonin) {.tabset}
 ```{r, include=FALSE}
-
+bland.altman.plot(df_neo_cat1_l$ref_o2, df_neo_cat1_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard O2 (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_neo_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_neo_cat2_l$ref_o2, df_neo_cat2_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard o2 (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_neo_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_neo_cat3_l$ref_o2, df_neo_cat3_l$ref_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard o2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_neo_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+### Pulse Rate
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_neo_cat1_l$ref_pr, df_neo_cat1_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard Pulse Rate (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_neo_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_neo_cat2_l$ref_pr, df_neo_cat2_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Neoguard Pulse Rate (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_neo_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_neo_cat3_l$ref_pr, df_neo_cat3_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Neoguard Pulse Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_neo_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_neo_cat1_l$ref_rracoustic, df_neo_cat1_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard Respiratory Rate (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_neo_cat1_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_neo_cat2_l$ref_rracoustic, df_neo_cat2_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard Respiratory Rate (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_neo_cat2_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_neo_cat3_l$ref_rracoustic, df_neo_cat3_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard Respiratory Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_neo_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+## Onyx PO+RR (Nonin) {.tabset}
+###Oxygen
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_onyx_cat3_l$ref_o2, df_onyx_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Onyx o2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_onyx_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+### Pulse Rate
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_onyx_cat3_l$ref_pr, df_onyx_cat3_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Onyx Pulse Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_onyx_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+##Respiratory Rate
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_onyx_cat3_l$ref_rracoustic, df_onyx_cat3_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Onyx Respiratory Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_scan_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
 
 ## Scanbo v8 (Scanbo) {.tabset}
-```{r, include=FALSE}
 
-```
 
 ### Temperature
-
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_scan_cat3_l$ref_temp, df_scan_cat3_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Scanbo Temperature (12-59 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_scan_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
 ### Oxygen
-
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_scan_cat3_l$ref_o2, df_scan_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Scanbo o2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_scan_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
 ### Pulse Rate
-
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_scan_cat3_l$ref_pr, df_scan_cat3_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Scanbo Pulse Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_scan_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
 ### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
-
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_scan_cat3_l$ref_rracoustic, df_scan_cat3_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Scanbo Respiratory Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_scan_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
+###SPO2
+```{r, results='hide', fig.keep='last'}
+bland.altman.plot(df_scan_cat3_l$ref_sp02, df_scan_cat3_l$index_spo2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Scanbo spO2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+legend("topright", legend = levels(df_scan_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
+```
 # Section 4: Intraclass Correlation Coefficients {.tabset}
 Reporting information:
 
