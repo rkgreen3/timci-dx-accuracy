@@ -100,7 +100,6 @@ df_og <- df_og %>%
          cv_index_temp = round(sd_index_temp/mean_index_temp, 1)*100,
          cv_index_pi = round(sd_index_pi/mean_index_pi, 1)*100,
          cv_index_rr = round(sd_index_rr/mean_index_rr, 1)*100)
-# add index rr measurement
 ```
 
 ```{r long_dfs, warning=FALSE}
@@ -184,12 +183,27 @@ mdf_reshaped$index_tachycardic_12mo <- ifelse(mdf_reshaped$index_pr>179 & mdf_re
 mdf_reshaped$ref_tachycardic_12mo <- ifelse(mdf_reshaped$ref_pr>179 & mdf_reshaped$age_months<12, 1, 0)
 mdf_reshaped$index_tachycardic_59mo <- ifelse(mdf_reshaped$index_pr>139 & mdf_reshaped$age_months>11, 1, 0)
 mdf_reshaped$ref_tachycardic_59mo <- ifelse(mdf_reshaped$ref_pr>139 & mdf_reshaped$age_months>11, 1, 0)
-# Add clinical age categories for fast breathing and tachycardic
-mdf_reshaped$age_cat_tachy <- ifelse(mdf_reshaped$age_months<12, "0-11 months", "12-59 months")
-mdf_reshaped$age_cat_fastbreathe <- case_when(mdf_reshaped$age_months<12 ~ "0-11 months",
+# Add clinical age category for fast breathing, ensuring groupings fall within study age categories as well
+mdf_reshaped$age_cat_fastbreathe <- case_when(mdf_reshaped$age_months<2 ~ "0-1 months",
+                                              mdf_reshaped$age_months>1 & mdf_reshaped$age_months<12 ~ "2-11 months",
                                               mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 ~ "12-35 months",
                                               mdf_reshaped$age_months>35 ~ "36-59 months")
 mdf_reshaped$grp <- as.factor(mdf_reshaped$grp)
+# Add indicator variables for number of trials and number of successes for each clinical outcome to use in percent agreement section
+mdf_reshaped$ref_index_pres_hypoxic <- ifelse(!is.na(mdf_reshaped$ref_hypoxic) & !is.na(mdf_reshaped$index_hypoxic), 1, 0)
+mdf_reshaped$ref_index_agree_hypoxic <- ifelse(mdf_reshaped$ref_hypoxic==mdf_reshaped$index_hypoxic, 1, 0)
+mdf_reshaped$ref_index_pres_fever <- ifelse(!is.na(mdf_reshaped$ref_fever) & !is.na(mdf_reshaped$index_fever), 1, 0)
+mdf_reshaped$ref_index_agree_fever <- ifelse(mdf_reshaped$ref_hypoxic==mdf_reshaped$index_hypoxic, 1, 0)
+mdf_reshaped$ref_index_pres_fb12mo <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_12mo) & !is.na(mdf_reshaped$index_fastbreath_12mo), 1, 0)
+mdf_reshaped$ref_index_agree_fb12mo <- ifelse(mdf_reshaped$ref_fastbreath_12mo==mdf_reshaped$index_fastbreath_12mo, 1, 0)
+mdf_reshaped$ref_index_pres_fb35mo <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_35mo) & !is.na(mdf_reshaped$index_fastbreath_35mo), 1, 0)
+mdf_reshaped$ref_index_agree_fb35mo <- ifelse(mdf_reshaped$ref_fastbreath_35mo==mdf_reshaped$index_fastbreath_35mo, 1, 0)
+mdf_reshaped$ref_index_pres_fb59mo <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_59mo) & !is.na(mdf_reshaped$index_fastbreath_59mo), 1, 0)
+mdf_reshaped$ref_index_agree_fb59mo <- ifelse(mdf_reshaped$ref_fastbreath_59mo==mdf_reshaped$index_fastbreath_59mo, 1, 0)
+mdf_reshaped$ref_index_pres_tachy12mo <- ifelse(!is.na(mdf_reshaped$ref_tachycardic_12mo) & !is.na(mdf_reshaped$index_tachycardic_12mo), 1, 0)
+mdf_reshaped$ref_index_agree_tachy12mo <- ifelse(mdf_reshaped$ref_tachycardic_12mo==mdf_reshaped$index_tachycardic_12mo, 1, 0)
+mdf_reshaped$ref_index_pres_tachy59mo <- ifelse(!is.na(mdf_reshaped$ref_tachycardic_59mo) & !is.na(mdf_reshaped$index_tachycardic_59mo), 1, 0)
+mdf_reshaped$ref_index_agree_tachy59mo <- ifelse(mdf_reshaped$ref_tachycardic_59mo==mdf_reshaped$index_tachycardic_59mo, 1, 0)
 ```
 
 ```{r device_dfs, warning=FALSE}
@@ -201,43 +215,38 @@ df_radg_l <- subset(mdf_reshaped, index_device_name=="Rad-G Temp (Masimo)")
 df_radg_cat1_l <- subset(df_radg_l, age_cat=="0-1 month")
 df_radg_cat2_l <- subset(df_radg_l, age_cat=="2-11 months")
 df_radg_cat3_l <- subset(df_radg_l, age_cat=="12-59 months")
-df_radg_cat1tachy_l <- subset(df_radg_l, age_cat_tachy=="0-11 months")
-df_radg_cat2tachy_l <- subset(df_radg_l, age_cat_tachy=="12-59 months")
-df_radg_cat1fb_l <- subset(df_radg_l, age_cat_fastbreathe=="0-11 months")
-df_radg_cat2fb_l <- subset(df_radg_l, age_cat_fastbreathe=="12-35 months")
-df_radg_cat3fb_l <- subset(df_radg_l, age_cat_fastbreathe=="36-59 months")
+df_radg_cat1fb_l <- subset(df_radg_l, age_cat_fastbreathe=="0-1 month")
+df_radg_cat2fb_l <- subset(df_radg_l, age_cat_fastbreathe=="2-11 months")
+df_radg_cat3fb_l <- subset(df_radg_l, age_cat_fastbreathe=="12-35 months")
+df_radg_cat4fb_l <- subset(df_radg_l, age_cat_fastbreathe=="36-59 months")
 
 df_bio_l <- subset(mdf_reshaped, index_device_name=="m800 (Biolight)")
 df_bio_cat1_l <- subset(df_bio_l, age_cat=="0-1 month")
 df_bio_cat2_l <- subset(df_bio_l, age_cat=="2-11 months")
 df_bio_cat3_l <- subset(df_bio_l, age_cat=="12-59 months")
-df_bio_cat1tachy_l <- subset(df_bio_l, age_cat_tachy=="0-11 months")
-df_bio_cat2tachy_l <- subset(df_bio_l, age_cat_tachy=="12-59 months")
-df_bio_cat1fb_l <- subset(df_bio_l, age_cat_fastbreathe=="0-11 months")
-df_bio_cat2fb_l <- subset(df_bio_l, age_cat_fastbreathe=="12-35 months")
-df_bio_cat3fb_l <- subset(df_bio_l, age_cat_fastbreathe=="36-59 months")
+df_bio_cat1fb_l <- subset(df_bio_l, age_cat_fastbreathe=="0-1 month")
+df_bio_cat2fb_l <- subset(df_bio_l, age_cat_fastbreathe=="2-11 months")
+df_bio_cat3fb_l <- subset(df_bio_l, age_cat_fastbreathe=="12-35 months")
+df_bio_cat4fb_l <- subset(df_bio_l, age_cat_fastbreathe=="36-59 months")
 
 df_neo_l <- subset(mdf_reshaped, index_device_name=="NeoGuard (Neopenda)")
 df_neo_cat1_l <- subset(df_neo_l, age_cat=="0-1 month")
 df_neo_cat2_l <- subset(df_neo_l, age_cat=="2-11 months")
 df_neo_cat3_l <- subset(df_neo_l, age_cat=="12-59 months")
-df_neo_cat1tachy_l <- subset(df_neo_l, age_cat_tachy=="0-11 months")
-df_neo_cat2tachy_l <- subset(df_neo_l, age_cat_tachy=="12-59 months")
-df_neo_cat1fb_l <- subset(df_neo_l, age_cat_fastbreathe=="0-11 months")
-df_neo_cat2fb_l <- subset(df_neo_l, age_cat_fastbreathe=="12-35 months")
-df_neo_cat3fb_l <- subset(df_neo_l, age_cat_fastbreathe=="36-59 months")
+df_neo_cat1fb_l <- subset(df_neo_l, age_cat_fastbreathe=="0-1 month")
+df_neo_cat2fb_l <- subset(df_neo_l, age_cat_fastbreathe=="2-11 months")
+df_neo_cat3fb_l <- subset(df_neo_l, age_cat_fastbreathe=="12-35 months")
+df_neo_cat4fb_l <- subset(df_neo_l, age_cat_fastbreathe=="36-59 months")
 
 df_onyx_l <- subset(mdf_reshaped, index_device_name=="Onyx PO+RR (Nonin)")
 df_onyx_cat3_l <- subset(df_onyx_l, age_cat=="12-59 months")
-df_onyx_cat2tachy_l <- subset(df_onyx_l, age_cat_tachy=="12-59 months")
-df_onyx_cat2fb_l <- subset(df_onyx_l, age_cat_fastbreathe=="12-35 months")
-df_onyx_cat3fb_l <- subset(df_onyx_l, age_cat_fastbreathe=="36-59 months")
+df_onyx_cat3fb_l <- subset(df_onyx_l, age_cat_fastbreathe=="12-35 months")
+df_onyx_cat4fb_l <- subset(df_onyx_l, age_cat_fastbreathe=="36-59 months")
 
 df_scan_l <- subset(mdf_reshaped, index_device_name=="Scanbo v8 (Scanbo)")
 df_scan_cat3_l <- subset(df_scan_l, age_cat=="12-59 months")
-df_scan_cat2tachy_l <- subset(df_scan_l, age_cat_tachy=="12-59 months")
-df_scan_cat2fb_l <- subset(df_scan_l, age_cat_fastbreathe=="12-35 months")
-df_scan_cat3fb_l <- subset(df_scan_l, age_cat_fastbreathe=="36-59 months")
+df_scan_cat3fb_l <- subset(df_scan_l, age_cat_fastbreathe=="12-35 months")
+df_scan_cat4fb_l <- subset(df_scan_l, age_cat_fastbreathe=="36-59 months")
 
 # Add indicator variables here for clinical thresholds (wide format), each measurement -- Note: From the SAP, these are defined for the user in Section 5, if changed here be sure to change there and above
 ## M1
@@ -285,11 +294,57 @@ df_og$m3_index_tachycardic_12mo <- ifelse(df_og$m3_index_pr>179 & df_og$age_mont
 df_og$m3_ref_tachycardic_12mo <- ifelse(df_og$m3_ref_pr>179 & df_og$age_months<12, 1, 0)
 df_og$m3_index_tachycardic_59mo <- ifelse(df_og$m3_index_pr>139 & df_og$age_months>11, 1, 0)
 df_og$m3_ref_tachycardic_59mo <- ifelse(df_og$m3_ref_pr>139 & df_og$age_months>11, 1, 0)
-# Add clinical age categories for fast breathing and tachycardic
-df_og$age_cat_tachy <- ifelse(df_og$age_months<12, "0-11 months", "12-59 months")
-df_og$age_cat_fastbreathe <- case_when(df_og$age_months<12 ~ "0-11 months",
+# Add clinical age category for fast breathing, ensuring groupings fall within study age categories as well
+df_og$age_cat_fastbreathe <- case_when(df_og$age_months<2 ~ "0-1 months",
+                                        df_og$age_months>1 & df_og$age_months<12 ~ "2-11 months",
                                         df_og$age_months>11 & df_og$age_months<36 ~ "12-35 months",
                                         df_og$age_months>35 ~ "36-59 months")
+# Add indicator variables for number of trials and number of successes for each clinical outcome to use in percent agreement section
+## M1
+df_og$m1_ref_index_pres_hypoxic <- ifelse(!is.na(df_og$m1_ref_hypoxic) & !is.na(df_og$m1_index_hypoxic), 1, 0)
+df_og$m1_ref_index_agree_hypoxic <- ifelse(df_og$m1_ref_hypoxic==df_og$m1_index_hypoxic, 1, 0)
+df_og$m1_ref_index_pres_fever <- ifelse(!is.na(df_og$m1_ref_fever) & !is.na(df_og$m1_index_fever), 1, 0)
+df_og$m1_ref_index_agree_fever <- ifelse(df_og$m1_ref_hypoxic==df_og$m1_index_hypoxic, 1, 0)
+df_og$m1_ref_index_pres_fb12mo <- ifelse(!is.na(df_og$m1_ref_fastbreath_12mo) & !is.na(df_og$m1_index_fastbreath_12mo), 1, 0)
+df_og$m1_ref_index_agree_fb12mo <- ifelse(df_og$m1_ref_fastbreath_12mo==df_og$m1_index_fastbreath_12mo, 1, 0)
+df_og$m1_ref_index_pres_fb35mo <- ifelse(!is.na(df_og$m1_ref_fastbreath_35mo) & !is.na(df_og$m1_index_fastbreath_35mo), 1, 0)
+df_og$m1_ref_index_agree_fb35mo <- ifelse(df_og$m1_ref_fastbreath_35mo==df_og$m1_index_fastbreath_35mo, 1, 0)
+df_og$m1_ref_index_pres_fb59mo <- ifelse(!is.na(df_og$m1_ref_fastbreath_59mo) & !is.na(df_og$m1_index_fastbreath_59mo), 1, 0)
+df_og$m1_ref_index_agree_fb59mo <- ifelse(df_og$m1_ref_fastbreath_59mo==df_og$m1_index_fastbreath_59mo, 1, 0)
+df_og$m1_ref_index_pres_tachy12mo <- ifelse(!is.na(df_og$m1_ref_tachycardic_12mo) & !is.na(df_og$m1_index_tachycardic_12mo), 1, 0)
+df_og$m1_ref_index_agree_tachy12mo <- ifelse(df_og$m1_ref_tachycardic_12mo==df_og$m1_index_tachycardic_12mo, 1, 0)
+df_og$m1_ref_index_pres_tachy59mo <- ifelse(!is.na(df_og$m1_ref_tachycardic_59mo) & !is.na(df_og$m1_index_tachycardic_59mo), 1, 0)
+df_og$m1_ref_index_agree_tachy59mo <- ifelse(df_og$m1_ref_tachycardic_59mo==df_og$m1_index_tachycardic_59mo, 1, 0)
+## M2
+df_og$m2_ref_index_pres_hypoxic <- ifelse(!is.na(df_og$m2_ref_hypoxic) & !is.na(df_og$m2_index_hypoxic), 1, 0)
+df_og$m2_ref_index_agree_hypoxic <- ifelse(df_og$m2_ref_hypoxic==df_og$m2_index_hypoxic, 1, 0)
+df_og$m2_ref_index_pres_fever <- ifelse(!is.na(df_og$m2_ref_fever) & !is.na(df_og$m2_index_fever), 1, 0)
+df_og$m2_ref_index_agree_fever <- ifelse(df_og$m2_ref_hypoxic==df_og$m2_index_hypoxic, 1, 0)
+df_og$m2_ref_index_pres_fb12mo <- ifelse(!is.na(df_og$m2_ref_fastbreath_12mo) & !is.na(df_og$m2_index_fastbreath_12mo), 1, 0)
+df_og$m2_ref_index_agree_fb12mo <- ifelse(df_og$m2_ref_fastbreath_12mo==df_og$m2_index_fastbreath_12mo, 1, 0)
+df_og$m2_ref_index_pres_fb35mo <- ifelse(!is.na(df_og$m2_ref_fastbreath_35mo) & !is.na(df_og$m2_index_fastbreath_35mo), 1, 0)
+df_og$m2_ref_index_agree_fb35mo <- ifelse(df_og$m2_ref_fastbreath_35mo==df_og$m2_index_fastbreath_35mo, 1, 0)
+df_og$m2_ref_index_pres_fb59mo <- ifelse(!is.na(df_og$m2_ref_fastbreath_59mo) & !is.na(df_og$m2_index_fastbreath_59mo), 1, 0)
+df_og$m2_ref_index_agree_fb59mo <- ifelse(df_og$m2_ref_fastbreath_59mo==df_og$m2_index_fastbreath_59mo, 1, 0)
+df_og$m2_ref_index_pres_tachy12mo <- ifelse(!is.na(df_og$m2_ref_tachycardic_12mo) & !is.na(df_og$m2_index_tachycardic_12mo), 1, 0)
+df_og$m2_ref_index_agree_tachy12mo <- ifelse(df_og$m2_ref_tachycardic_12mo==df_og$m2_index_tachycardic_12mo, 1, 0)
+df_og$m2_ref_index_pres_tachy59mo <- ifelse(!is.na(df_og$m2_ref_tachycardic_59mo) & !is.na(df_og$m2_index_tachycardic_59mo), 1, 0)
+df_og$m2_ref_index_agree_tachy59mo <- ifelse(df_og$m2_ref_tachycardic_59mo==df_og$m2_index_tachycardic_59mo, 1, 0)
+## M3
+df_og$m3_ref_index_pres_hypoxic <- ifelse(!is.na(df_og$m3_ref_hypoxic) & !is.na(df_og$m3_index_hypoxic), 1, 0)
+df_og$m3_ref_index_agree_hypoxic <- ifelse(df_og$m3_ref_hypoxic==df_og$m3_index_hypoxic, 1, 0)
+df_og$m3_ref_index_pres_fever <- ifelse(!is.na(df_og$m3_ref_fever) & !is.na(df_og$m3_index_fever), 1, 0)
+df_og$m3_ref_index_agree_fever <- ifelse(df_og$m3_ref_hypoxic==df_og$m3_index_hypoxic, 1, 0)
+df_og$m3_ref_index_pres_fb12mo <- ifelse(!is.na(df_og$m3_ref_fastbreath_12mo) & !is.na(df_og$m3_index_fastbreath_12mo), 1, 0)
+df_og$m3_ref_index_agree_fb12mo <- ifelse(df_og$m3_ref_fastbreath_12mo==df_og$m3_index_fastbreath_12mo, 1, 0)
+df_og$m3_ref_index_pres_fb35mo <- ifelse(!is.na(df_og$m3_ref_fastbreath_35mo) & !is.na(df_og$m3_index_fastbreath_35mo), 1, 0)
+df_og$m3_ref_index_agree_fb35mo <- ifelse(df_og$m3_ref_fastbreath_35mo==df_og$m3_index_fastbreath_35mo, 1, 0)
+df_og$m3_ref_index_pres_fb59mo <- ifelse(!is.na(df_og$m3_ref_fastbreath_59mo) & !is.na(df_og$m3_index_fastbreath_59mo), 1, 0)
+df_og$m3_ref_index_agree_fb59mo <- ifelse(df_og$m3_ref_fastbreath_59mo==df_og$m3_index_fastbreath_59mo, 1, 0)
+df_og$m3_ref_index_pres_tachy12mo <- ifelse(!is.na(df_og$m3_ref_tachycardic_12mo) & !is.na(df_og$m3_index_tachycardic_12mo), 1, 0)
+df_og$m3_ref_index_agree_tachy12mo <- ifelse(df_og$m3_ref_tachycardic_12mo==df_og$m3_index_tachycardic_12mo, 1, 0)
+df_og$m3_ref_index_pres_tachy59mo <- ifelse(!is.na(df_og$m3_ref_tachycardic_59mo) & !is.na(df_og$m3_index_tachycardic_59mo), 1, 0)
+df_og$m3_ref_index_agree_tachy59mo <- ifelse(df_og$m3_ref_tachycardic_59mo==df_og$m3_index_tachycardic_59mo, 1, 0)
 
 ## Wide format device df's (M1-M3 are variables)
 df_ref_cat1_w <- subset(df_og, age_cat=="0-1 month")
@@ -300,49 +355,43 @@ df_radg_w <- subset(df_og, index_device_name=="Rad-G Temp (Masimo)")
 df_radg_cat1_w <- subset(df_radg_w, age_cat=="0-1 month")
 df_radg_cat2_w <- subset(df_radg_w, age_cat=="2-11 months")
 df_radg_cat3_w <- subset(df_radg_w, age_cat=="12-59 months")
-df_radg_cat1tachy_w <- subset(df_radg_w, age_cat_tachy=="0-11 months")
-df_radg_cat2tachy_w <- subset(df_radg_w, age_cat_tachy=="12-59 months")
-df_radg_cat1fb_w <- subset(df_radg_w, age_cat_fastbreathe=="0-11 months")
-df_radg_cat2fb_w <- subset(df_radg_w, age_cat_fastbreathe=="12-35 months")
-df_radg_cat3fb_w <- subset(df_radg_w, age_cat_fastbreathe=="36-59 months")
+df_radg_cat1fb_w <- subset(df_radg_w, age_cat_fastbreathe=="0-1 months")
+df_radg_cat2fb_w <- subset(df_radg_w, age_cat_fastbreathe=="2-11 months")
+df_radg_cat3fb_w <- subset(df_radg_w, age_cat_fastbreathe=="12-35 months")
+df_radg_cat4fb_w <- subset(df_radg_w, age_cat_fastbreathe=="36-59 months")
 
 df_bio_w <- subset(df_og, index_device_name=="m800 (Biolight)")
 df_bio_cat1_w <- subset(df_bio_w, age_cat=="0-1 month")
 df_bio_cat2_w <- subset(df_bio_w, age_cat=="2-11 months")
 df_bio_cat3_w <- subset(df_bio_w, age_cat=="12-59 months")
-df_bio_cat1tachy_w <- subset(df_bio_w, age_cat_tachy=="0-11 months")
-df_bio_cat2tachy_w <- subset(df_bio_w, age_cat_tachy=="12-59 months")
-df_bio_cat1fb_w <- subset(df_bio_w, age_cat_fastbreathe=="0-11 months")
-df_bio_cat2fb_w <- subset(df_bio_w, age_cat_fastbreathe=="12-35 months")
-df_bio_cat3fb_w <- subset(df_bio_w, age_cat_fastbreathe=="36-59 months")
+df_bio_cat1fb_w <- subset(df_bio_w, age_cat_fastbreathe=="0-1 months")
+df_bio_cat2fb_w <- subset(df_bio_w, age_cat_fastbreathe=="2-11 months")
+df_bio_cat3fb_w <- subset(df_bio_w, age_cat_fastbreathe=="12-35 months")
+df_bio_cat4fb_w <- subset(df_bio_w, age_cat_fastbreathe=="36-59 months")
 
 df_neo_w <- subset(df_og, index_device_name=="NeoGuard (Neopenda)")
 df_neo_cat1_w <- subset(df_neo_w, age_cat=="0-1 month")
 df_neo_cat2_w <- subset(df_neo_w, age_cat=="2-11 months")
 df_neo_cat3_w <- subset(df_neo_w, age_cat=="12-59 months")
-df_neo_cat1tachy_w <- subset(df_neo_w, age_cat_tachy=="0-11 months")
-df_neo_cat2tachy_w <- subset(df_neo_w, age_cat_tachy=="12-59 months")
-df_neo_cat1fb_w <- subset(df_neo_w, age_cat_fastbreathe=="0-11 months")
-df_neo_cat2fb_w <- subset(df_neo_w, age_cat_fastbreathe=="12-35 months")
-df_neo_cat3fb_w <- subset(df_neo_w, age_cat_fastbreathe=="36-59 months")
+df_neo_cat1fb_w <- subset(df_neo_w, age_cat_fastbreathe=="0-1 months")
+df_neo_cat2fb_w <- subset(df_neo_w, age_cat_fastbreathe=="2-11 months")
+df_neo_cat3fb_w <- subset(df_neo_w, age_cat_fastbreathe=="12-35 months")
+df_neo_cat4fb_w <- subset(df_neo_w, age_cat_fastbreathe=="36-59 months")
 
 df_onyx_w <- subset(df_og, index_device_name=="Onyx PO+RR (Nonin)")
 df_onyx_cat3_w <- subset(df_onyx_w, age_cat=="12-59 months")
-df_onyx_cat2tachy_w <- subset(df_onyx_w, age_cat_tachy=="12-59 months")
-df_onyx_cat2fb_w <- subset(df_onyx_w, age_cat_fastbreathe=="12-35 months")
-df_onyx_cat3fb_w <- subset(df_onyx_w, age_cat_fastbreathe=="36-59 months")
+df_onyx_cat3fb_w <- subset(df_onyx_w, age_cat_fastbreathe=="12-35 months")
+df_onyx_cat4fb_w <- subset(df_onyx_w, age_cat_fastbreathe=="36-59 months")
 
 df_scan_w <- subset(df_og, index_device_name=="Scanbo v8 (Scanbo)")
 df_scan_cat3_w <- subset(df_scan_w, age_cat=="12-59 months")
-df_scan_cat2tachy_w <- subset(df_scan_w, age_cat_tachy=="12-59 months")
-df_scan_cat2fb_w <- subset(df_scan_w, age_cat_fastbreathe=="12-35 months")
-df_scan_cat3fb_w <- subset(df_scan_w, age_cat_fastbreathe=="36-59 months")
+df_scan_cat3fb_w <- subset(df_scan_w, age_cat_fastbreathe=="12-35 months")
+df_scan_cat4fb_w <- subset(df_scan_w, age_cat_fastbreathe=="36-59 months")
 ```
 
 This report contains data from **`r COUNTRY`**.
 
 # Section 1: Participant Characteristics {.tabset}
-Leila
 
 ## Table 1: Participant Characteristics Overall and by Facility
 Note: Reference measure summaries presented in this table (for measurements obtained at more than one time point) are the population mean/SD of the summarized measures (i.e., mean of the mean of M1-3).
@@ -471,7 +520,6 @@ print(txs, n=Inf)
 ```
 
 # Section 2: Measurement Characteristics & Precision {.tabset}
-Leila
 
 ## Reference {.tabset}
 ```{r, include=FALSE}
@@ -567,7 +615,6 @@ radg3_t2 <- kable(cat3_radg, col.names = c("Participant ID","Temperature", "Oxyg
 ## m800 (Biolight) {.tabset}
 ```{r}
 # Age Cat 1
-
 cat1_biolight <- df_bio_cat1_w %>% select(ppt_id) %>% 
   mutate(oxygen = paste(df_bio_cat1_w$mean_ref_o2, " (", df_bio_cat1_w$sd_ref_o2, ")", " [", df_bio_cat1_w$min_ref_o2, ",", df_bio_cat1_w$max_ref_o2, "] ", df_bio_cat1_w$cv_ref_o2, "%", sep = ""),
          pr = paste(df_bio_cat1_w$mean_ref_pr, " (", df_bio_cat1_w$sd_ref_pr, ")", " [", df_bio_cat1_w$min_ref_pr, ",", df_bio_cat1_w$max_ref_pr, "] ", df_bio_cat1_w$cv_ref_pr, "%", sep = ""))
@@ -577,7 +624,6 @@ bio1_t2 <- kable(cat1_biolight, col.names = c("Participant ID","Oxygen", "Pulse 
   add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 3))
 
 # Age Cat 2
-
 cat2_biolight <- df_bio_cat2_w %>% select(ppt_id) %>% 
   mutate(oxygen = paste(df_bio_cat2_w$mean_ref_o2, " (", df_bio_cat2_w$sd_ref_o2, ")", " [", df_bio_cat2_w$min_ref_o2, ",", df_bio_cat2_w$max_ref_o2, "] ", df_bio_cat2_w$cv_ref_o2, "%", sep = ""),
          pr = paste(df_bio_cat2_w$mean_ref_pr, " (", df_bio_cat2_w$sd_ref_pr, ")", " [", df_bio_cat2_w$min_ref_pr, ",", df_bio_cat2_w$max_ref_pr, "] ", df_bio_cat2_w$cv_ref_pr, "%", sep = ""))
@@ -587,7 +633,6 @@ bio2_t2 <- kable(cat2_biolight, col.names = c("Participant ID","Oxygen", "Pulse 
   add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 3))
 
 # Age Cat 3
-
 cat3_biolight <- df_bio_cat3_w %>% select(ppt_id) %>% 
   mutate(oxygen = paste(df_bio_cat3_w$mean_ref_o2, " (", df_bio_cat3_w$sd_ref_o2, ")", " [", df_bio_cat3_w$min_ref_o2, ",", df_bio_cat3_w$max_ref_o2, "] ", df_bio_cat3_w$cv_ref_o2, "%", sep = ""),
          pr = paste(df_bio_cat3_w$mean_ref_pr, " (", df_bio_cat3_w$sd_ref_pr, ")", " [", df_bio_cat3_w$min_ref_pr, ",", df_bio_cat3_w$max_ref_pr, "] ", df_bio_cat3_w$cv_ref_pr, "%", sep = ""))
@@ -595,7 +640,6 @@ cat3_biolight <- df_bio_cat3_w %>% select(ppt_id) %>%
 bio3_t2 <- kable(cat3_biolight, col.names = c("Participant ID","Oxygen", "Pulse Rate")) %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
   add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 3))
-
 ```
 
 ### 0-1 month
@@ -610,7 +654,6 @@ bio3_t2 <- kable(cat3_biolight, col.names = c("Participant ID","Oxygen", "Pulse 
 ## NeoGuard (Neopenda) {.tabset}
 ```{r}
 #Age Cat 1
-
 cat1_neo <- df_neo_cat1_w %>% select(ppt_id) %>% 
   mutate(temp = paste(df_neo_cat1_w$mean_ref_temp, " (", df_neo_cat1_w$sd_ref_temp, ")", " [", df_neo_cat1_w$min_ref_temp, ",", df_neo_cat1_w$max_ref_temp, "] ", df_neo_cat1_w$cv_ref_temp, "%", sep = ""),
          oxygen = paste(df_neo_cat1_w$mean_ref_o2, " (", df_neo_cat1_w$sd_ref_o2, ")", " [", df_neo_cat1_w$min_ref_o2, ",", df_neo_cat1_w$max_ref_o2, "] ", df_neo_cat1_w$cv_ref_o2, "%", sep = ""),
@@ -621,7 +664,6 @@ neo1_t2 <- kable(cat1_neo, col.names = c("Participant ID","Temperature", "Oxygen
   add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 4))
 
 #Age Cat 2
-
 cat2_neo <- df_neo_cat2_w %>% select(ppt_id) %>% 
   mutate(temp = paste(df_neo_cat2_w$mean_ref_temp, " (", df_neo_cat2_w$sd_ref_temp, ")", " [", df_neo_cat2_w$min_ref_temp, ",", df_neo_cat2_w$max_ref_temp, "] ", df_neo_cat2_w$cv_ref_temp, "%", sep = ""),
          oxygen = paste(df_neo_cat2_w$mean_ref_o2, " (", df_neo_cat2_w$sd_ref_o2, ")", " [", df_neo_cat2_w$min_ref_o2, ",", df_neo_cat2_w$max_ref_o2, "] ", df_neo_cat2_w$cv_ref_o2, "%", sep = ""),
@@ -632,7 +674,6 @@ neo2_t2 <- kable(cat2_neo, col.names = c("Participant ID","Temperature", "Oxygen
   add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 4))
 
 #Age Cat 3
-
 cat3_neo <- df_neo_cat3_w %>% select(ppt_id) %>% 
   mutate(temp = paste(df_neo_cat3_w$mean_ref_temp, " (", df_neo_cat3_w$sd_ref_temp, ")", " [", df_neo_cat3_w$min_ref_temp, ",", df_neo_cat3_w$max_ref_temp, "] ", df_neo_cat3_w$cv_ref_temp, "%", sep = ""),
          oxygen = paste(df_neo_cat3_w$mean_ref_o2, " (", df_neo_cat3_w$sd_ref_o2, ")", " [", df_neo_cat3_w$min_ref_o2, ",", df_neo_cat3_w$max_ref_o2, "] ", df_neo_cat3_w$cv_ref_o2, "%", sep = ""),
@@ -641,8 +682,6 @@ cat3_neo <- df_neo_cat3_w %>% select(ppt_id) %>%
 neo3_t2 <- kable(cat3_neo, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate")) %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
   add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 4))
-
-
 ```
 
 ### 0-1 month
@@ -657,7 +696,6 @@ neo3_t2 <- kable(cat3_neo, col.names = c("Participant ID","Temperature", "Oxygen
 ## Onyx PO+RR (Nonin) {.tabset}
 ```{r}
 # Age Cat 3
-
 cat3_onyx <- df_onyx_cat3_w %>% select(ppt_id) %>% 
   mutate(oxygen = paste(df_onyx_cat3_w$mean_ref_o2, " (", df_onyx_cat3_w$sd_ref_o2, ")", " [", df_onyx_cat3_w$min_ref_o2, ",", df_onyx_cat3_w$max_ref_o2, "] ", df_onyx_cat3_w$cv_ref_o2, "%", sep = ""),
          pr = paste(df_onyx_cat3_w$mean_ref_pr, " (", df_onyx_cat3_w$sd_ref_pr, ")", " [", df_onyx_cat3_w$min_ref_pr, ",", df_onyx_cat3_w$max_ref_pr, "] ", df_onyx_cat3_w$cv_ref_pr, "%", sep = ""))
@@ -665,7 +703,6 @@ cat3_onyx <- df_onyx_cat3_w %>% select(ppt_id) %>%
 onyx3_t2 <- kable(cat3_onyx, col.names = c("Participant ID", "Oxygen", "Pulse Rate")) %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
   add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 3))
-
 ```
 
 ### 12-59 months
@@ -674,7 +711,6 @@ onyx3_t2 <- kable(cat3_onyx, col.names = c("Participant ID", "Oxygen", "Pulse Ra
 ## Scanbo v8 (Scanbo) {.tabset}
 ```{r}
 # Age Cat 3
-
 cat3_scan <- df_scan_cat3_w %>% select(ppt_id) %>% 
   mutate(temp = paste(df_scan_cat3_w$mean_ref_temp, " (", df_scan_cat3_w$sd_ref_temp, ")", " [", df_scan_cat3_w$min_ref_temp, ",", df_scan_cat3_w$max_ref_temp, "] ", df_scan_cat3_w$cv_ref_temp, "%", sep = ""),
          oxygen = paste(df_scan_cat3_w$mean_ref_o2, " (", df_scan_cat3_w$sd_ref_o2, ")", " [", df_scan_cat3_w$min_ref_o2, ",", df_scan_cat3_w$max_ref_o2, "] ", df_scan_cat3_w$cv_ref_o2, "%", sep = ""),
@@ -684,14 +720,13 @@ cat3_scan <- df_scan_cat3_w %>% select(ppt_id) %>%
 scan3_t2 <- kable(cat3_scan, col.names = c("Participant ID","Temperature", "Oxygen", "Pulse Rate", "Profusion Index")) %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = TRUE) %>%
   add_header_above(c("Measurement Characteristics and Precision across Measurement Attempts, Mean (SD) [Min, Max] %CV" = 5))
-
 ```
 
 ### 12-59 months
 `r scan3_t2`
 
 # Section 3: Bland Altman Plots {.tabset}
-Anmol
+**NOTE:** Legends have been removed from all plots in this section so as not to obstruct data. Colors represented include **<span style="color: black;">M1</span>, <span style="color: #EB6864;">M2</span>, and <span style="color: #777777;">M3</span>.**
 
 ## Rad-G Temp (Masimo) {.tabset}
 
@@ -878,7 +913,6 @@ legend("topright", legend = levels(df_scan_cat3_l$grp), col = c("black", "#EB686
 
 ## Scanbo v8 (Scanbo) {.tabset}
 
-
 ### Temperature
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_scan_cat3_l$ref_temp, df_scan_cat3_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Scanbo Temperature (12-59 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
@@ -904,6 +938,7 @@ legend("topright", legend = levels(df_scan_cat3_l$grp), col = c("black", "#EB686
 bland.altman.plot(df_scan_cat3_l$ref_sp02, df_scan_cat3_l$index_spo2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Scanbo spO2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 legend("topright", legend = levels(df_scan_cat3_l$grp), col = c("black", "#EB6864", "#777777"), pch = c(19, 17, 15))
 ```
+
 # Section 4: Intraclass Correlation Coefficients {.tabset}
 Reporting information:
 
@@ -1152,11 +1187,11 @@ icc_t3 <- kable(out3, col.names = c("","Rad-G Temp (Masimo)", "M800 (Biolight)",
   add_header_above(c(" ", "Intraclass correlation coefficient for clinical measures across devices for participantss aged 12-59 months (95%CI)" = 5))
 ```
 
-## Table 3a
+## 0-1 month
 `r icc_t1`
-## Table 3b
+## 2-11 months
 `r icc_t2`
-## Table 3c
+## 12-59 months
 `r icc_t3`
 
 # Section 5: Confusion Matrices {.tabset}
@@ -1168,8 +1203,6 @@ Clinical thresholds used in the section are as follows:
 - Tachycardia: <12 months (>179 bpm); 12-60 months (>139 bpm)
 - Fever: >37C (≥100.4F)
 
-*NOTE: Where different, clinical age categories are used in this section (and the next) in place of the study age categories.*
-
 ## Rad-G Temp (Masimo) {.tabset}
 ```{r, include=FALSE}
 # create 2x2 table objects with margins to display (to display overall only)
@@ -1180,7 +1213,7 @@ Clinical thresholds used in the section are as follows:
 ```{r helper_fn}
 # Function to create the confusion matrix
 # It takes the dataset, reference variable name and index variable name 
-# It handles labelling for different cases
+# It handles labeling for different cases
 
 confusion_matrix <- function(df, ref_item, index_item, age_cat){
   item_margin <- addmargins(table(df[[ref_item]], df[[index_item]]))
@@ -1269,188 +1302,120 @@ confusion_matrix <- function(df, ref_item, index_item, age_cat){
 ### Hypoxia
 ```{r}
 # Long format (overall)
-confusion_matrix(df_radg_cat1_l,"ref_hypoxic","index_hypoxic","**0-1 month**")
-confusion_matrix(df_radg_cat2_l,"ref_hypoxic","index_hypoxic", "**2-11 months**")
-confusion_matrix(df_radg_cat3_l,"ref_hypoxic","index_hypoxic","**12-59 months**")
+confusion_matrix(df_radg_cat1_l,"ref_hypoxic","index_hypoxic","*0-1 month*")
+confusion_matrix(df_radg_cat2_l,"ref_hypoxic","index_hypoxic", "*2-11 months*")
+confusion_matrix(df_radg_cat3_l,"ref_hypoxic","index_hypoxic","*12-59 months*")
 
+# Wide format, M1-3 -- keep here in case we need to create these objects...will not be built out in other sections unless necessary. Creating the confusion matrices as kable objects means we can't apply indices to pull out specific dimensions later for the percent agreement calculations. This is ok though because we need a way to dynamically calculate these parameters based on differences in the underlying data across countries.
+radg_hypoxia1_m1 <- confusion_matrix(df_radg_cat1_w, "m1_ref_hypoxic", "m1_index_hypoxic", "*0-1 month*")
+radg_hypoxia1_m2 <- confusion_matrix(df_radg_cat1_w, "m2_ref_hypoxic", "m2_index_hypoxic", "*0-1 month*")
+radg_hypoxia1_m3 <- confusion_matrix(df_radg_cat1_w, "m3_ref_hypoxic", "m3_index_hypoxic", "*0-1 month*")
 
-# Wide format, M1-3
-radg_hypoxia1_m1 <- addmargins(table(df_radg_cat1_w$m1_ref_hypoxic, df_radg_cat1_w$m1_index_hypoxic))
-radg_hypoxia1_m2 <- addmargins(table(df_radg_cat1_w$m2_ref_hypoxic, df_radg_cat1_w$m2_index_hypoxic))
-radg_hypoxia1_m3 <- addmargins(table(df_radg_cat1_w$m3_ref_hypoxic, df_radg_cat1_w$m3_index_hypoxic))
+radg_hypoxia2_m1 <- confusion_matrix(df_radg_cat2_w, "m1_ref_hypoxic", "m1_index_hypoxic", "*2-11 months*")
+radg_hypoxia2_m2 <- confusion_matrix(df_radg_cat2_w, "m2_ref_hypoxic", "m2_index_hypoxic", "*2-11 months*")
+radg_hypoxia2_m3 <- confusion_matrix(df_radg_cat2_w, "m3_ref_hypoxic", "m3_index_hypoxic", "*2-11 months*")
 
-radg_hypoxia2_m1 <- addmargins(table(df_radg_cat2_w$m1_ref_hypoxic, df_radg_cat2_w$m1_index_hypoxic))
-radg_hypoxia2_m2 <- addmargins(table(df_radg_cat2_w$m2_ref_hypoxic, df_radg_cat2_w$m2_index_hypoxic))
-radg_hypoxia2_m3 <- addmargins(table(df_radg_cat2_w$m3_ref_hypoxic, df_radg_cat2_w$m3_index_hypoxic))
-
-radg_hypoxia3_m1 <- addmargins(table(df_radg_cat3_w$m1_ref_hypoxic, df_radg_cat3_w$m1_index_hypoxic))
-radg_hypoxia3_m2 <- addmargins(table(df_radg_cat3_w$m2_ref_hypoxic, df_radg_cat3_w$m2_index_hypoxic))
-radg_hypoxia3_m3 <- addmargins(table(df_radg_cat3_w$m3_ref_hypoxic, df_radg_cat3_w$m3_index_hypoxic))
+radg_hypoxia3_m1 <- confusion_matrix(df_radg_cat3_w, "m1_ref_hypoxic", "m1_index_hypoxic", "*12-59 months*")
+radg_hypoxia3_m2 <- confusion_matrix(df_radg_cat3_w, "m2_ref_hypoxic", "m2_index_hypoxic", "*12-59 months*")
+radg_hypoxia3_m3 <- confusion_matrix(df_radg_cat3_w, "m3_ref_hypoxic", "m3_index_hypoxic", "*12-59 months*")
 ```
 
 ### Fever
 ```{r}
 # Long format (overall)
-confusion_matrix(df_radg_cat1_l,"ref_fever","index_fever", "**0-1 month**")
-confusion_matrix(df_radg_cat2_l,"ref_fever","index_fever", "**2-11 months**")
-confusion_matrix(df_radg_cat3_l,"ref_fever","index_fever","**12-59 months**")
-
-# Wide format, M1-3
-radg_fever1_m1 <- addmargins(table(df_radg_cat1_w$m1_ref_fever, df_radg_cat1_w$m1_index_fever))
-radg_fever1_m2 <- addmargins(table(df_radg_cat1_w$m2_ref_fever, df_radg_cat1_w$m2_index_fever))
-radg_fever1_m3 <- addmargins(table(df_radg_cat1_w$m3_ref_fever, df_radg_cat1_w$m3_index_fever))
-
-radg_fever2_m1 <- addmargins(table(df_radg_cat2_w$m1_ref_fever, df_radg_cat2_w$m1_index_fever))
-radg_fever2_m2 <- addmargins(table(df_radg_cat2_w$m2_ref_fever, df_radg_cat2_w$m2_index_fever))
-radg_fever2_m3 <- addmargins(table(df_radg_cat2_w$m3_ref_fever, df_radg_cat2_w$m3_index_fever))
-
-radg_fever3_m1 <- addmargins(table(df_radg_cat3_w$m1_ref_fever, df_radg_cat3_w$m1_index_fever))
-radg_fever3_m2 <- addmargins(table(df_radg_cat3_w$m2_ref_fever, df_radg_cat3_w$m2_index_fever))
-radg_fever3_m3 <- addmargins(table(df_radg_cat3_w$m3_ref_fever, df_radg_cat3_w$m3_index_fever))
+confusion_matrix(df_radg_cat1_l,"ref_fever","index_fever", "*0-1 month*")
+confusion_matrix(df_radg_cat2_l,"ref_fever","index_fever", "*2-11 months*")
+confusion_matrix(df_radg_cat3_l,"ref_fever","index_fever","*12-59 months*")
 ```
 
 ### Fast Breathing
 ```{r}
 # Long format
-confusion_matrix(df_radg_cat1fb_l,"ref_fastbreath_12mo","index_fastbreath_12mo", "**0-11 months**")
-confusion_matrix(df_radg_cat2fb_l,"ref_fastbreath_35mo","index_fastbreath_35mo", "**12-35 months**")
-confusion_matrix(df_radg_cat3fb_l,"ref_fastbreath_59mo","index_fastbreath_59mo", "**36-59 months**")
-
-
-# Wide format
-radg_fb1_m1 <- addmargins(table(df_radg_cat1fb_w$m1_ref_fastbreath_12mo, df_radg_cat1fb_w$m1_index_fastbreath_12mo))
-radg_fb1_m2 <- addmargins(table(df_radg_cat1fb_w$m2_ref_fastbreath_12mo, df_radg_cat1fb_w$m2_index_fastbreath_12mo))
-radg_fb1_m3 <- addmargins(table(df_radg_cat1fb_w$m3_ref_fastbreath_12mo, df_radg_cat1fb_w$m3_index_fastbreath_12mo))
-
-radg_fb2_m1 <- addmargins(table(df_radg_cat2fb_w$m1_ref_fastbreath_35mo, df_radg_cat2fb_w$m1_index_fastbreath_35mo))
-radg_fb2_m2 <- addmargins(table(df_radg_cat2fb_w$m2_ref_fastbreath_35mo, df_radg_cat2fb_w$m2_index_fastbreath_35mo))
-radg_fb2_m3 <- addmargins(table(df_radg_cat2fb_w$m3_ref_fastbreath_35mo, df_radg_cat2fb_w$m3_index_fastbreath_35mo))
-
-radg_fb3_m1 <- addmargins(table(df_radg_cat3fb_w$m1_ref_fastbreath_59mo, df_radg_cat3fb_w$m1_index_fastbreath_59mo))
-radg_fb3_m2 <- addmargins(table(df_radg_cat3fb_w$m2_ref_fastbreath_59mo, df_radg_cat3fb_w$m2_index_fastbreath_59mo))
-radg_fb3_m3 <- addmargins(table(df_radg_cat3fb_w$m3_ref_fastbreath_59mo, df_radg_cat3fb_w$m3_index_fastbreath_59mo))
+confusion_matrix(df_radg_cat1fb_l,"ref_fastbreath_12mo","index_fastbreath_12mo", "*0-1 month*")
+confusion_matrix(df_radg_cat2fb_l,"ref_fastbreath_12mo","index_fastbreath_12mo", "*2-11 months*")
+confusion_matrix(df_radg_cat3fb_l,"ref_fastbreath_35mo","index_fastbreath_35mo", "*12-35 months*")
+confusion_matrix(df_radg_cat4fb_l,"ref_fastbreath_59mo","index_fastbreath_59mo", "*36-59 months*")
 ```
 
 ### Tachycardia
 ```{r}
 # Long
-confusion_matrix(df_radg_cat1tachy_l,"ref_tachycardic_12mo","index_tachycardic_12mo", "**0-11 month**")
-confusion_matrix(df_radg_cat2tachy_l,"ref_tachycardic_59mo","index_tachycardic_59mo", "**12-59 months**")
-
-
-# Wide
-radg_tachy1_m1 <- addmargins(table(df_radg_cat1tachy_w$m1_ref_tachycardic_12mo, df_radg_cat1tachy_w$m1_index_tachycardic_12mo))
-radg_tachy1_m2 <- addmargins(table(df_radg_cat1tachy_w$m2_ref_tachycardic_12mo, df_radg_cat1tachy_w$m2_index_tachycardic_12mo))
-radg_tachy1_m3 <- addmargins(table(df_radg_cat1tachy_w$m3_ref_tachycardic_12mo, df_radg_cat1tachy_w$m3_index_tachycardic_12mo))
-
-radg_tachy2_m1 <- addmargins(table(df_radg_cat2tachy_w$m1_ref_tachycardic_59mo, df_radg_cat2tachy_w$m1_index_tachycardic_59mo))
-radg_tachy2_m2 <- addmargins(table(df_radg_cat2tachy_w$m2_ref_tachycardic_59mo, df_radg_cat2tachy_w$m2_index_tachycardic_59mo))
-radg_tachy2_m3 <- addmargins(table(df_radg_cat2tachy_w$m3_ref_tachycardic_59mo, df_radg_cat2tachy_w$m3_index_tachycardic_59mo))
+confusion_matrix(df_radg_cat1_l,"ref_tachycardic_12mo","index_tachycardic_12mo", "*0-1 month*")
+confusion_matrix(df_radg_cat2_l,"ref_tachycardic_12mo","index_tachycardic_12mo", "*2-11 months*")
+confusion_matrix(df_radg_cat3_l,"ref_tachycardic_59mo","index_tachycardic_59mo", "*12-59 months*")
 ```
 
 ## m800 (Biolight) {.tabset}
 
 ### Hypoxia
 ```{r}
-# Long
-confusion_matrix(df_bio_cat1_l,"ref_hypoxic","index_hypoxic","**0-1 month**")
-confusion_matrix(df_bio_cat2_l,"ref_hypoxic","index_hypoxic", "**2-11 months**")
-confusion_matrix(df_bio_cat3_l,"ref_hypoxic","index_hypoxic","**12-59 months**")
-
-
-# Wide
-bio_hypoxia1_m1 <- addmargins(table(df_bio_cat1_w$m1_ref_hypoxic, df_bio_cat1_w$m1_index_hypoxic))
-bio_hypoxia1_m2 <- addmargins(table(df_bio_cat1_w$m2_ref_hypoxic, df_bio_cat1_w$m2_index_hypoxic))
-bio_hypoxia1_m3 <- addmargins(table(df_bio_cat1_w$m3_ref_hypoxic, df_bio_cat1_w$m3_index_hypoxic))
-
-bio_hypoxia2_m1 <- addmargins(table(df_bio_cat2_w$m1_ref_hypoxic, df_bio_cat2_w$m1_index_hypoxic))
-bio_hypoxia2_m2 <- addmargins(table(df_bio_cat2_w$m2_ref_hypoxic, df_bio_cat2_w$m2_index_hypoxic))
-bio_hypoxia2_m3 <- addmargins(table(df_bio_cat2_w$m3_ref_hypoxic, df_bio_cat2_w$m3_index_hypoxic))
-
-bio_hypoxia3_m1 <- addmargins(table(df_bio_cat3_w$m1_ref_hypoxic, df_bio_cat3_w$m1_index_hypoxic))
-bio_hypoxia3_m2 <- addmargins(table(df_bio_cat3_w$m2_ref_hypoxic, df_bio_cat3_w$m2_index_hypoxic))
-bio_hypoxia3_m3 <- addmargins(table(df_bio_cat3_w$m3_ref_hypoxic, df_bio_cat3_w$m3_index_hypoxic))
+confusion_matrix(df_bio_cat1_l,"ref_hypoxic","index_hypoxic","*0-1 month*")
+confusion_matrix(df_bio_cat2_l,"ref_hypoxic","index_hypoxic", "*2-11 months*")
+confusion_matrix(df_bio_cat3_l,"ref_hypoxic","index_hypoxic","*12-59 months*")
 ```
 
 ### Fast Breathing
 ```{r}
-confusion_matrix(df_bio_cat1fb_l,"ref_fastbreath_12mo","index_fastbreath_12mo", "**0-11 months**")
-confusion_matrix(df_bio_cat2fb_l,"ref_fastbreath_35mo","index_fastbreath_35mo", "**12-35 months**")
-confusion_matrix(df_bio_cat3fb_l,"ref_fastbreath_59mo","index_fastbreath_59mo", "**36-59 months**")
+confusion_matrix(df_bio_cat1fb_l,"ref_fastbreath_12mo","index_fastbreath_12mo", "*0-1 month*")
+confusion_matrix(df_bio_cat2fb_l,"ref_fastbreath_12mo","index_fastbreath_12mo", "*2-11 months*")
+confusion_matrix(df_bio_cat3fb_l,"ref_fastbreath_35mo","index_fastbreath_35mo", "*12-35 months*")
+confusion_matrix(df_bio_cat4fb_l,"ref_fastbreath_59mo","index_fastbreath_59mo", "*36-59 months*")
 ```
 
 ### Tachycardia
 ```{r}
-confusion_matrix(df_bio_cat1tachy_l,"ref_tachycardic_12mo","index_tachycardic_12mo", "**0-11 month**")
-confusion_matrix(df_bio_cat2tachy_l,"ref_tachycardic_59mo","index_tachycardic_59mo", "**12-59 months**")
+confusion_matrix(df_bio_cat1_l,"ref_tachycardic_12mo","index_tachycardic_12mo", "*0-1 month*")
+confusion_matrix(df_bio_cat2_l,"ref_tachycardic_12mo","index_tachycardic_12mo", "*2-11 months*")
+confusion_matrix(df_bio_cat3_l,"ref_tachycardic_59mo","index_tachycardic_59mo", "*12-59 months*")
 ```
 
 ## NeoGuard (Neopenda) {.tabset}
 
 ### Hypoxia
 ```{r}
-# Long
-confusion_matrix(df_neo_cat1_l,"ref_hypoxic","index_hypoxic","**0-1 month**")
-confusion_matrix(df_neo_cat2_l,"ref_hypoxic","index_hypoxic", "**2-11 months**")
-confusion_matrix(df_neo_cat3_l,"ref_hypoxic","index_hypoxic","**12-59 months**")
-
-# Wide
-neo_hypoxia1_m1 <- addmargins(table(df_neo_cat1_w$m1_ref_hypoxic, df_neo_cat1_w$m1_index_hypoxic))
-neo_hypoxia1_m2 <- addmargins(table(df_neo_cat1_w$m2_ref_hypoxic, df_neo_cat1_w$m2_index_hypoxic))
-neo_hypoxia1_m3 <- addmargins(table(df_neo_cat1_w$m3_ref_hypoxic, df_neo_cat1_w$m3_index_hypoxic))
-
-neo_hypoxia2_m1 <- addmargins(table(df_neo_cat2_w$m1_ref_hypoxic, df_neo_cat2_w$m1_index_hypoxic))
-neo_hypoxia2_m2 <- addmargins(table(df_neo_cat2_w$m2_ref_hypoxic, df_neo_cat2_w$m2_index_hypoxic))
-neo_hypoxia2_m3 <- addmargins(table(df_neo_cat2_w$m3_ref_hypoxic, df_neo_cat2_w$m3_index_hypoxic))
-
-neo_hypoxia3_m1 <- addmargins(table(df_neo_cat3_w$m1_ref_hypoxic, df_neo_cat3_w$m1_index_hypoxic))
-neo_hypoxia3_m2 <- addmargins(table(df_neo_cat3_w$m2_ref_hypoxic, df_neo_cat3_w$m2_index_hypoxic))
-neo_hypoxia3_m3 <- addmargins(table(df_neo_cat3_w$m3_ref_hypoxic, df_neo_cat3_w$m3_index_hypoxic))
+confusion_matrix(df_neo_cat1_l,"ref_hypoxic","index_hypoxic","*0-1 month*")
+confusion_matrix(df_neo_cat2_l,"ref_hypoxic","index_hypoxic", "*2-11 months*")
+confusion_matrix(df_neo_cat3_l,"ref_hypoxic","index_hypoxic","*12-59 months*")
 ```
 
 ### Fever
 ```{r}
-confusion_matrix(df_neo_cat1_l,"ref_fever","index_fever", "**0-1 month**")
-confusion_matrix(df_neo_cat2_l,"ref_fever","index_fever", "**2-11 months**")
-confusion_matrix(df_neo_cat3_l,"ref_fever","index_fever","**12-59 months**")
+confusion_matrix(df_neo_cat1_l,"ref_fever","index_fever", "*0-1 month*")
+confusion_matrix(df_neo_cat2_l,"ref_fever","index_fever", "*2-11 months*")
+confusion_matrix(df_neo_cat3_l,"ref_fever","index_fever","*12-59 months*")
 ```
 
 ### Fast Breathing
 ```{r}
-confusion_matrix(df_neo_cat1fb_l,"ref_fastbreath_12mo","index_fastbreath_12mo", "**0-11 months**")
-confusion_matrix(df_neo_cat2fb_l,"ref_fastbreath_35mo","index_fastbreath_35mo", "**12-35 months**")
-confusion_matrix(df_neo_cat3fb_l,"ref_fastbreath_59mo","index_fastbreath_59mo", "**36-59 months**")
+confusion_matrix(df_neo_cat1fb_l,"ref_fastbreath_12mo","index_fastbreath_12mo", "*0-1 month*")
+confusion_matrix(df_neo_cat2fb_l,"ref_fastbreath_12mo","index_fastbreath_12mo", "*2-11 months*")
+confusion_matrix(df_neo_cat3fb_l,"ref_fastbreath_35mo","index_fastbreath_35mo", "*12-35 months*")
+confusion_matrix(df_neo_cat4fb_l,"ref_fastbreath_59mo","index_fastbreath_59mo", "*36-59 months*")
 ```
 
 ### Tachycardia
 ```{r}
-confusion_matrix(df_neo_cat1tachy_l,"ref_tachycardic_12mo","index_tachycardic_12mo", "**0-11 month**")
-confusion_matrix(df_neo_cat2tachy_l,"ref_tachycardic_59mo","index_tachycardic_59mo", "**12-59 months**")
+confusion_matrix(df_neo_cat1_l,"ref_tachycardic_12mo","index_tachycardic_12mo", "*0-1 month*")
+confusion_matrix(df_neo_cat2_l,"ref_tachycardic_12mo","index_tachycardic_12mo", "*2-11 months*")
+confusion_matrix(df_neo_cat3_l,"ref_tachycardic_59mo","index_tachycardic_59mo", "*12-59 months*")
 ```
 
 ## Onyx PO+RR (Nonin) {.tabset}
 
 ### Hypoxia
 ```{r}
-# Long
-confusion_matrix(df_onyx_cat3_l,"ref_hypoxic","index_hypoxic","**12-59 months**")
-
-
-# Wide
-onyx_hypoxia3_m1 <- addmargins(table(df_onyx_cat3_w$m1_ref_hypoxic, df_onyx_cat3_w$m1_index_hypoxic))
-onyx_hypoxia3_m2 <- addmargins(table(df_onyx_cat3_w$m2_ref_hypoxic, df_onyx_cat3_w$m2_index_hypoxic))
-onyx_hypoxia3_m3 <- addmargins(table(df_onyx_cat3_w$m3_ref_hypoxic, df_onyx_cat3_w$m3_index_hypoxic))
+confusion_matrix(df_onyx_cat3_l,"ref_hypoxic","index_hypoxic","*12-59 months*")
 ```
 
 ### Fast Breathing
 ```{r}
-confusion_matrix(df_onyx_cat2fb_l,"ref_fastbreath_35mo","index_fastbreath_35mo", "**12-35 months**")
-confusion_matrix(df_onyx_cat3fb_l,"ref_fastbreath_35mo","index_fastbreath_59mo", "**36-59 months**")
+confusion_matrix(df_onyx_cat3fb_l,"ref_fastbreath_35mo","index_fastbreath_35mo", "*12-35 months*")
+confusion_matrix(df_onyx_cat4fb_l,"ref_fastbreath_35mo","index_fastbreath_59mo", "*36-59 months*")
 ```
 
 ### Tachycardia
 ```{r}
-confusion_matrix(df_neo_cat2tachy_l,"ref_tachycardic_59mo","index_tachycardic_59mo", "**12-59 months**")
+confusion_matrix(df_neo_cat3_l,"ref_tachycardic_59mo","index_tachycardic_59mo", "*12-59 months*")
 ```
 
 ## Scanbo v8 (Scanbo) {.tabset}
@@ -1458,101 +1423,144 @@ confusion_matrix(df_neo_cat2tachy_l,"ref_tachycardic_59mo","index_tachycardic_59
 ### Hypoxia
 ```{r}
 # Long
-confusion_matrix(df_scan_cat3_l,"ref_hypoxic","index_hypoxic","**12-59 months**")
- 
-
-# Wide
-scan_hypoxia3_m1 <- addmargins(table(df_scan_cat3_w$m1_ref_hypoxic, df_scan_cat3_w$m1_index_hypoxic))
-scan_hypoxia3_m2 <- addmargins(table(df_scan_cat3_w$m2_ref_hypoxic, df_scan_cat3_w$m2_index_hypoxic))
-scan_hypoxia3_m3 <- addmargins(table(df_scan_cat3_w$m3_ref_hypoxic, df_scan_cat3_w$m3_index_hypoxic))
+confusion_matrix(df_scan_cat3_l,"ref_hypoxic","index_hypoxic","*12-59 months*")
 ```
 
 ### Fever
 ```{r}
-confusion_matrix(df_scan_cat3_l,"ref_fever","index_fever","**12-59 months**")
+confusion_matrix(df_scan_cat3_l,"ref_fever","index_fever","*12-59 months*")
 ```
 
 ### Fast Breathing
 ```{r}
-confusion_matrix(df_scan_cat2fb_l,"ref_fastbreath_35mo","index_fastbreath_35mo", "**12-35 months**")
-confusion_matrix(df_scan_cat3fb_l,"ref_fastbreath_59mo","index_fastbreath_59mo", "**36-59 months**")
+confusion_matrix(df_scan_cat3fb_l,"ref_fastbreath_35mo","index_fastbreath_35mo", "*12-35 months*")
+confusion_matrix(df_scan_cat4fb_l,"ref_fastbreath_59mo","index_fastbreath_59mo", "*36-59 months*")
 ```
 
 ### Tachycardia
 ```{r}
-confusion_matrix(df_scan_cat2tachy_l,"ref_tachycardic_59mo","index_tachycardic_59mo", "**12-59 months**")
+confusion_matrix(df_scan_cat3_l,"ref_tachycardic_59mo","index_tachycardic_59mo", "*12-59 months*")
 ```
 
 # Section 6: Percent Agreement {.tabset}
-Samwel (Rebecca can take this if helpful)
+Samwel
 
 ```{r, include=FALSE}
 # use binom.exact function from exactci package to calculate percent agreement and associated 95% CI's for each device/measurement/age category
-# store cacluations in object to call in subsequent sections and display in table
+# store calculations in object to call in subsequent sections and display in table
+# the total number of trials and the number of successes must be calculated dynamically to allow for varying data inputs
+# to do this, two new variables have been created in the original wide and long df's (prior to subsetting) that we can call from each device df
+# the ref_index_pres_ variable = 1 when both the index and reference measurements are not null, this is the total number of trials passed to the "x" argument
+# the ref_index_agree_ variable = 1 when the binary indicators for the clinical condition agree, this is the total number of successes passed to the "n" argument
 
 # Rad-G
 ## Overall
-pa_radg_hypoxia1 <- binom.exact(x = sum(radg_hypoxia1[1,1], radg_hypoxia1[2,2]), n = radg_hypoxia1[3,3])
-pa_radg_hypoxia2 <- binom.exact(x = sum(radg_hypoxia2[1,1], radg_hypoxia2[2,2]), n = radg_hypoxia2[3,3])
-pa_radg_hypoxia3 <- binom.exact(x = sum(radg_hypoxia3[1,1], radg_hypoxia3[2,2]), n = radg_hypoxia3[3,3])
+pa_radg_hypoxia1 <- binom.exact(x = sum(df_radg_cat1_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_radg_cat1_l$ref_index_pres_hypoxic))
+pa_radg_hypoxia2 <- binom.exact(x = sum(df_radg_cat2_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_radg_cat2_l$ref_index_pres_hypoxic))
+pa_radg_hypoxia3 <- binom.exact(x = sum(df_radg_cat3_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_radg_cat3_l$ref_index_pres_hypoxic))
 
-pa_radg_fever1 <- binom.exact(x = sum(radg_fever1[1,1], radg_fever1[2,2]), n = radg_fever1[3,3])
-pa_radg_fever2 <- binom.exact(x = sum(radg_fever2[1,1], radg_fever2[2,2]), n = radg_fever2[3,3])
-pa_radg_fever3 <- binom.exact(x = sum(radg_fever3[1,1], radg_fever3[2,2]), n = radg_fever3[3,3])
+pa_radg_fever1 <- binom.exact(x = sum(df_radg_cat1_l$ref_index_agree_fever, na.rm=T), n = sum(df_radg_cat1_l$ref_index_pres_fever))
+pa_radg_fever2 <- binom.exact(x = sum(df_radg_cat2_l$ref_index_agree_fever, na.rm=T), n = sum(df_radg_cat2_l$ref_index_pres_fever))
+pa_radg_fever3 <- binom.exact(x = sum(df_radg_cat3_l$ref_index_agree_fever, na.rm=T), n = sum(df_radg_cat3_l$ref_index_pres_fever))
 
-pa_radg_fb1 <- binom.exact(x = sum(radg_fb1[1,1], radg_fb1[2,2]), n = radg_fb1[3,3])
-pa_radg_fb2 <- binom.exact(x = sum(radg_fb2[1,1], radg_fb2[2,2]), n = radg_fb2[3,3])
-pa_radg_fb3 <- binom.exact(x = sum(radg_fb3[1,1], radg_fb3[2,2]), n = radg_fb3[3,3])
+pa_radg_fb1 <- binom.exact(x = sum(df_radg_cat1fb_l$ref_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat1_l$ref_index_pres_fb12mo))
+pa_radg_fb2 <- binom.exact(x = sum(df_radg_cat2fb_l$ref_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat2_l$ref_index_pres_fb12mo))
+pa_radg_fb3 <- binom.exact(x = sum(df_radg_cat3fb_l$ref_index_agree_fb35mo, na.rm=T), n = sum(df_radg_cat3_l$ref_index_pres_fb35mo))
+pa_radg_fb4 <- binom.exact(x = sum(df_radg_cat4fb_l$ref_index_agree_fb59mo, na.rm=T), n = sum(df_radg_cat4_l$ref_index_pres_fb59mo))
 
-pa_radg_tachy1 <- binom.exact(x = sum(radg_tachy1[1,1], radg_tachy1[2,2]), n = radg_tachy1[3,3])
-pa_radg_tachy2 <- binom.exact(x = sum(radg_tachy2[1,1], radg_tachy2[2,2]), n = radg_tachy2[3,3])
+pa_radg_tachy1 <- binom.exact(x = sum(df_radg_cat1_l$ref_index_agree_tachy12mo, na.rm=T), n = sum(df_radg_cat1_l$ref_index_pres_tachy12mo))
+pa_radg_tachy2 <- binom.exact(x = sum(df_radg_cat2_l$ref_index_agree_tachy12mo, na.rm=T), n = sum(df_radg_cat2_l$ref_index_pres_tachy12mo))
+pa_radg_tachy3 <- binom.exact(x = sum(df_radg_cat3_l$ref_index_agree_tachy59mo, na.rm=T), n = sum(df_radg_cat3_l$ref_index_pres_tachy59mo))
 
 ## M1-3
 ### Hypoxia
-pa_radg_hypoxia1_m1 <- binom.exact(x = radg_hypoxia1_m1[1,1], n = sum(radg_hypoxia1_m1[1,1], radg_hypoxia1_m1[2,1])) # Intentionally updated to reflect issues with underlying 2x2
-pa_radg_hypoxia1_m2 <- binom.exact(x = sum(radg_hypoxia1_m2[1,1], radg_hypoxia1_m2[2,2]), n = radg_hypoxia1_m2[3,3])
-pa_radg_hypoxia1_m3 <- binom.exact(x = sum(radg_hypoxia1_m3[1,1], radg_hypoxia1_m3[2,2]), n = radg_hypoxia1_m3[3,3])
+pa_radg_hypoxia1_m1 <- binom.exact(x = sum(df_radg_cat1_w$m1_ref_index_agree_hypoxic, na.rm=T), n = sum(df_radg_cat1_w$m1_ref_index_pres_hypoxic))
+pa_radg_hypoxia1_m2 <- binom.exact(x = sum(df_radg_cat1_w$m2_ref_index_agree_hypoxic, na.rm=T), n = sum(df_radg_cat1_w$m2_ref_index_pres_hypoxic))
+pa_radg_hypoxia1_m3 <- binom.exact(x = sum(df_radg_cat1_w$m3_ref_index_agree_hypoxic, na.rm=T), n = sum(df_radg_cat1_w$m3_ref_index_pres_hypoxic))
 
-pa_radg_hypoxia2_m1 <- binom.exact(x = radg_hypoxia2_m1[1,1], n = sum(radg_hypoxia2_m1[1,1], radg_hypoxia2_m1[2,1])) # Intentionally updated to reflect issues with underlying 2x2
-pa_radg_hypoxia2_m2 <- binom.exact(x = sum(radg_hypoxia2_m2[1,1], radg_hypoxia2_m2[2,2]), n = radg_hypoxia2_m2[3,3])
-pa_radg_hypoxia2_m3 <- binom.exact(x = sum(radg_hypoxia2_m3[1,1], radg_hypoxia2_m3[2,2]), n = radg_hypoxia2_m3[3,3])
+pa_radg_hypoxia2_m1 <- binom.exact(x = sum(df_radg_cat2_w$m1_ref_index_agree_hypoxic, na.rm=T), n = sum(df_radg_cat2_w$m1_ref_index_pres_hypoxic))
+pa_radg_hypoxia2_m2 <- binom.exact(x = sum(df_radg_cat2_w$m2_ref_index_agree_hypoxic, na.rm=T), n = sum(df_radg_cat2_w$m2_ref_index_pres_hypoxic))
+pa_radg_hypoxia2_m3 <- binom.exact(x = sum(df_radg_cat2_w$m3_ref_index_agree_hypoxic, na.rm=T), n = sum(df_radg_cat2_w$m3_ref_index_pres_hypoxic))
 
-pa_radg_hypoxia3_m1 <- binom.exact(x = radg_hypoxia3_m1[1,1], n = sum(radg_hypoxia3_m1[1,1], radg_hypoxia3_m1[1,2])) # Intentionally updated to reflect issues with underlying 2x2
-pa_radg_hypoxia3_m2 <- binom.exact(x = sum(radg_hypoxia3_m2[1,1], radg_hypoxia3_m2[2,2]), n = radg_hypoxia3_m2[3,3])
-pa_radg_hypoxia3_m3 <- binom.exact(x = sum(radg_hypoxia3_m3[1,1], radg_hypoxia3_m3[2,2]), n = radg_hypoxia3_m3[3,3])
+pa_radg_hypoxia3_m1 <- binom.exact(x = sum(df_radg_cat3_w$m1_ref_index_agree_hypoxic, na.rm=T), n = sum(df_radg_cat3_w$m1_ref_index_pres_hypoxic))
+pa_radg_hypoxia3_m2 <- binom.exact(x = sum(df_radg_cat3_w$m2_ref_index_agree_hypoxic, na.rm=T), n = sum(df_radg_cat3_w$m2_ref_index_pres_hypoxic))
+pa_radg_hypoxia3_m3 <- binom.exact(x = sum(df_radg_cat3_w$m3_ref_index_agree_hypoxic, na.rm=T), n = sum(df_radg_cat3_w$m3_ref_index_pres_hypoxic))
 
 ### Fever
+pa_radg_fever1_m1 <- binom.exact(x = sum(df_radg_cat1_w$m1_ref_index_agree_fever, na.rm=T), n = sum(df_radg_cat1_w$m1_ref_index_pres_fever))
+pa_radg_fever1_m2 <- binom.exact(x = sum(df_radg_cat1_w$m2_ref_index_agree_fever, na.rm=T), n = sum(df_radg_cat1_w$m2_ref_index_pres_fever))
+pa_radg_fever1_m3 <- binom.exact(x = sum(df_radg_cat1_w$m3_ref_index_agree_fever, na.rm=T), n = sum(df_radg_cat1_w$m3_ref_index_pres_fever))
+
+pa_radg_fever2_m1 <- binom.exact(x = sum(df_radg_cat2_w$m1_ref_index_agree_fever, na.rm=T), n = sum(df_radg_cat2_w$m1_ref_index_pres_fever))
+pa_radg_fever2_m2 <- binom.exact(x = sum(df_radg_cat2_w$m2_ref_index_agree_fever, na.rm=T), n = sum(df_radg_cat2_w$m2_ref_index_pres_fever))
+pa_radg_fever2_m3 <- binom.exact(x = sum(df_radg_cat2_w$m3_ref_index_agree_fever, na.rm=T), n = sum(df_radg_cat2_w$m3_ref_index_pres_fever))
+
+pa_radg_fever3_m1 <- binom.exact(x = sum(df_radg_cat3_w$m1_ref_index_agree_fever, na.rm=T), n = sum(df_radg_cat3_w$m1_ref_index_pres_fever))
+pa_radg_fever3_m2 <- binom.exact(x = sum(df_radg_cat3_w$m2_ref_index_agree_fever, na.rm=T), n = sum(df_radg_cat3_w$m2_ref_index_pres_fever))
+pa_radg_fever3_m3 <- binom.exact(x = sum(df_radg_cat3_w$m3_ref_index_agree_fever, na.rm=T), n = sum(df_radg_cat3_w$m3_ref_index_pres_fever))
 
 ### Fast breathing
+pa_radg_fb1_m1 <- binom.exact(x = sum(df_radg_cat1fb_w$m1_ref_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat1fb_w$m1_ref_index_pres_fb12mo))
+pa_radg_fb1_m2 <- binom.exact(x = sum(df_radg_cat1fb_w$m2_ref_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat1fb_w$m2_ref_index_pres_fb12mo))
+pa_radg_fb1_m3 <- binom.exact(x = sum(df_radg_cat1_w$m3_ref_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat1fb_w$m3_ref_index_pres_fb12mo))
+
+pa_radg_fb2_m1 <- binom.exact(x = sum(df_radg_cat2fb_w$m1_ref_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat2fb_w$m1_ref_index_pres_fb12mo))
+pa_radg_fb2_m2 <- binom.exact(x = sum(df_radg_cat2fb_w$m2_ref_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat2fb_w$m2_ref_index_pres_fb12mo))
+pa_radg_fb2_m3 <- binom.exact(x = sum(df_radg_cat2fb_w$m3_ref_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat2fb_w$m3_ref_index_pres_fb12mo))
+
+pa_radg_fb3_m1 <- binom.exact(x = sum(df_radg_cat3fb_w$m1_ref_index_agree_fb35mo, na.rm=T), n = sum(df_radg_cat3fb_w$m1_ref_index_pres_fb35mo))
+pa_radg_fb3_m2 <- binom.exact(x = sum(df_radg_cat3fb_w$m2_ref_index_agree_fb35mo, na.rm=T), n = sum(df_radg_cat3fb_w$m2_ref_index_pres_fb35mo))
+pa_radg_fb3_m3 <- binom.exact(x = sum(df_radg_cat3fb_w$m3_ref_index_agree_fb35mo, na.rm=T), n = sum(df_radg_cat3fb_w$m3_ref_index_pres_fb35mo))
+
+pa_radg_fb4_m1 <- binom.exact(x = sum(df_radg_cat4fb_w$m1_ref_index_agree_fb59mo, na.rm=T), n = sum(df_radg_cat4fb_w$m1_ref_index_pres_fb59mo))
+pa_radg_fb4_m2 <- binom.exact(x = sum(df_radg_cat4fb_w$m2_ref_index_agree_fb59mo, na.rm=T), n = sum(df_radg_cat4fb_w$m2_ref_index_pres_fb59mo))
+pa_radg_fb4_m3 <- binom.exact(x = sum(df_radg_cat4fb_w$m3_ref_index_agree_fb59mo, na.rm=T), n = sum(df_radg_cat4fb_w$m3_ref_index_pres_fb59mo))
 
 ### Tachycardia
+pa_radg_tachy1_m1 <- binom.exact(x = sum(df_radg_cat1_w$m1_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_radg_cat1_w$m1_ref_index_pres_tachy12mo))
+pa_radg_tachy1_m2 <- binom.exact(x = sum(df_radg_cat1_w$m2_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_radg_cat1_w$m2_ref_index_pres_tachy12mo))
+pa_radg_tachy1_m3 <- binom.exact(x = sum(df_radg_cat1_w$m3_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_radg_cat1_w$m3_ref_index_pres_tachy12mo))
+
+pa_radg_tachy2_m1 <- binom.exact(x = sum(df_radg_cat2_w$m1_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_radg_cat2_w$m1_ref_index_pres_tachy12mo))
+pa_radg_tachy2_m2 <- binom.exact(x = sum(df_radg_cat2_w$m2_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_radg_cat2_w$m2_ref_index_pres_tachy12mo))
+pa_radg_tachy2_m3 <- binom.exact(x = sum(df_radg_cat2_w$m3_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_radg_cat2_w$m3_ref_index_pres_tachy12mo))
+
+pa_radg_tachy3_m1 <- binom.exact(x = sum(df_radg_cat3_w$m1_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_radg_cat3_w$m1_ref_index_pres_tachy59mo))
+pa_radg_tachy3_m2 <- binom.exact(x = sum(df_radg_cat3_w$m2_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_radg_cat3_w$m2_ref_index_pres_tachy59mo))
+pa_radg_tachy3_m3 <- binom.exact(x = sum(df_radg_cat3_w$m3_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_radg_cat3_w$m3_ref_index_pres_tachy59mo))
 
 # Biolight
 ## Overall
-pa_bio_hypoxia1 <- binom.exact(x = sum(bio_hypoxia1[1,1], bio_hypoxia1[2,2]), n = bio_hypoxia1[3,3])
-pa_bio_hypoxia2 <- binom.exact(x = sum(bio_hypoxia2[1,1], bio_hypoxia2[2,2]), n = bio_hypoxia2[3,3])
-pa_bio_hypoxia3 <- binom.exact(x = sum(bio_hypoxia3[1,1], bio_hypoxia3[2,2]), n = bio_hypoxia3[3,3])
+pa_bio_hypoxia1 <- binom.exact(x = sum(df_bio_cat1_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_bio_cat1_l$ref_index_pres_hypoxic))
+pa_bio_hypoxia2 <- binom.exact(x = sum(df_bio_cat2_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_bio_cat2_l$ref_index_pres_hypoxic))
+pa_bio_hypoxia3 <- binom.exact(x = sum(df_bio_cat3_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_bio_cat3_l$ref_index_pres_hypoxic))
 
-pa_bio_fb1 <- binom.exact(x = sum(bio_fb1[1,1], bio_fb1[2,2]), n = bio_fb1[3,3])
-pa_bio_fb2 <- binom.exact(x = sum(bio_fb2[1,1], bio_fb2[2,2]), n = bio_fb2[3,3])
-pa_bio_fb3 <- binom.exact(x = sum(bio_fb3[1,1], bio_fb3[2,2]), n = bio_fb3[3,3])
+pa_bio_fever1 <- binom.exact(x = sum(df_bio_cat1_l$ref_index_agree_fever, na.rm=T), n = sum(df_bio_cat1_l$ref_index_pres_fever))
+pa_bio_fever2 <- binom.exact(x = sum(df_bio_cat2_l$ref_index_agree_fever, na.rm=T), n = sum(df_bio_cat2_l$ref_index_pres_fever))
+pa_bio_fever3 <- binom.exact(x = sum(df_bio_cat3_l$ref_index_agree_fever, na.rm=T), n = sum(df_bio_cat3_l$ref_index_pres_fever))
 
-pa_bio_tachy1 <- binom.exact(x = sum(bio_tachy1[1,1], bio_tachy1[2,2]), n = bio_tachy1[3,3])
-pa_bio_tachy2 <- binom.exact(x = sum(bio_tachy2[1,1], bio_tachy2[2,2]), n = bio_tachy2[3,3])
+pa_bio_fb1 <- binom.exact(x = sum(df_bio_cat1fb_l$ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat1_l$ref_index_pres_fb12mo))
+pa_bio_fb2 <- binom.exact(x = sum(df_bio_cat2fb_l$ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat2_l$ref_index_pres_fb12mo))
+pa_bio_fb3 <- binom.exact(x = sum(df_bio_cat3fb_l$ref_index_agree_fb35mo, na.rm=T), n = sum(df_bio_cat3_l$ref_index_pres_fb35mo))
+pa_bio_fb4 <- binom.exact(x = sum(df_bio_cat4fb_l$ref_index_agree_fb59mo, na.rm=T), n = sum(df_bio_cat4_l$ref_index_pres_fb59mo))
+
+pa_bio_tachy1 <- binom.exact(x = sum(df_bio_cat1_l$ref_index_agree_tachy12mo, na.rm=T), n = sum(df_bio_cat1_l$ref_index_pres_tachy12mo))
+pa_bio_tachy2 <- binom.exact(x = sum(df_bio_cat2_l$ref_index_agree_tachy12mo, na.rm=T), n = sum(df_bio_cat2_l$ref_index_pres_tachy12mo))
+pa_bio_tachy3 <- binom.exact(x = sum(df_bio_cat3_l$ref_index_agree_tachy59mo, na.rm=T), n = sum(df_bio_cat3_l$ref_index_pres_tachy59mo))
 
 ## M1-3
 ### Hypoxia
-pa_bio_hypoxia1_m1 <- binom.exact(x = sum(bio_hypoxia1_m1[1,1], bio_hypoxia1_m1[2,2]), n = bio_hypoxia1_m1[3,3])
-pa_bio_hypoxia1_m2 <- binom.exact(x = sum(bio_hypoxia1_m2[1,1], bio_hypoxia1_m2[2,2]), n = bio_hypoxia1_m2[3,3])
-pa_bio_hypoxia1_m3 <- binom.exact(x = sum(bio_hypoxia1_m3[1,1], bio_hypoxia1_m3[2,2]), n = bio_hypoxia1_m3[3,3])
+pa_bio_hypoxia1_m1 <- binom.exact(x = sum(df_bio_cat1_w$m1_ref_index_agree_hypoxic, na.rm=T), n = sum(df_bio_cat1_w$m1_ref_index_pres_hypoxic))
+pa_bio_hypoxia1_m2 <- binom.exact(x = sum(df_bio_cat1_w$m2_ref_index_agree_hypoxic, na.rm=T), n = sum(df_bio_cat1_w$m2_ref_index_pres_hypoxic))
+pa_bio_hypoxia1_m3 <- binom.exact(x = sum(df_bio_cat1_w$m3_ref_index_agree_hypoxic, na.rm=T), n = sum(df_bio_cat1_w$m3_ref_index_pres_hypoxic))
 
-pa_bio_hypoxia2_m1 <- binom.exact(x = sum(bio_hypoxia2_m1[1,1], bio_hypoxia2_m1[2,2]), n = bio_hypoxia2_m1[3,3])
-pa_bio_hypoxia2_m2 <- binom.exact(x = sum(bio_hypoxia2_m2[1,1], bio_hypoxia2_m2[2,2]), n = bio_hypoxia2_m2[3,3])
-pa_bio_hypoxia2_m3 <- binom.exact(x = sum(bio_hypoxia2_m3[1,1], bio_hypoxia2_m3[2,2]), n = bio_hypoxia2_m3[3,3])
+pa_bio_hypoxia2_m1 <- binom.exact(x = sum(df_bio_cat2_w$m1_ref_index_agree_hypoxic, na.rm=T), n = sum(df_bio_cat2_w$m1_ref_index_pres_hypoxic))
+pa_bio_hypoxia2_m2 <- binom.exact(x = sum(df_bio_cat2_w$m2_ref_index_agree_hypoxic, na.rm=T), n = sum(df_bio_cat2_w$m2_ref_index_pres_hypoxic))
+pa_bio_hypoxia2_m3 <- binom.exact(x = sum(df_bio_cat2_w$m3_ref_index_agree_hypoxic, na.rm=T), n = sum(df_bio_cat2_w$m3_ref_index_pres_hypoxic))
 
-pa_bio_hypoxia3_m1 <- binom.exact(x = sum(bio_hypoxia3_m1[1,1], bio_hypoxia3_m1[2,2]), n = bio_hypoxia3_m1[3,3])
-pa_bio_hypoxia3_m2 <- binom.exact(x = bio_hypoxia3_m2[1,1], n = sum(bio_hypoxia3_m2[1,1], bio_hypoxia3_m2[1,2])) # Intentionally updated to reflect issues with underlying 2x2
-pa_bio_hypoxia3_m3 <- binom.exact(x = bio_hypoxia3_m3[1,1], n = sum(bio_hypoxia3_m3[1,1], bio_hypoxia3_m3[1,2])) # Intentionally updated to reflect issues with underlying 2x2
+pa_bio_hypoxia3_m1 <- binom.exact(x = sum(df_bio_cat3_w$m1_ref_index_agree_hypoxic, na.rm=T), n = sum(df_bio_cat3_w$m1_ref_index_pres_hypoxic))
+pa_bio_hypoxia3_m2 <- binom.exact(x = sum(df_bio_cat3_w$m2_ref_index_agree_hypoxic, na.rm=T), n = sum(df_bio_cat3_w$m2_ref_index_pres_hypoxic))
+pa_bio_hypoxia3_m3 <- binom.exact(x = sum(df_bio_cat3_w$m3_ref_index_agree_hypoxic, na.rm=T), n = sum(df_bio_cat3_w$m3_ref_index_pres_hypoxic))
 
 ### Fever -- N/A, no temp measurement
 
@@ -1561,35 +1569,38 @@ pa_bio_hypoxia3_m3 <- binom.exact(x = bio_hypoxia3_m3[1,1], n = sum(bio_hypoxia3
 ### Tachycardia
 
 # Neopenda
+# Biolight
 ## Overall
-pa_neo_hypoxia1 <- binom.exact(x = sum(neo_hypoxia1[1,1], neo_hypoxia1[2,2]), n = neo_hypoxia1[3,3])
-pa_neo_hypoxia2 <- binom.exact(x = sum(neo_hypoxia2[1,1], neo_hypoxia2[2,2]), n = neo_hypoxia2[3,3])
-pa_neo_hypoxia3 <- binom.exact(x = sum(neo_hypoxia3[1,1], neo_hypoxia3[2,2]), n = neo_hypoxia3[3,3])
+pa_neo_hypoxia1 <- binom.exact(x = sum(df_neo_cat1_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_neo_cat1_l$ref_index_pres_hypoxic))
+pa_neo_hypoxia2 <- binom.exact(x = sum(df_neo_cat2_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_neo_cat2_l$ref_index_pres_hypoxic))
+pa_neo_hypoxia3 <- binom.exact(x = sum(df_neo_cat3_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_neo_cat3_l$ref_index_pres_hypoxic))
 
-pa_neo_fever1 <- binom.exact(x = neo_fever1[1,1], n = sum(neo_fever1[1,1], neo_fever1[2,1])) # Intentionally updated to reflect issues with underlying 2x2
-pa_neo_fever2 <- binom.exact(x = sum(neo_fever2[1,1], neo_fever2[2,2]), n = neo_fever2[3,3])
-pa_neo_fever3 <- binom.exact(x = sum(neo_fever3[1,1], neo_fever3[2,2]), n = neo_fever3[3,3])
+pa_neo_fever1 <- binom.exact(x = sum(df_neo_cat1_l$ref_index_agree_fever, na.rm=T), n = sum(df_neo_cat1_l$ref_index_pres_fever))
+pa_neo_fever2 <- binom.exact(x = sum(df_neo_cat2_l$ref_index_agree_fever, na.rm=T), n = sum(df_neo_cat2_l$ref_index_pres_fever))
+pa_neo_fever3 <- binom.exact(x = sum(df_neo_cat3_l$ref_index_agree_fever, na.rm=T), n = sum(df_neo_cat3_l$ref_index_pres_fever))
 
-pa_neo_fb1 <- binom.exact(x = sum(neo_fb1[1,1], neo_fb1[2,2]), n = neo_fb1[3,3])
-pa_neo_fb2 <- binom.exact(x = sum(neo_fb2[1,1], neo_fb2[2,2]), n = neo_fb2[3,3])
-pa_neo_fb3 <- binom.exact(x = sum(neo_fb3[1,1], neo_fb3[2,2]), n = neo_fb3[3,3])
+pa_neo_fb1 <- binom.exact(x = sum(df_neo_cat1fb_l$ref_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat1_l$ref_index_pres_fb12mo))
+pa_neo_fb2 <- binom.exact(x = sum(df_neo_cat2fb_l$ref_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat2_l$ref_index_pres_fb12mo))
+pa_neo_fb3 <- binom.exact(x = sum(df_neo_cat3fb_l$ref_index_agree_fb35mo, na.rm=T), n = sum(df_neo_cat3_l$ref_index_pres_fb35mo))
+pa_neo_fb4 <- binom.exact(x = sum(df_neo_cat4fb_l$ref_index_agree_fb59mo, na.rm=T), n = sum(df_neo_cat4_l$ref_index_pres_fb59mo))
 
-pa_neo_tachy1 <- binom.exact(x = neo_tachy1[1,1], n = sum(neo_tachy1[1,1], neo_tachy1[2,1])) # Intentionally updated to reflect issues with underlying 2x2
-pa_neo_tachy2 <- binom.exact(x = sum(neo_tachy2[1,1], neo_tachy2[2,2]), n = neo_tachy2[3,3])
+pa_neo_tachy1 <- binom.exact(x = sum(df_neo_cat1_l$ref_index_agree_tachy12mo, na.rm=T), n = sum(df_neo_cat1_l$ref_index_pres_tachy12mo))
+pa_neo_tachy2 <- binom.exact(x = sum(df_neo_cat2_l$ref_index_agree_tachy12mo, na.rm=T), n = sum(df_neo_cat2_l$ref_index_pres_tachy12mo))
+pa_neo_tachy3 <- binom.exact(x = sum(df_neo_cat3_l$ref_index_agree_tachy59mo, na.rm=T), n = sum(df_neo_cat3_l$ref_index_pres_tachy59mo))
 
 ## M1-3
 ### Hypoxia
-pa_neo_hypoxia1_m1 <- binom.exact(x = sum(neo_hypoxia1_m1[1,1], neo_hypoxia1_m1[2,2]), n = neo_hypoxia1_m1[3,3])
-pa_neo_hypoxia1_m2 <- binom.exact(x = sum(neo_hypoxia1_m2[1,1], neo_hypoxia1_m2[2,2]), n = neo_hypoxia1_m2[3,3])
-pa_neo_hypoxia1_m3 <- binom.exact(x = sum(neo_hypoxia1_m3[1,1], neo_hypoxia1_m3[2,2]), n = neo_hypoxia1_m3[3,3])
+pa_neo_hypoxia1_m1 <- binom.exact(x = sum(df_neo_cat1_w$m1_ref_index_agree_hypoxic, na.rm=T), n = sum(df_neo_cat1_w$m1_ref_index_pres_hypoxic))
+pa_neo_hypoxia1_m2 <- binom.exact(x = sum(df_neo_cat1_w$m2_ref_index_agree_hypoxic, na.rm=T), n = sum(df_neo_cat1_w$m2_ref_index_pres_hypoxic))
+pa_neo_hypoxia1_m3 <- binom.exact(x = sum(df_neo_cat1_w$m3_ref_index_agree_hypoxic, na.rm=T), n = sum(df_neo_cat1_w$m3_ref_index_pres_hypoxic))
 
-pa_neo_hypoxia2_m1 <- binom.exact(x = sum(neo_hypoxia2_m1[1,1], neo_hypoxia2_m1[2,2]), n = neo_hypoxia2_m1[3,3])
-pa_neo_hypoxia2_m2 <- binom.exact(x = sum(neo_hypoxia2_m2[1,1], neo_hypoxia2_m2[2,2]), n = neo_hypoxia2_m2[3,3])
-pa_neo_hypoxia2_m3 <- binom.exact(x = sum(neo_hypoxia2_m3[1,1], neo_hypoxia2_m3[2,2]), n = neo_hypoxia2_m3[3,3])
+pa_neo_hypoxia2_m1 <- binom.exact(x = sum(df_neo_cat2_w$m1_ref_index_agree_hypoxic, na.rm=T), n = sum(df_neo_cat2_w$m1_ref_index_pres_hypoxic))
+pa_neo_hypoxia2_m2 <- binom.exact(x = sum(df_neo_cat2_w$m2_ref_index_agree_hypoxic, na.rm=T), n = sum(df_neo_cat2_w$m2_ref_index_pres_hypoxic))
+pa_neo_hypoxia2_m3 <- binom.exact(x = sum(df_neo_cat2_w$m3_ref_index_agree_hypoxic, na.rm=T), n = sum(df_neo_cat2_w$m3_ref_index_pres_hypoxic))
 
-pa_neo_hypoxia3_m1 <- binom.exact(x = sum(neo_hypoxia3_m1[1,1], neo_hypoxia3_m1[2,2]), n = neo_hypoxia3_m1[3,3])
-pa_neo_hypoxia3_m2 <- binom.exact(x = sum(neo_hypoxia3_m2[1,1], neo_hypoxia3_m2[2,2]), n = neo_hypoxia3_m2[3,3])
-pa_neo_hypoxia3_m3 <- binom.exact(x = sum(neo_hypoxia3_m3[1,1], neo_hypoxia3_m3[2,2]), n = neo_hypoxia3_m3[3,3])
+pa_neo_hypoxia3_m1 <- binom.exact(x = sum(df_neo_cat3_w$m1_ref_index_agree_hypoxic, na.rm=T), n = sum(df_neo_cat3_w$m1_ref_index_pres_hypoxic))
+pa_neo_hypoxia3_m2 <- binom.exact(x = sum(df_neo_cat3_w$m2_ref_index_agree_hypoxic, na.rm=T), n = sum(df_neo_cat3_w$m2_ref_index_pres_hypoxic))
+pa_neo_hypoxia3_m3 <- binom.exact(x = sum(df_neo_cat3_w$m3_ref_index_agree_hypoxic, na.rm=T), n = sum(df_neo_cat3_w$m3_ref_index_pres_hypoxic))
 
 ### Fever
 
@@ -1599,18 +1610,18 @@ pa_neo_hypoxia3_m3 <- binom.exact(x = sum(neo_hypoxia3_m3[1,1], neo_hypoxia3_m3[
 
 # Onyx
 ## Overall
-pa_onyx_hypoxia3 <- binom.exact(x = onyx_hypoxia3[1,1], n = sum(onyx_hypoxia3[1,1], onyx_hypoxia3[2,1])) # Intentionally updated to reflect issues with underlying 2x2
+pa_onyx_hypoxia3 <- binom.exact(x = sum(df_onyx_cat3_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_onyx_cat3_l$ref_index_pres_hypoxic))
 
-pa_onyx_fb2 <- binom.exact(x = sum(onyx_fb2[1,1], onyx_fb2[2,2]), n = onyx_fb2[3,3])
-pa_onyx_fb3 <- binom.exact(x = sum(onyx_fb3[1,1], onyx_fb3[2,2]), n = onyx_fb3[3,3])
+pa_onyx_fb3 <- binom.exact(x = sum(df_onyx_cat3fb_l$ref_index_agree_fb35mo, na.rm=T), n = sum(df_onyx_cat3_l$ref_index_pres_fb35mo))
+pa_onyx_fb4 <- binom.exact(x = sum(df_onyx_cat4fb_l$ref_index_agree_fb59mo, na.rm=T), n = sum(df_onyx_cat4_l$ref_index_pres_fb59mo))
 
-pa_onyx_tachy2 <- binom.exact(x = sum(onyx_tachy2[1,1], onyx_tachy2[2,2]), n = onyx_tachy2[3,3])
+pa_onyx_tachy3 <- binom.exact(x = sum(df_onyx_cat3_l$ref_index_agree_tachy59mo, na.rm=T), n = sum(df_onyx_cat3_l$ref_index_pres_tachy59mo))
 
 ## M1-3
 ### Hypoxia
-pa_onyx_hypoxia3_m1 <- binom.exact(x = onyx_hypoxia3_m1[1,1], n = sum(onyx_hypoxia3_m1[1,1], onyx_hypoxia3_m1[2,1])) # Intentionally updated to reflect issues with underlying 2x2
-pa_onyx_hypoxia3_m2 <- binom.exact(x = onyx_hypoxia3_m2[1,1], n = sum(onyx_hypoxia3_m2[1,1], onyx_hypoxia3_m2[2,1])) # Intentionally updated to reflect issues with underlying 2x2
-pa_onyx_hypoxia3_m3 <- binom.exact(x = onyx_hypoxia3_m3[1,1], n = sum(onyx_hypoxia3_m3[1,1], onyx_hypoxia3_m3[2,1])) # Intentionally updated to reflect issues with underlying 2x2
+pa_onyx_hypoxia3_m1 <- binom.exact(x = sum(df_onyx_cat3_w$m1_ref_index_agree_hypoxic, na.rm=T), n = sum(df_onyx_cat3_w$m1_ref_index_pres_hypoxic))
+pa_onyx_hypoxia3_m2 <- binom.exact(x = sum(df_onyx_cat3_w$m2_ref_index_agree_hypoxic, na.rm=T), n = sum(df_onyx_cat3_w$m2_ref_index_pres_hypoxic))
+pa_onyx_hypoxia3_m3 <- binom.exact(x = sum(df_onyx_cat3_w$m3_ref_index_agree_hypoxic, na.rm=T), n = sum(df_onyx_cat3_w$m3_ref_index_pres_hypoxic))
 
 ### Fever -- N/A, no temp measurement
 
@@ -1620,20 +1631,20 @@ pa_onyx_hypoxia3_m3 <- binom.exact(x = onyx_hypoxia3_m3[1,1], n = sum(onyx_hypox
 
 # Scanbo
 ## Overall
-pa_scan_hypoxia3 <- binom.exact(x = scan_hypoxia3[1,1], n = sum(scan_hypoxia3[1,1], scan_hypoxia3[2,1])) # Intentionally updated to reflect issues with underlying 2x2
+pa_scan_hypoxia3 <- binom.exact(x = sum(df_scan_cat3_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_scan_cat3_l$ref_index_pres_hypoxic))
 
-pa_scan_fever3 <- binom.exact(x = sum(scan_fever3[1,1], scan_fever3[2,2]), n = scan_fever3[3,3])
+pa_scan_fever3 <- binom.exact(x = sum(df_scan_cat3_l$ref_index_agree_fever, na.rm=T), n = sum(df_scan_cat3_l$ref_index_pres_fever))
 
-pa_scan_fb2 <- binom.exact(x = scan_fb2[1,1], n = sum(scan_fb2[1,1], scan_fb2[2,1])) # Intentionally updated to reflect issues with underlying 2x2
-pa_scan_fb3 <- binom.exact(x = sum(scan_fb3[1,1], scan_fb3[2,2]), n = scan_fb3[3,3])
+pa_scan_fb3 <- binom.exact(x = sum(df_scan_cat3fb_l$ref_index_agree_fb35mo, na.rm=T), n = sum(df_scan_cat3_l$ref_index_pres_fb35mo))
+pa_scan_fb4 <- binom.exact(x = sum(df_scan_cat4fb_l$ref_index_agree_fb59mo, na.rm=T), n = sum(df_scan_cat4_l$ref_index_pres_fb59mo))
 
-pa_scan_tachy2 <- binom.exact(x = sum(scan_tachy2[1,1], scan_tachy2[2,2]), n = scan_tachy2[3,3])
+pa_scan_tachy3 <- binom.exact(x = sum(df_scan_cat3_l$ref_index_agree_tachy59mo, na.rm=T), n = sum(df_scan_cat3_l$ref_index_pres_tachy59mo))
 
 ## M1-3
 ### Hypoxia
-pa_scan_hypoxia3_m1 <- binom.exact(x = scan_hypoxia3_m1[1,1], n = sum(scan_hypoxia3_m1[1,1], scan_hypoxia3_m1[2,1])) # Intentionally updated to reflect issues with underlying 2x2
-pa_scan_hypoxia3_m2 <- binom.exact(x = scan_hypoxia3_m2[1,1], n = sum(scan_hypoxia3_m2[1,1], scan_hypoxia3_m2[2,1])) # Intentionally updated to reflect issues with underlying 2x2
-pa_scan_hypoxia3_m3 <- binom.exact(x = scan_hypoxia3_m3[1,1], n = sum(scan_hypoxia3_m3[1,1], scan_hypoxia3_m3[2,1])) # Intentionally updated to reflect issues with underlying 2x2
+pa_scan_hypoxia3_m1 <- binom.exact(x = sum(df_scan_cat3_w$m1_ref_index_agree_hypoxic, na.rm=T), n = sum(df_scan_cat3_w$m1_ref_index_pres_hypoxic))
+pa_scan_hypoxia3_m2 <- binom.exact(x = sum(df_scan_cat3_w$m2_ref_index_agree_hypoxic, na.rm=T), n = sum(df_scan_cat3_w$m2_ref_index_pres_hypoxic))
+pa_scan_hypoxia3_m3 <- binom.exact(x = sum(df_scan_cat3_w$m3_ref_index_agree_hypoxic, na.rm=T), n = sum(df_scan_cat3_w$m3_ref_index_pres_hypoxic))
 
 ### Fever
 
