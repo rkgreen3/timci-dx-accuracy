@@ -113,7 +113,7 @@ mdf_reshaped$grp <- toupper(substr(mdf_reshaped$variable, start = 1, stop = 2)) 
 mdf_reshaped$mes <- substr(mdf_reshaped$variable, start = 4, stop = nchar(as.character(mdf_reshaped$variable))) # Extract index/ref and measurement type into variable
 mdf_reshaped <- mdf_reshaped %>% select(-c(variable))
 mdf_reshaped$mes <- ifelse(mdf_reshaped$mes=="therm_skin_temp", "ref_temp", mdf_reshaped$mes)
-## Subset into index measurments only, further subset into each measurement type so value can be renamed accordingly
+## Subset into index measurements only, further subset into each measurement type so value can be renamed accordingly
 mdf_reshaped_i <- subset(mdf_reshaped, grepl("index", mdf_reshaped$mes))
 mdf_reshaped_i_temp <- subset(mdf_reshaped_i, grepl("temp", mdf_reshaped_i$mes)) # Temp
 names(mdf_reshaped_i_temp)[5] <- paste(mdf_reshaped_i_temp$mes)
@@ -1406,8 +1406,8 @@ Samwel
 # store calculations in object to call in subsequent sections and display in table
 # the total number of trials and the number of successes must be calculated dynamically to allow for varying data inputs
 # to do this, two new variables have been created in the original wide and long df's (prior to subsetting) that we can call from each device df
-# the ref_index_pres_ variable = 1 when both the index and reference measurements are not null, this is the total number of trials passed to the "x" argument
-# the ref_index_agree_ variable = 1 when the binary indicators for the clinical condition agree, this is the total number of successes passed to the "n" argument
+# the ref_index_pres_ variable = 1 when both the index and reference measurements are not null, this is the total number of trials passed to the "n" argument
+# the ref_index_agree_ variable = 1 when the binary indicators for the clinical condition agree, this is the total number of successes passed to the "x" argument
 
 # Rad-G
 ## Overall
@@ -1519,7 +1519,7 @@ pa_bio_hypoxia3_m3 <- binom.exact(x = sum(df_bio_cat3_w$m3_ref_index_agree_hypox
 ### Fast breathing
 pa_bio_fb1_m1 <- binom.exact(x = sum(df_bio_cat1fb_w$m1_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat1fb_w$m1_ref_index_pres_fb12mo))
 pa_bio_fb1_m2 <- binom.exact(x = sum(df_bio_cat1fb_w$m2_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat1fb_w$m2_ref_index_pres_fb12mo))
-#pa_bio_fb1_m3 <- binom.exact(x = sum(df_bio_cat1_w$m3_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat1fb_w$m3_ref_index_pres_fb12mo)) ///==> This requires checking the nuber of success greater than number of trials
+pa_bio_fb1_m3 <- binom.exact(x = sum(df_bio_cat1fb_w$m3_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat1fb_w$m3_ref_index_pres_fb12mo))
 
 pa_bio_fb2_m1 <- binom.exact(x = sum(df_bio_cat2fb_w$m1_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat2fb_w$m1_ref_index_pres_fb12mo))
 pa_bio_fb2_m2 <- binom.exact(x = sum(df_bio_cat2fb_w$m2_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat2fb_w$m2_ref_index_pres_fb12mo))
@@ -1868,7 +1868,7 @@ out_fb <- data.frame(col1 = c("", "", "Rad-G", "Biolight", "Neopenda", "Onyx", "
                              NA),
                     
                     col5 = c("0-1 month", "M3", paste(round(pa_radg_fb1_m3$estimate, 2), " (", round(pa_radg_fb1_m3$conf.int[1], 2)," - ", round(pa_radg_fb1_m3$conf.int[2], 2),")", sep = ""),
-                             #paste(round(pa_bio_fb1_m3$estimate, 2), " (", round(pa_bio_fb1_m3$conf.int[1], 2)," - ", round(pa_bio_fb1_m3$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_fb1_m3$estimate, 2), " (", round(pa_bio_fb1_m3$conf.int[1], 2)," - ", round(pa_bio_fb1_m3$conf.int[2], 2),")", sep = ""),
                              NA,
                              paste(round(pa_neo_fb1_m3$estimate, 2), " (", round(pa_neo_fb1_m3$conf.int[1], 2)," - ", round(pa_neo_fb1_m3$conf.int[2], 2),")", sep = ""),
                              NA,
