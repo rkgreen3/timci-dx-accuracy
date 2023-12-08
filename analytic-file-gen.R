@@ -1,4 +1,4 @@
-# Version date: 2023-11-17
+# Version date: 2023-12-8
 
 # Load packages
 library(plyr)
@@ -13,13 +13,23 @@ df <- subset(df_og, redcap_data_access_group!="") #remove if DAG missing, N=2
 df <- subset(df, is.na(df$exclude_data_rsn)) #remove duplicates and requested withdrawals, N = 6 and 5, respectively
 df <- df %>% select(-c("jan_date", "date_diff", "bdate_diff", "age_cat_calc", "m1_ref_rrpleth", "m2_ref_rrpleth", "m3_ref_rrpleth")) #remove unnecessary fields
 
-# Add device names for codes
+# Add device names and cg relationships for codes
 df$index_device_name <- case_when(df$index_device_name==1 ~ "Rad-G Temp (Masimo)",
                                   df$index_device_name==2 ~ "m800 (Biolight)",
                                   df$index_device_name==3 ~ "Scanbo v8 (Scanbo)",
                                   df$index_device_name==4 ~ "Onyx PO+RR (Nonin)",
                                   df$index_device_name==5 ~ "NeoGuard (Neopenda)",
                                   df$index_device_name==6 ~ "Android device")
+df$cg_relationship <- case_when(df$cg_relationship==1 ~ "Mother and father",
+                                df$cg_relationship==2 ~ "Mother and grandmother",
+                                df$cg_relationship==3 ~ "Mother only",
+                                df$cg_relationship==4 ~ "Father only",
+                                df$cg_relationship==5 ~ "Grandmother only",
+                                df$cg_relationship==6 ~ "Grandfather only",
+                                df$cg_relationship==7 ~ "Sibling",
+                                df$cg_relationship==8 ~ "Other family member",
+                                df$cg_relationship==9 ~ "Community member",
+                                df$cg_relationship==10 ~ "Other")
 
 # Rename key checkbox variables
 colnames(df)[colnames(df) == "visit_reason___1"] = "visit_rsn_illness"
@@ -112,7 +122,7 @@ df$country <- case_when(df$facility_name=="TZN01"|df$facility_name=="TZN02" ~ "T
                         df$facility_name=="IND01"|df$facility_name=="IND02" ~ "India",
                         df$facility_name=="KYA01"|df$facility_name=="KYA02" ~ "Kenya")
 
-# Recalculate age -- NEED TO CONFIRM METHOD W/HELEN
+# Recalculate age
 df$bdate <- paste(df$birth_year, df$birth_month, "15", sep = "-")
 df$bdate <- as.Date(df$bdate)
 df$visit_date <- as.Date(df$visit_date)
@@ -123,8 +133,16 @@ df$age_cat2 <- case_when(df$month_diff<2 ~ "0-1 month",
 df$age_cat <- df$age_cat2
 df$age_months <- round(df$month_diff, 0)
 
+# Convert Rad-G Temp from F to C
+df$m1_index_temp_f <- ifelse(df$index_device_name=="Rad-G Temp (Masimo)", df$m1_index_temp, NA)
+df$m1_index_temp <- ifelse(df$index_device_name=="Rad-G Temp (Masimo)", ((df$m1_index_temp_f-32) * (5/9)), df$m1_index_temp)
+df$m2_index_temp_f <- ifelse(df$index_device_name=="Rad-G Temp (Masimo)", df$m2_index_temp, NA)
+df$m2_index_temp <- ifelse(df$index_device_name=="Rad-G Temp (Masimo)", ((df$m2_index_temp_f-32) * (5/9)), df$m2_index_temp)
+df$m3_index_temp_f <- ifelse(df$index_device_name=="Rad-G Temp (Masimo)", df$m3_index_temp, NA)
+df$m3_index_temp <- ifelse(df$index_device_name=="Rad-G Temp (Masimo)", ((df$m3_index_temp_f-32) * (5/9)), df$m3_index_temp)
+
 # Remove unnecessary variables
 df <- df %>% select(-c(bdate, age_cat2, month_diff, m1_30s_pic, m1_90s_pic, m2_30s_pic, m2_90s_pic, m3_30s_pic, m3_90s_pic, cg_interview_yn, cg_sex, cg_edu_mother, cg_edu_mother_oth, cg_overall_comfort, cg_like_most, cg_like_least, cg_prov_challenges_yn, cg_prov_challenges, cg_overall_satisfied, cg_confident_use, cg_confident_performance, cg_adequate_assess_yn,  cg_adequate_assess_rsn, cg_advantage, cg_concerns, cg_compare_assess, cg_compare_assess_rsn, cg_useful, cg_useful_rsn, cg_rec_device, cg_rec_device_rsn, cg_rec_facility, cg_rec_facility_rsn,  cg_major_considerations, cg_provider_use_yn, cg_provider_use, cg_overall_impression, cg_advantages, cg_disadvantages, cg_understand_purpose, cg_discomfort, cg_discomfort_des, cg_recommend,  cg_change_desire, cg_oth_comments, caregiver_interview_complete))
 
 # Write file as .csv to shared Box folder
-write.csv(df, "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2023-11-17.csv")
+write.csv(df, "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2023-12-08.csv")
