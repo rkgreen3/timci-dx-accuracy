@@ -1485,7 +1485,7 @@ pa_radg_tachy3_m1 <- binom.exact(x = sum(df_radg_cat3_w$m1_ref_index_agree_tachy
 pa_radg_tachy3_m2 <- binom.exact(x = sum(df_radg_cat3_w$m2_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_radg_cat3_w$m2_ref_index_pres_tachy59mo))
 pa_radg_tachy3_m3 <- binom.exact(x = sum(df_radg_cat3_w$m3_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_radg_cat3_w$m3_ref_index_pres_tachy59mo))
 
-# Biolight
+#=========================== BIOLIGHT ==========================================
 ## Overall
 pa_bio_hypoxia1 <- binom.exact(x = sum(df_bio_cat1_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_bio_cat1_l$ref_index_pres_hypoxic))
 pa_bio_hypoxia2 <- binom.exact(x = sum(df_bio_cat2_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_bio_cat2_l$ref_index_pres_hypoxic))
@@ -1517,10 +1517,36 @@ pa_bio_hypoxia3_m3 <- binom.exact(x = sum(df_bio_cat3_w$m3_ref_index_agree_hypox
 ### Fever -- N/A, no temp measurement
 
 ### Fast breathing
+pa_bio_fb1_m1 <- binom.exact(x = sum(df_bio_cat1fb_w$m1_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat1fb_w$m1_ref_index_pres_fb12mo))
+pa_bio_fb1_m2 <- binom.exact(x = sum(df_bio_cat1fb_w$m2_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat1fb_w$m2_ref_index_pres_fb12mo))
+#pa_bio_fb1_m3 <- binom.exact(x = sum(df_bio_cat1_w$m3_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat1fb_w$m3_ref_index_pres_fb12mo)) ///==> This requires checking the nuber of success greater than number of trials
+
+pa_bio_fb2_m1 <- binom.exact(x = sum(df_bio_cat2fb_w$m1_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat2fb_w$m1_ref_index_pres_fb12mo))
+pa_bio_fb2_m2 <- binom.exact(x = sum(df_bio_cat2fb_w$m2_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat2fb_w$m2_ref_index_pres_fb12mo))
+pa_bio_fb2_m3 <- binom.exact(x = sum(df_bio_cat2fb_w$m3_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat2fb_w$m3_ref_index_pres_fb12mo))
+
+pa_bio_fb3_m1 <- binom.exact(x = sum(df_bio_cat3fb_w$m1_ref_index_agree_fb35mo, na.rm=T), n = sum(df_bio_cat3fb_w$m1_ref_index_pres_fb35mo))
+pa_bio_fb3_m2 <- binom.exact(x = sum(df_bio_cat3fb_w$m2_ref_index_agree_fb35mo, na.rm=T), n = sum(df_bio_cat3fb_w$m2_ref_index_pres_fb35mo))
+pa_bio_fb3_m3 <- binom.exact(x = sum(df_bio_cat3fb_w$m3_ref_index_agree_fb35mo, na.rm=T), n = sum(df_bio_cat3fb_w$m3_ref_index_pres_fb35mo))
+
+pa_bio_fb4_m1 <- binom.exact(x = sum(df_bio_cat4fb_w$m1_ref_index_agree_fb59mo, na.rm=T), n = sum(df_bio_cat4fb_w$m1_ref_index_pres_fb59mo))
+pa_bio_fb4_m2 <- binom.exact(x = sum(df_bio_cat4fb_w$m2_ref_index_agree_fb59mo, na.rm=T), n = sum(df_bio_cat4fb_w$m2_ref_index_pres_fb59mo))
+pa_bio_fb4_m3 <- binom.exact(x = sum(df_bio_cat4fb_w$m3_ref_index_agree_fb59mo, na.rm=T), n = sum(df_bio_cat4fb_w$m3_ref_index_pres_fb59mo))
 
 ### Tachycardia
+pa_bio_tachy1_m1 <- binom.exact(x = sum(df_bio_cat1_w$m1_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_bio_cat1_w$m1_ref_index_pres_tachy12mo))
+pa_bio_tachy1_m2 <- binom.exact(x = sum(df_bio_cat1_w$m2_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_bio_cat1_w$m2_ref_index_pres_tachy12mo))
+pa_bio_tachy1_m3 <- binom.exact(x = sum(df_bio_cat1_w$m3_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_bio_cat1_w$m3_ref_index_pres_tachy12mo))
 
-# Neopenda
+pa_bio_tachy2_m1 <- binom.exact(x = sum(df_bio_cat2_w$m1_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_bio_cat2_w$m1_ref_index_pres_tachy12mo))
+pa_bio_tachy2_m2 <- binom.exact(x = sum(df_bio_cat2_w$m2_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_bio_cat2_w$m2_ref_index_pres_tachy12mo))
+pa_bio_tachy2_m3 <- binom.exact(x = sum(df_bio_cat2_w$m3_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_bio_cat2_w$m3_ref_index_pres_tachy12mo))
+
+pa_bio_tachy3_m1 <- binom.exact(x = sum(df_bio_cat3_w$m1_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_bio_cat3_w$m1_ref_index_pres_tachy59mo))
+pa_bio_tachy3_m2 <- binom.exact(x = sum(df_bio_cat3_w$m2_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_bio_cat3_w$m2_ref_index_pres_tachy59mo))
+pa_bio_tachy3_m3 <- binom.exact(x = sum(df_bio_cat3_w$m3_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_bio_cat3_w$m3_ref_index_pres_tachy59mo))
+
+#================================= NEOPENDA ====================================
 ## Overall
 pa_neo_hypoxia1 <- binom.exact(x = sum(df_neo_cat1_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_neo_cat1_l$ref_index_pres_hypoxic))
 pa_neo_hypoxia2 <- binom.exact(x = sum(df_neo_cat2_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_neo_cat2_l$ref_index_pres_hypoxic))
@@ -1554,12 +1580,52 @@ pa_neo_hypoxia3_m2 <- binom.exact(x = sum(df_neo_cat3_w$m2_ref_index_agree_hypox
 pa_neo_hypoxia3_m3 <- binom.exact(x = sum(df_neo_cat3_w$m3_ref_index_agree_hypoxic, na.rm=T), n = sum(df_neo_cat3_w$m3_ref_index_pres_hypoxic))
 
 ### Fever
+pa_neo_fever1_m1 <- binom.exact(x = sum(df_neo_cat1_w$m1_ref_index_agree_fever, na.rm=T), n = sum(df_neo_cat1_w$m1_ref_index_pres_fever))
+pa_neo_fever1_m2 <- binom.exact(x = sum(df_neo_cat1_w$m2_ref_index_agree_fever, na.rm=T), n = sum(df_neo_cat1_w$m2_ref_index_pres_fever))
+pa_neo_fever1_m3 <- binom.exact(x = sum(df_neo_cat1_w$m3_ref_index_agree_fever, na.rm=T), n = sum(df_neo_cat1_w$m3_ref_index_pres_fever))
+
+pa_neo_fever2_m1 <- binom.exact(x = sum(df_neo_cat2_w$m1_ref_index_agree_fever, na.rm=T), n = sum(df_neo_cat2_w$m1_ref_index_pres_fever))
+pa_neo_fever2_m2 <- binom.exact(x = sum(df_neo_cat2_w$m2_ref_index_agree_fever, na.rm=T), n = sum(df_neo_cat2_w$m2_ref_index_pres_fever))
+pa_neo_fever2_m3 <- binom.exact(x = sum(df_neo_cat2_w$m3_ref_index_agree_fever, na.rm=T), n = sum(df_neo_cat2_w$m3_ref_index_pres_fever))
+
+pa_neo_fever3_m1 <- binom.exact(x = sum(df_neo_cat3_w$m1_ref_index_agree_fever, na.rm=T), n = sum(df_neo_cat3_w$m1_ref_index_pres_fever))
+pa_neo_fever3_m2 <- binom.exact(x = sum(df_neo_cat3_w$m2_ref_index_agree_fever, na.rm=T), n = sum(df_neo_cat3_w$m2_ref_index_pres_fever))
+pa_neo_fever3_m3 <- binom.exact(x = sum(df_neo_cat3_w$m3_ref_index_agree_fever, na.rm=T), n = sum(df_neo_cat3_w$m3_ref_index_pres_fever))
 
 ### Fast breathing
+pa_neo_fb1_m1 <- binom.exact(x = sum(df_neo_cat1fb_w$m1_ref_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat1fb_w$m1_ref_index_pres_fb12mo))
+pa_neo_fb1_m2 <- binom.exact(x = sum(df_neo_cat1fb_w$m2_ref_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat1fb_w$m2_ref_index_pres_fb12mo))
+pa_neo_fb1_m3 <- binom.exact(x = sum(df_neo_cat1_w$m3_ref_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat1fb_w$m3_ref_index_pres_fb12mo))
+
+pa_neo_fb2_m1 <- binom.exact(x = sum(df_neo_cat2fb_w$m1_ref_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat2fb_w$m1_ref_index_pres_fb12mo))
+pa_neo_fb2_m2 <- binom.exact(x = sum(df_neo_cat2fb_w$m2_ref_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat2fb_w$m2_ref_index_pres_fb12mo))
+pa_neo_fb2_m3 <- binom.exact(x = sum(df_neo_cat2fb_w$m3_ref_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat2fb_w$m3_ref_index_pres_fb12mo))
+
+pa_neo_fb3_m1 <- binom.exact(x = sum(df_neo_cat3fb_w$m1_ref_index_agree_fb35mo, na.rm=T), n = sum(df_neo_cat3fb_w$m1_ref_index_pres_fb35mo))
+pa_neo_fb3_m2 <- binom.exact(x = sum(df_neo_cat3fb_w$m2_ref_index_agree_fb35mo, na.rm=T), n = sum(df_neo_cat3fb_w$m2_ref_index_pres_fb35mo))
+pa_neo_fb3_m3 <- binom.exact(x = sum(df_neo_cat3fb_w$m3_ref_index_agree_fb35mo, na.rm=T), n = sum(df_neo_cat3fb_w$m3_ref_index_pres_fb35mo))
+
+pa_neo_fb4_m1 <- binom.exact(x = sum(df_neo_cat4fb_w$m1_ref_index_agree_fb59mo, na.rm=T), n = sum(df_neo_cat4fb_w$m1_ref_index_pres_fb59mo))
+pa_neo_fb4_m2 <- binom.exact(x = sum(df_neo_cat4fb_w$m2_ref_index_agree_fb59mo, na.rm=T), n = sum(df_neo_cat4fb_w$m2_ref_index_pres_fb59mo))
+pa_neo_fb4_m3 <- binom.exact(x = sum(df_neo_cat4fb_w$m3_ref_index_agree_fb59mo, na.rm=T), n = sum(df_neo_cat4fb_w$m3_ref_index_pres_fb59mo))
+
 
 ### Tachycardia
+pa_neo_tachy1_m1 <- binom.exact(x = sum(df_neo_cat1_w$m1_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_neo_cat1_w$m1_ref_index_pres_tachy12mo))
+pa_neo_tachy1_m2 <- binom.exact(x = sum(df_neo_cat1_w$m2_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_neo_cat1_w$m2_ref_index_pres_tachy12mo))
+pa_neo_tachy1_m3 <- binom.exact(x = sum(df_neo_cat1_w$m3_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_neo_cat1_w$m3_ref_index_pres_tachy12mo))
 
-# Onyx
+pa_neo_tachy2_m1 <- binom.exact(x = sum(df_neo_cat2_w$m1_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_neo_cat2_w$m1_ref_index_pres_tachy12mo))
+pa_neo_tachy2_m2 <- binom.exact(x = sum(df_neo_cat2_w$m2_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_neo_cat2_w$m2_ref_index_pres_tachy12mo))
+pa_neo_tachy2_m3 <- binom.exact(x = sum(df_neo_cat2_w$m3_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_neo_cat2_w$m3_ref_index_pres_tachy12mo))
+
+pa_neo_tachy3_m1 <- binom.exact(x = sum(df_neo_cat3_w$m1_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_neo_cat3_w$m1_ref_index_pres_tachy59mo))
+pa_neo_tachy3_m2 <- binom.exact(x = sum(df_neo_cat3_w$m2_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_neo_cat3_w$m2_ref_index_pres_tachy59mo))
+pa_neo_tachy3_m3 <- binom.exact(x = sum(df_neo_cat3_w$m3_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_neo_cat3_w$m3_ref_index_pres_tachy59mo))
+
+
+
+#===================================== Onyx ====================================
 ## Overall
 pa_onyx_hypoxia3 <- binom.exact(x = sum(df_onyx_cat3_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_onyx_cat3_l$ref_index_pres_hypoxic))
 
@@ -1577,10 +1643,21 @@ pa_onyx_hypoxia3_m3 <- binom.exact(x = sum(df_onyx_cat3_w$m3_ref_index_agree_hyp
 ### Fever -- N/A, no temp measurement
 
 ### Fast breathing
+pa_onyx_fb3_m1 <- binom.exact(x = sum(df_onyx_cat3fb_w$m1_ref_index_agree_fb35mo, na.rm=T), n = sum(df_onyx_cat3fb_w$m1_ref_index_pres_fb35mo))
+pa_onyx_fb3_m2 <- binom.exact(x = sum(df_onyx_cat3fb_w$m2_ref_index_agree_fb35mo, na.rm=T), n = sum(df_onyx_cat3fb_w$m2_ref_index_pres_fb35mo))
+pa_onyx_fb3_m3 <- binom.exact(x = sum(df_onyx_cat3fb_w$m3_ref_index_agree_fb35mo, na.rm=T), n = sum(df_onyx_cat3fb_w$m3_ref_index_pres_fb35mo))
+
+pa_onyx_fb4_m1 <- binom.exact(x = sum(df_onyx_cat4fb_w$m1_ref_index_agree_fb59mo, na.rm=T), n = sum(df_onyx_cat4fb_w$m1_ref_index_pres_fb59mo))
+pa_onyx_fb4_m2 <- binom.exact(x = sum(df_onyx_cat4fb_w$m2_ref_index_agree_fb59mo, na.rm=T), n = sum(df_onyx_cat4fb_w$m2_ref_index_pres_fb59mo))
+pa_onyx_fb4_m3 <- binom.exact(x = sum(df_onyx_cat4fb_w$m3_ref_index_agree_fb59mo, na.rm=T), n = sum(df_onyx_cat4fb_w$m3_ref_index_pres_fb59mo))
 
 ### Tachycardia
+pa_onyx_tachy3_m1 <- binom.exact(x = sum(df_onyx_cat3_w$m1_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_onyx_cat3_w$m1_ref_index_pres_tachy59mo))
+pa_onyx_tachy3_m2 <- binom.exact(x = sum(df_onyx_cat3_w$m2_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_onyx_cat3_w$m2_ref_index_pres_tachy59mo))
+pa_onyx_tachy3_m3 <- binom.exact(x = sum(df_onyx_cat3_w$m3_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_onyx_cat3_w$m3_ref_index_pres_tachy59mo))
 
-# Scanbo
+
+#====================================== SCANBO =================================
 ## Overall
 pa_scan_hypoxia3 <- binom.exact(x = sum(df_scan_cat3_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_scan_cat3_l$ref_index_pres_hypoxic))
 
@@ -1598,10 +1675,23 @@ pa_scan_hypoxia3_m2 <- binom.exact(x = sum(df_scan_cat3_w$m2_ref_index_agree_hyp
 pa_scan_hypoxia3_m3 <- binom.exact(x = sum(df_scan_cat3_w$m3_ref_index_agree_hypoxic, na.rm=T), n = sum(df_scan_cat3_w$m3_ref_index_pres_hypoxic))
 
 ### Fever
+pa_scan_fever3_m1 <- binom.exact(x = sum(df_scan_cat3_w$m1_ref_index_agree_fever, na.rm=T), n = sum(df_scan_cat3_w$m1_ref_index_pres_fever))
+pa_scan_fever3_m2 <- binom.exact(x = sum(df_scan_cat3_w$m2_ref_index_agree_fever, na.rm=T), n = sum(df_scan_cat3_w$m2_ref_index_pres_fever))
+pa_scan_fever3_m3 <- binom.exact(x = sum(df_scan_cat3_w$m3_ref_index_agree_fever, na.rm=T), n = sum(df_scan_cat3_w$m3_ref_index_pres_fever))
 
 ### Fast breathing
+pa_scan_fb3_m1 <- binom.exact(x = sum(df_scan_cat3fb_w$m1_ref_index_agree_fb35mo, na.rm=T), n = sum(df_scan_cat3fb_w$m1_ref_index_pres_fb35mo))
+pa_scan_fb3_m2 <- binom.exact(x = sum(df_scan_cat3fb_w$m2_ref_index_agree_fb35mo, na.rm=T), n = sum(df_scan_cat3fb_w$m2_ref_index_pres_fb35mo))
+pa_scan_fb3_m3 <- binom.exact(x = sum(df_scan_cat3fb_w$m3_ref_index_agree_fb35mo, na.rm=T), n = sum(df_scan_cat3fb_w$m3_ref_index_pres_fb35mo))
+
+pa_scan_fb4_m1 <- binom.exact(x = sum(df_scan_cat4fb_w$m1_ref_index_agree_fb59mo, na.rm=T), n = sum(df_scan_cat4fb_w$m1_ref_index_pres_fb59mo))
+pa_scan_fb4_m2 <- binom.exact(x = sum(df_scan_cat4fb_w$m2_ref_index_agree_fb59mo, na.rm=T), n = sum(df_scan_cat4fb_w$m2_ref_index_pres_fb59mo))
+pa_scan_fb4_m3 <- binom.exact(x = sum(df_scan_cat4fb_w$m3_ref_index_agree_fb59mo, na.rm=T), n = sum(df_scan_cat4fb_w$m3_ref_index_pres_fb59mo))
 
 ### Tachycardia
+pa_scan_tachy3_m1 <- binom.exact(x = sum(df_scan_cat3_w$m1_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_scan_cat3_w$m1_ref_index_pres_tachy59mo))
+pa_scan_tachy3_m2 <- binom.exact(x = sum(df_scan_cat3_w$m2_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_scan_cat3_w$m2_ref_index_pres_tachy59mo))
+pa_scan_tachy3_m3 <- binom.exact(x = sum(df_scan_cat3_w$m3_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_scan_cat3_w$m3_ref_index_pres_tachy59mo))
 ```
 
 ## Hypoxia
@@ -1693,7 +1783,243 @@ hypoxia_pa <- kable(out_hypoxia, col.names = c("Device","Overall", "M1", "M2", "
 `r hypoxia_pa`
 
 ## Fever
+```{r}
+# create df with all device/age group/measurements
+out_fever <- data.frame(col1 = c("", "", "Rad-G",  "Neopenda",  "Scanbo"),
+                    col2 = c("0-1 month", "Overall", paste(round(pa_radg_fever1$estimate, 2), " (", round(pa_radg_fever1$conf.int[1], 2)," - ", round(pa_radg_fever1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fever1$estimate, 2), " (", round(pa_neo_fever1$conf.int[1], 2)," - ", round(pa_neo_fever1$conf.int[2], 2),")", sep = ""),
+                             NA),
+                    
+                    col3 = c("0-1 month", "M1", paste(round(pa_radg_fever1_m1$estimate, 2), " (", round(pa_radg_fever1_m1$conf.int[1], 2)," - ", round(pa_radg_fever1_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fever1_m1$estimate, 2), " (", round(pa_neo_fever1_m1$conf.int[1], 2)," - ", round(pa_neo_fever1_m1$conf.int[2], 2),")", sep = ""),
+                             NA),
+                    
+                    col4 = c("0-1 month", "M2", paste(round(pa_radg_fever1_m2$estimate, 2), " (", round(pa_radg_fever1_m2$conf.int[1], 2)," - ", round(pa_radg_fever1_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fever1_m2$estimate, 2), " (", round(pa_neo_fever1_m2$conf.int[1], 2)," - ", round(pa_neo_fever1_m2$conf.int[2], 2),")", sep = ""),
+                             NA),
+                    
+                    col5 = c("0-1 month", "M3", paste(round(pa_radg_fever1_m3$estimate, 2), " (", round(pa_radg_fever1_m3$conf.int[1], 2)," - ", round(pa_radg_fever1_m3$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fever1_m3$estimate, 2), " (", round(pa_neo_fever1_m3$conf.int[1], 2)," - ", round(pa_neo_fever1_m3$conf.int[2], 2),")", sep = ""),
+                             NA),
+                    
+                    col6 = c("2-11 months", "Overall", paste(round(pa_radg_fever2$estimate, 2), " (", round(pa_radg_fever2$conf.int[1], 2)," - ", round(pa_radg_fever2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fever2$estimate, 2), " (", round(pa_neo_fever2$conf.int[1], 2)," - ", round(pa_neo_fever2$conf.int[2], 2),")", sep = ""),
+                             NA),
+                    
+                    col7 = c("2-11 months", "M1", paste(round(pa_radg_fever2_m1$estimate, 2), " (", round(pa_radg_fever2_m1$conf.int[1], 2)," - ", round(pa_radg_fever2_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fever2_m1$estimate, 2), " (", round(pa_neo_fever2_m1$conf.int[1], 2)," - ", round(pa_neo_fever2_m1$conf.int[2], 2),")", sep = ""),
+                             NA),
+                    
+                    col8 = c("2-11 months", "M2", paste(round(pa_radg_fever2_m2$estimate, 2), " (", round(pa_radg_fever2_m2$conf.int[1], 2)," - ", round(pa_radg_fever2_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fever2_m2$estimate, 2), " (", round(pa_neo_fever2_m2$conf.int[1], 2)," - ", round(pa_neo_fever2_m2$conf.int[2], 2),")", sep = ""),
+                             NA),
+                    
+                    col9 = c("2-11 months", "M3", paste(round(pa_radg_fever2_m3$estimate, 2), " (", round(pa_radg_fever2_m3$conf.int[1], 2)," - ", round(pa_radg_fever2_m3$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fever2_m3$estimate, 2), " (", round(pa_neo_fever2_m3$conf.int[1], 2)," - ", round(pa_neo_fever2_m3$conf.int[2], 2),")", sep = ""),
+                             NA),
+                    
+                    col10 = c("12-59 months", "Overall", paste(round(pa_radg_fever3$estimate, 2), " (", round(pa_radg_fever3$conf.int[1], 2)," - ", round(pa_radg_fever3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_fever3$estimate, 2), " (", round(pa_neo_fever3$conf.int[1], 2)," - ", round(pa_neo_fever3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_fever3$estimate, 2), " (", round(pa_scan_fever3$conf.int[1], 2)," - ", round(pa_scan_fever3$conf.int[2], 2),")", sep = "")),
+                    
+                    col11 = c("12-59 months", "M1", paste(round(pa_radg_fever3_m1$estimate, 2), " (", round(pa_radg_fever3_m1$conf.int[1], 2)," - ", round(pa_radg_fever3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_fever3_m1$estimate, 2), " (", round(pa_neo_fever3_m1$conf.int[1], 2)," - ", round(pa_neo_fever3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_fever3_m1$estimate, 2), " (", round(pa_scan_fever3_m1$conf.int[1], 2)," - ", round(pa_scan_fever3_m1$conf.int[2], 2),")", sep = "")),
+                    
+                    col12 = c("12-59 months", "M2", paste(round(pa_radg_fever3_m2$estimate, 2), " (", round(pa_radg_fever3_m2$conf.int[1], 2)," - ", round(pa_radg_fever3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_fever3_m2$estimate, 2), " (", round(pa_neo_fever3_m2$conf.int[1], 2)," - ", round(pa_neo_fever3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_fever3_m2$estimate, 2), " (", round(pa_scan_fever3_m2$conf.int[1], 2)," - ", round(pa_scan_fever3_m2$conf.int[2], 2),")", sep = "")),
+                    
+                    col13 = c("12-59 months", "M3", paste(round(pa_radg_fever3_m3$estimate, 2), " (", round(pa_radg_fever3_m3$conf.int[1], 2)," - ", round(pa_radg_fever3_m3$conf.int[2], 2),")", sep = " "),
+                              paste(round(pa_neo_fever3_m3$estimate, 2), " (", round(pa_neo_fever3_m3$conf.int[1], 2)," - ", round(pa_neo_fever3_m3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_fever3_m3$estimate, 2), " (", round(pa_scan_fever3_m3$conf.int[1], 2)," - ", round(pa_scan_fever3_m3$conf.int[2], 2),")", sep = ""))
+                    )
+out_fever <- out_fever[out_fever[1]!="",] # remove first two rows of labels since labels will be added in kable
+rownames(out_fever) <- NULL # make row names null so numbers don't print in table
+# Create nicely labelled kable object
+fever_pa <- kable(out_fever, col.names = c("Device","Overall", "M1", "M2", "M3","Overall", "M1", "M2", "M3","Overall", "M1", "M2", "M3")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = T) %>%
+  add_header_above(c("", "0-1 month" = 4, "2-11 months" = 4, "12-59 months" = 4)) %>%
+  column_spec(2, italic = T, border_left = T) %>%
+  column_spec(6, italic = T, border_left = T) %>%
+  column_spec(10, italic = T, border_left = T)
+```
+`r fever_pa`
 
 ## Fast Breathing
+```{r}
+out_fb <- data.frame(col1 = c("", "", "Rad-G", "Biolight", "Neopenda", "Onyx", "Scanbo"),
+                    col2 = c("0-1 month", "Overall", paste(round(pa_radg_fb1$estimate, 2), " (", round(pa_radg_fb1$conf.int[1], 2)," - ", round(pa_radg_fb1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_fb1$estimate, 2), " (", round(pa_bio_fb1$conf.int[1], 2)," - ", round(pa_bio_fb1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fb1$estimate, 2), " (", round(pa_neo_fb1$conf.int[1], 2)," - ", round(pa_neo_fb1$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col3 = c("0-1 month", "M1", paste(round(pa_radg_fb1_m1$estimate, 2), " (", round(pa_radg_fb1_m1$conf.int[1], 2)," - ", round(pa_radg_fb1_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_fb1_m1$estimate, 2), " (", round(pa_bio_fb1_m1$conf.int[1], 2)," - ", round(pa_bio_fb1_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fb1_m1$estimate, 2), " (", round(pa_neo_fb1_m1$conf.int[1], 2)," - ", round(pa_neo_fb1_m1$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col4 = c("0-1 month", "M2", paste(round(pa_radg_fb1_m2$estimate, 2), " (", round(pa_radg_fb1_m2$conf.int[1], 2)," - ", round(pa_radg_fb1_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_fb1_m2$estimate, 2), " (", round(pa_bio_fb1_m2$conf.int[1], 2)," - ", round(pa_bio_fb1_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fb1_m2$estimate, 2), " (", round(pa_neo_fb1_m2$conf.int[1], 2)," - ", round(pa_neo_fb1_m2$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col5 = c("0-1 month", "M3", paste(round(pa_radg_fb1_m3$estimate, 2), " (", round(pa_radg_fb1_m3$conf.int[1], 2)," - ", round(pa_radg_fb1_m3$conf.int[2], 2),")", sep = ""),
+                             #paste(round(pa_bio_fb1_m3$estimate, 2), " (", round(pa_bio_fb1_m3$conf.int[1], 2)," - ", round(pa_bio_fb1_m3$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             paste(round(pa_neo_fb1_m3$estimate, 2), " (", round(pa_neo_fb1_m3$conf.int[1], 2)," - ", round(pa_neo_fb1_m3$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col6 = c("2-11 months", "Overall", paste(round(pa_radg_fb2$estimate, 2), " (", round(pa_radg_fb2$conf.int[1], 2)," - ", round(pa_radg_fb2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_fb2$estimate, 2), " (", round(pa_bio_fb2$conf.int[1], 2)," - ", round(pa_bio_fb2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fb2$estimate, 2), " (", round(pa_neo_fb2$conf.int[1], 2)," - ", round(pa_neo_fb2$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col7 = c("2-11 months", "M1", paste(round(pa_radg_fb2_m1$estimate, 2), " (", round(pa_radg_fb2_m1$conf.int[1], 2)," - ", round(pa_radg_fb2_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_fb2_m1$estimate, 2), " (", round(pa_bio_fb2_m1$conf.int[1], 2)," - ", round(pa_bio_fb2_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fb2_m1$estimate, 2), " (", round(pa_neo_fb2_m1$conf.int[1], 2)," - ", round(pa_neo_fb2_m1$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col8 = c("2-11 months", "M2", paste(round(pa_radg_fb2_m2$estimate, 2), " (", round(pa_radg_fb2_m2$conf.int[1], 2)," - ", round(pa_radg_fb2_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_fb2_m2$estimate, 2), " (", round(pa_bio_fb2_m2$conf.int[1], 2)," - ", round(pa_bio_fb2_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fb2_m2$estimate, 2), " (", round(pa_neo_fb2_m2$conf.int[1], 2)," - ", round(pa_neo_fb2_m2$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col9 = c("2-11 months", "M3", paste(round(pa_radg_fb2_m3$estimate, 2), " (", round(pa_radg_fb2_m3$conf.int[1], 2)," - ", round(pa_radg_fb2_m3$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_fb2_m3$estimate, 2), " (", round(pa_bio_fb2_m3$conf.int[1], 2)," - ", round(pa_bio_fb2_m3$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fb2_m3$estimate, 2), " (", round(pa_neo_fb2_m3$conf.int[1], 2)," - ", round(pa_neo_fb2_m3$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col10 = c("12-59 months", "Overall", paste(round(pa_radg_fb3$estimate, 2), " (", round(pa_radg_fb3$conf.int[1], 2)," - ", round(pa_radg_fb3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_bio_fb3$estimate, 2), " (", round(pa_bio_fb3$conf.int[1], 2)," - ", round(pa_bio_fb3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_fb3$estimate, 2), " (", round(pa_neo_fb3$conf.int[1], 2)," - ", round(pa_neo_fb3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_fb3$estimate, 2), " (", round(pa_onyx_fb3$conf.int[1], 2)," - ", round(pa_onyx_fb3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_fb3$estimate, 2), " (", round(pa_scan_fb3$conf.int[1], 2)," - ", round(pa_scan_fb3$conf.int[2], 2),")", sep = "")),
+                    
+                    col11 = c("12-59 months", "M1", paste(round(pa_radg_fb3_m1$estimate, 2), " (", round(pa_radg_fb3_m1$conf.int[1], 2)," - ", round(pa_radg_fb3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_bio_fb3_m1$estimate, 2), " (", round(pa_bio_fb3_m1$conf.int[1], 2)," - ", round(pa_bio_fb3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_fb3_m1$estimate, 2), " (", round(pa_neo_fb3_m1$conf.int[1], 2)," - ", round(pa_neo_fb3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_fb3_m1$estimate, 2), " (", round(pa_onyx_fb3_m1$conf.int[1], 2)," - ", round(pa_onyx_fb3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_fb3_m1$estimate, 2), " (", round(pa_scan_fb3_m1$conf.int[1], 2)," - ", round(pa_scan_fb3_m1$conf.int[2], 2),")", sep = "")),
+                    
+                    col12 = c("12-59 months", "M2", paste(round(pa_radg_fb3_m2$estimate, 2), " (", round(pa_radg_fb3_m2$conf.int[1], 2)," - ", round(pa_radg_fb3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_bio_fb3_m2$estimate, 2), " (", round(pa_bio_fb3_m2$conf.int[1], 2)," - ", round(pa_bio_fb3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_fb3_m2$estimate, 2), " (", round(pa_neo_fb3_m2$conf.int[1], 2)," - ", round(pa_neo_fb3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_fb3_m2$estimate, 2), " (", round(pa_onyx_fb3_m2$conf.int[1], 2)," - ", round(pa_onyx_fb3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_fb3_m2$estimate, 2), " (", round(pa_scan_fb3_m2$conf.int[1], 2)," - ", round(pa_scan_fb3_m2$conf.int[2], 2),")", sep = "")),
+                    
+                    col13 = c("12-59 months", "M3", paste(round(pa_radg_fb3_m3$estimate, 2), " (", round(pa_radg_fb3_m3$conf.int[1], 2)," - ", round(pa_radg_fb3_m3$conf.int[2], 2),")", sep = " "),
+                              paste(round(pa_bio_fb3_m3$estimate, 2), " (", round(pa_bio_fb3_m3$conf.int[1], 2)," - ", round(pa_bio_fb3_m3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_fb3_m3$estimate, 2), " (", round(pa_neo_fb3_m3$conf.int[1], 2)," - ", round(pa_neo_fb3_m3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_fb3_m3$estimate, 2), " (", round(pa_onyx_fb3_m3$conf.int[1], 2)," - ", round(pa_onyx_fb3_m3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_fb3_m3$estimate, 2), " (", round(pa_scan_fb3_m3$conf.int[1], 2)," - ", round(pa_scan_fb3_m3$conf.int[2], 2),")", sep = ""))
+                    )
+out_fb <- out_fb[out_fb[1]!="",] # remove first two rows of labels since labels will be added in kable
+rownames(out_fb) <- NULL # make row names null so numbers don't print in table
+# Create nicely labelled kable object
+fb_pa <- kable(out_fb, col.names = c("Device","Overall", "M1", "M2", "M3","Overall", "M1", "M2", "M3","Overall", "M1", "M2", "M3")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = T) %>%
+  add_header_above(c("", "0-11 month" = 4, "12-35 months" = 4, "36-59 months" = 4)) %>%
+  column_spec(2, italic = T, border_left = T) %>%
+  column_spec(6, italic = T, border_left = T) %>%
+  column_spec(10, italic = T, border_left = T)
+
+fb_pa
+```
+`r fb_pa`
 
 ## Tachycardia
+```{r}
+# create df with all device/age group/measurements
+out_tachy <- data.frame(col1 = c("", "", "Rad-G", "Biolight", "Neopenda", "Onyx", "Scanbo"),
+                    col2 = c("0-1 month", "Overall", paste(round(pa_radg_tachy1$estimate, 2), " (", round(pa_radg_tachy1$conf.int[1], 2)," - ", round(pa_radg_tachy1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_tachy1$estimate, 2), " (", round(pa_bio_tachy1$conf.int[1], 2)," - ", round(pa_bio_tachy1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_tachy1$estimate, 2), " (", round(pa_neo_tachy1$conf.int[1], 2)," - ", round(pa_neo_tachy1$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col3 = c("0-1 month", "M1", paste(round(pa_radg_tachy1_m1$estimate, 2), " (", round(pa_radg_tachy1_m1$conf.int[1], 2)," - ", round(pa_radg_tachy1_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_tachy1_m1$estimate, 2), " (", round(pa_bio_tachy1_m1$conf.int[1], 2)," - ", round(pa_bio_tachy1_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_tachy1_m1$estimate, 2), " (", round(pa_neo_tachy1_m1$conf.int[1], 2)," - ", round(pa_neo_tachy1_m1$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col4 = c("0-1 month", "M2", paste(round(pa_radg_tachy1_m2$estimate, 2), " (", round(pa_radg_tachy1_m2$conf.int[1], 2)," - ", round(pa_radg_tachy1_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_tachy1_m2$estimate, 2), " (", round(pa_bio_tachy1_m2$conf.int[1], 2)," - ", round(pa_bio_tachy1_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_tachy1_m2$estimate, 2), " (", round(pa_neo_tachy1_m2$conf.int[1], 2)," - ", round(pa_neo_tachy1_m2$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col5 = c("0-1 month", "M3", paste(round(pa_radg_tachy1_m3$estimate, 2), " (", round(pa_radg_tachy1_m3$conf.int[1], 2)," - ", round(pa_radg_tachy1_m3$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_tachy1_m3$estimate, 2), " (", round(pa_bio_tachy1_m3$conf.int[1], 2)," - ", round(pa_bio_tachy1_m3$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_tachy1_m3$estimate, 2), " (", round(pa_neo_tachy1_m3$conf.int[1], 2)," - ", round(pa_neo_tachy1_m3$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col6 = c("2-11 months", "Overall", paste(round(pa_radg_tachy2$estimate, 2), " (", round(pa_radg_tachy2$conf.int[1], 2)," - ", round(pa_radg_tachy2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_tachy2$estimate, 2), " (", round(pa_bio_tachy2$conf.int[1], 2)," - ", round(pa_bio_tachy2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_tachy2$estimate, 2), " (", round(pa_neo_tachy2$conf.int[1], 2)," - ", round(pa_neo_tachy2$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col7 = c("2-11 months", "M1", paste(round(pa_radg_tachy2_m1$estimate, 2), " (", round(pa_radg_tachy2_m1$conf.int[1], 2)," - ", round(pa_radg_tachy2_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_tachy2_m1$estimate, 2), " (", round(pa_bio_tachy2_m1$conf.int[1], 2)," - ", round(pa_bio_tachy2_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_tachy2_m1$estimate, 2), " (", round(pa_neo_tachy2_m1$conf.int[1], 2)," - ", round(pa_neo_tachy2_m1$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col8 = c("2-11 months", "M2", paste(round(pa_radg_tachy2_m2$estimate, 2), " (", round(pa_radg_tachy2_m2$conf.int[1], 2)," - ", round(pa_radg_tachy2_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_tachy2_m2$estimate, 2), " (", round(pa_bio_tachy2_m2$conf.int[1], 2)," - ", round(pa_bio_tachy2_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_tachy2_m2$estimate, 2), " (", round(pa_neo_tachy2_m2$conf.int[1], 2)," - ", round(pa_neo_tachy2_m2$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col9 = c("2-11 months", "M3", paste(round(pa_radg_tachy2_m3$estimate, 2), " (", round(pa_radg_tachy2_m3$conf.int[1], 2)," - ", round(pa_radg_tachy2_m3$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_tachy2_m3$estimate, 2), " (", round(pa_bio_tachy2_m3$conf.int[1], 2)," - ", round(pa_bio_tachy2_m3$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_tachy2_m3$estimate, 2), " (", round(pa_neo_tachy2_m3$conf.int[1], 2)," - ", round(pa_neo_tachy2_m3$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col10 = c("12-59 months", "Overall", paste(round(pa_radg_tachy3$estimate, 2), " (", round(pa_radg_tachy3$conf.int[1], 2)," - ", round(pa_radg_tachy3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_bio_tachy3$estimate, 2), " (", round(pa_bio_tachy3$conf.int[1], 2)," - ", round(pa_bio_tachy3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_tachy3$estimate, 2), " (", round(pa_neo_tachy3$conf.int[1], 2)," - ", round(pa_neo_tachy3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_tachy3$estimate, 2), " (", round(pa_onyx_tachy3$conf.int[1], 2)," - ", round(pa_onyx_tachy3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_tachy3$estimate, 2), " (", round(pa_scan_tachy3$conf.int[1], 2)," - ", round(pa_scan_tachy3$conf.int[2], 2),")", sep = "")),
+                    
+                    col11 = c("12-59 months", "M1", paste(round(pa_radg_tachy3_m1$estimate, 2), " (", round(pa_radg_tachy3_m1$conf.int[1], 2)," - ", round(pa_radg_tachy3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_bio_tachy3_m1$estimate, 2), " (", round(pa_bio_tachy3_m1$conf.int[1], 2)," - ", round(pa_bio_tachy3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_tachy3_m1$estimate, 2), " (", round(pa_neo_tachy3_m1$conf.int[1], 2)," - ", round(pa_neo_tachy3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_tachy3_m1$estimate, 2), " (", round(pa_onyx_tachy3_m1$conf.int[1], 2)," - ", round(pa_onyx_tachy3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_tachy3_m1$estimate, 2), " (", round(pa_scan_tachy3_m1$conf.int[1], 2)," - ", round(pa_scan_tachy3_m1$conf.int[2], 2),")", sep = "")),
+                    
+                    col12 = c("12-59 months", "M2", paste(round(pa_radg_tachy3_m2$estimate, 2), " (", round(pa_radg_tachy3_m2$conf.int[1], 2)," - ", round(pa_radg_tachy3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_bio_tachy3_m2$estimate, 2), " (", round(pa_bio_tachy3_m2$conf.int[1], 2)," - ", round(pa_bio_tachy3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_tachy3_m2$estimate, 2), " (", round(pa_neo_tachy3_m2$conf.int[1], 2)," - ", round(pa_neo_tachy3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_tachy3_m2$estimate, 2), " (", round(pa_onyx_tachy3_m2$conf.int[1], 2)," - ", round(pa_onyx_tachy3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_tachy3_m2$estimate, 2), " (", round(pa_scan_tachy3_m2$conf.int[1], 2)," - ", round(pa_scan_tachy3_m2$conf.int[2], 2),")", sep = "")),
+                    
+                    col13 = c("12-59 months", "M3", paste(round(pa_radg_tachy3_m3$estimate, 2), " (", round(pa_radg_tachy3_m3$conf.int[1], 2)," - ", round(pa_radg_tachy3_m3$conf.int[2], 2),")", sep = " "),
+                              paste(round(pa_bio_tachy3_m3$estimate, 2), " (", round(pa_bio_tachy3_m3$conf.int[1], 2)," - ", round(pa_bio_tachy3_m3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_tachy3_m3$estimate, 2), " (", round(pa_neo_tachy3_m3$conf.int[1], 2)," - ", round(pa_neo_tachy3_m3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_tachy3_m3$estimate, 2), " (", round(pa_onyx_tachy3_m3$conf.int[1], 2)," - ", round(pa_onyx_tachy3_m3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_tachy3_m3$estimate, 2), " (", round(pa_scan_tachy3_m3$conf.int[1], 2)," - ", round(pa_scan_tachy3_m3$conf.int[2], 2),")", sep = ""))
+                    )
+out_tachy <- out_tachy[out_tachy[1]!="",] # remove first two rows of labels since labels will be added in kable
+rownames(out_tachy) <- NULL # make row names null so numbers don't print in table
+# Create nicely labelled kable object
+tachy_pa <- kable(out_tachy, col.names = c("Device","Overall", "M1", "M2", "M3","Overall", "M1", "M2", "M3","Overall", "M1", "M2", "M3")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = T) %>%
+  add_header_above(c("",  "0-11 month" = 4, "12-35 months" = 4, "36-59 months" = 4)) %>%
+  column_spec(2, italic = T, border_left = T) %>%
+  column_spec(6, italic = T, border_left = T) %>%
+  column_spec(10, italic = T, border_left = T)
+```
+`r tachy_pa`
