@@ -34,7 +34,7 @@ library(ggplot2)
 # Read in (cleaned) data 
 filename <- "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2023-12-08.csv"
 df_og <- read.csv(filename)
-df_og <- df_og %>% select(-c("X"))
+df_og <- df_og %>% select(-c("X", "m1_index_temp_f", "m2_index_temp_f", "m3_index_temp_f"))
 
 # Create variables for the mean, SD, min, max, and %CV of reference and index measures across all 3 measurements per row (to be used in Table 1 and Section 2 tables)
 ## Reference values
@@ -65,7 +65,7 @@ df_og <- df_og %>%
 df_og <- df_og %>% 
   mutate(mean_index_o2 = round(rowMeans(select(df_og, c(m1_index_o2, m2_index_o2, m3_index_o2)), na.rm = TRUE), 1),
          mean_index_pr = round(rowMeans(select(df_og, c(m1_index_pr, m2_index_pr, m3_index_pr)), na.rm = TRUE), 1),
-         mean_index_temp = round(rowMeans(select(df_og, c(m1_therm_skin_temp, m2_therm_skin_temp, m3_therm_skin_temp)), na.rm = TRUE), 1),
+         mean_index_temp = round(rowMeans(select(df_og, c(m1_index_temp, m2_index_temp, m3_index_temp)), na.rm = TRUE), 1),
          mean_index_pi = round(rowMeans(select(df_og, c(m1_index_pi, m2_index_pi, m3_index_pi)), na.rm = TRUE), 1),
          mean_index_rr = round(rowMeans(select(df_og, c(m1_index_rr, m2_index_rr, m3_index_rr)), na.rm = TRUE), 1)) %>%
   rowwise() %>%
@@ -183,7 +183,7 @@ mdf_reshaped$grp <- as.factor(mdf_reshaped$grp)
 mdf_reshaped$ref_index_pres_hypoxic <- ifelse(!is.na(mdf_reshaped$ref_hypoxic) & !is.na(mdf_reshaped$index_hypoxic), 1, 0)
 mdf_reshaped$ref_index_agree_hypoxic <- ifelse(mdf_reshaped$ref_hypoxic==mdf_reshaped$index_hypoxic, 1, 0)
 mdf_reshaped$ref_index_pres_fever <- ifelse(!is.na(mdf_reshaped$ref_fever) & !is.na(mdf_reshaped$index_fever), 1, 0)
-mdf_reshaped$ref_index_agree_fever <- ifelse(mdf_reshaped$ref_hypoxic==mdf_reshaped$index_hypoxic, 1, 0)
+mdf_reshaped$ref_index_agree_fever <- ifelse(mdf_reshaped$ref_fever==mdf_reshaped$index_fever, 1, 0)
 mdf_reshaped$ref_index_pres_fb12mo <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_12mo) & !is.na(mdf_reshaped$index_fastbreath_12mo), 1, 0)
 mdf_reshaped$ref_index_agree_fb12mo <- ifelse(mdf_reshaped$ref_fastbreath_12mo==mdf_reshaped$index_fastbreath_12mo, 1, 0)
 mdf_reshaped$ref_index_pres_fb35mo <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_35mo) & !is.na(mdf_reshaped$index_fastbreath_35mo), 1, 0)
@@ -294,7 +294,7 @@ df_og$age_cat_fastbreathe <- case_when(df_og$age_months<2 ~ "0-1 month",
 df_og$m1_ref_index_pres_hypoxic <- ifelse(!is.na(df_og$m1_ref_hypoxic) & !is.na(df_og$m1_index_hypoxic), 1, 0)
 df_og$m1_ref_index_agree_hypoxic <- ifelse(df_og$m1_ref_hypoxic==df_og$m1_index_hypoxic, 1, 0)
 df_og$m1_ref_index_pres_fever <- ifelse(!is.na(df_og$m1_ref_fever) & !is.na(df_og$m1_index_fever), 1, 0)
-df_og$m1_ref_index_agree_fever <- ifelse(df_og$m1_ref_hypoxic==df_og$m1_index_hypoxic, 1, 0)
+df_og$m1_ref_index_agree_fever <- ifelse(df_og$m1_ref_fever==df_og$m1_index_fever, 1, 0)
 df_og$m1_ref_index_pres_fb12mo <- ifelse(!is.na(df_og$m1_ref_fastbreath_12mo) & !is.na(df_og$m1_index_fastbreath_12mo), 1, 0)
 df_og$m1_ref_index_agree_fb12mo <- ifelse(df_og$m1_ref_fastbreath_12mo==df_og$m1_index_fastbreath_12mo, 1, 0)
 df_og$m1_ref_index_pres_fb35mo <- ifelse(!is.na(df_og$m1_ref_fastbreath_35mo) & !is.na(df_og$m1_index_fastbreath_35mo), 1, 0)
@@ -309,7 +309,7 @@ df_og$m1_ref_index_agree_tachy59mo <- ifelse(df_og$m1_ref_tachycardic_59mo==df_o
 df_og$m2_ref_index_pres_hypoxic <- ifelse(!is.na(df_og$m2_ref_hypoxic) & !is.na(df_og$m2_index_hypoxic), 1, 0)
 df_og$m2_ref_index_agree_hypoxic <- ifelse(df_og$m2_ref_hypoxic==df_og$m2_index_hypoxic, 1, 0)
 df_og$m2_ref_index_pres_fever <- ifelse(!is.na(df_og$m2_ref_fever) & !is.na(df_og$m2_index_fever), 1, 0)
-df_og$m2_ref_index_agree_fever <- ifelse(df_og$m2_ref_hypoxic==df_og$m2_index_hypoxic, 1, 0)
+df_og$m2_ref_index_agree_fever <- ifelse(df_og$m2_ref_fever==df_og$m2_index_fever, 1, 0)
 df_og$m2_ref_index_pres_fb12mo <- ifelse(!is.na(df_og$m2_ref_fastbreath_12mo) & !is.na(df_og$m2_index_fastbreath_12mo), 1, 0)
 df_og$m2_ref_index_agree_fb12mo <- ifelse(df_og$m2_ref_fastbreath_12mo==df_og$m2_index_fastbreath_12mo, 1, 0)
 df_og$m2_ref_index_pres_fb35mo <- ifelse(!is.na(df_og$m2_ref_fastbreath_35mo) & !is.na(df_og$m2_index_fastbreath_35mo), 1, 0)
@@ -324,7 +324,7 @@ df_og$m2_ref_index_agree_tachy59mo <- ifelse(df_og$m2_ref_tachycardic_59mo==df_o
 df_og$m3_ref_index_pres_hypoxic <- ifelse(!is.na(df_og$m3_ref_hypoxic) & !is.na(df_og$m3_index_hypoxic), 1, 0)
 df_og$m3_ref_index_agree_hypoxic <- ifelse(df_og$m3_ref_hypoxic==df_og$m3_index_hypoxic, 1, 0)
 df_og$m3_ref_index_pres_fever <- ifelse(!is.na(df_og$m3_ref_fever) & !is.na(df_og$m3_index_fever), 1, 0)
-df_og$m3_ref_index_agree_fever <- ifelse(df_og$m3_ref_hypoxic==df_og$m3_index_hypoxic, 1, 0)
+df_og$m3_ref_index_agree_fever <- ifelse(df_og$m3_ref_fever==df_og$m3_index_fever, 1, 0)
 df_og$m3_ref_index_pres_fb12mo <- ifelse(!is.na(df_og$m3_ref_fastbreath_12mo) & !is.na(df_og$m3_index_fastbreath_12mo), 1, 0)
 df_og$m3_ref_index_agree_fb12mo <- ifelse(df_og$m3_ref_fastbreath_12mo==df_og$m3_index_fastbreath_12mo, 1, 0)
 df_og$m3_ref_index_pres_fb35mo <- ifelse(!is.na(df_og$m3_ref_fastbreath_35mo) & !is.na(df_og$m3_index_fastbreath_35mo), 1, 0)
@@ -379,7 +379,7 @@ df_scan_cat3fb_w <- subset(df_scan_w, age_cat_fastbreathe=="12-35 months")
 df_scan_cat4fb_w <- subset(df_scan_w, age_cat_fastbreathe=="36-59 months")
 ```
 
-This report contains data from **`r COUNTRY`**.
+This report contains data from **ALL COUNTRY DATA**.
 
 # Section 1: Participant Characteristics {.tabset}
 
@@ -424,7 +424,7 @@ t1_overall <- print(out1,
 
 # Create row labels -- "6-Grandfather only" removed as does not appear as level (at least for Kenya data)
 t1lab <- c("N", "Age Category (%)", "0-1 month", "2-11 months", "12-59 months", "Sex = Male/Female (%)",
-            "Relationship of caregiver to child (%)", "Community member", "Fater only", "Grandfather only", "Grandmother only", "Mother and father", "Mother and grandmother", "Mother only", "other", "Other family   
+            "Relationship of caregiver to child (%)", "Community member", "Fater only", "Grandfather only", "Grandmother only", "Mother and father", "Mother and grandmother", "Mother only", "Other", "Other family   
               member", "Sibling", "Visited due to Illness (%)", "Visited for Immunization (%)", "Visited for Routine Monitoring (%)", "Visited due to Trauma (%)", "Admission to inpatient unit of the
              facility (%)", "Cough (%)", "Difficulty/Rapid breathing (%)", "Fever (%)", "Diarrhea (%)", "Vomiting (%)", "Other (%)", "Received Diagnosis (%)", "Dehydration", "Respiratory", "Digestive", "Malaria", 
               "Fever", "Measles=False", "Ear infection", "Throat infection", "Other", "Received Treatment (%)", "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other", "Height (cm) (mean (SD))", 
@@ -683,7 +683,7 @@ bland.altman.plot(df_radg_cat1_l$ref_o2, df_radg_cat1_l$index_o2, graph.sys = "b
 bland.altman.plot(df_radg_cat2_l$ref_o2, df_radg_cat2_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_radg_cat3_l$ref_o2, df_radg_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G o2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+bland.altman.plot(df_radg_cat3_l$ref_o2, df_radg_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G O2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
 
 ### Profusion Index
@@ -708,7 +708,7 @@ bland.altman.plot(df_radg_cat2_l$ref_pr, df_radg_cat2_l$index_pr, graph.sys = "b
 bland.altman.plot(df_radg_cat3_l$ref_pr, df_radg_cat3_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Pulse Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
 
-### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
+### Respiratory Rate (against Masimo reference device)
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat1_l$ref_rracoustic, df_radg_cat1_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Respiratory Rate (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
@@ -718,6 +718,9 @@ bland.altman.plot(df_radg_cat2_l$ref_rracoustic, df_radg_cat2_l$index_rr, graph.
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_radg_cat3_l$ref_rracoustic, df_radg_cat3_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Rad-G Respiratory Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
+
+### Respiratory Rate (against video annotation) - data not yet available
+
 ## m800 (Biolight) {.tabset}
 
 ### Oxygen
@@ -725,11 +728,12 @@ bland.altman.plot(df_radg_cat3_l$ref_rracoustic, df_radg_cat3_l$index_rr, graph.
 bland.altman.plot(df_bio_cat1_l$ref_o2, df_bio_cat1_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight O2 (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_bio_cat2_l$ref_o2, df_bio_cat2_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight o2 (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+bland.altman.plot(df_bio_cat2_l$ref_o2, df_bio_cat2_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight O2 (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_bio_cat3_l$ref_o2, df_bio_cat3_l$ref_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight o2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+bland.altman.plot(df_bio_cat3_l$ref_o2, df_bio_cat3_l$ref_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight O2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
+
 ### Pulse Rate
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_bio_cat1_l$ref_pr, df_bio_cat1_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight Pulse Rate (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
@@ -740,7 +744,8 @@ bland.altman.plot(df_bio_cat2_l$ref_pr, df_bio_cat2_l$index_pr, graph.sys = "bas
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_bio_cat3_l$ref_pr, df_bio_cat3_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight Pulse Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
-### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
+
+### Respiratory Rate (against Masimo reference device)
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_bio_cat1_l$ref_rracoustic, df_bio_cat1_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight Respiratory Rate (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
@@ -750,6 +755,9 @@ bland.altman.plot(df_bio_cat2_l$ref_rracoustic, df_bio_cat2_l$index_rr, graph.sy
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_bio_cat3_l$ref_rracoustic, df_bio_cat3_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight Respiratory Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
+
+### Respiratory Rate (against video annotation) - data not yet available
+
 ## NeoGuard (Neopenda) {.tabset}
 
 ### Temperature
@@ -762,6 +770,7 @@ bland.altman.plot(df_neo_cat2_l$ref_temp, df_neo_cat2_l$index_temp, graph.sys = 
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_neo_cat3_l$ref_temp, df_neo_cat3_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard Temperature (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
+
 ### Oxygen
 ```{r, include=FALSE}
 bland.altman.plot(df_neo_cat1_l$ref_o2, df_neo_cat1_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard O2 (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
@@ -772,6 +781,7 @@ bland.altman.plot(df_neo_cat2_l$ref_o2, df_neo_cat2_l$index_o2, graph.sys = "bas
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_neo_cat3_l$ref_o2, df_neo_cat3_l$ref_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard o2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
+
 ### Pulse Rate
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_neo_cat1_l$ref_pr, df_neo_cat1_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard Pulse Rate (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
@@ -782,7 +792,8 @@ bland.altman.plot(df_neo_cat2_l$ref_pr, df_neo_cat2_l$index_pr, graph.sys = "bas
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_neo_cat3_l$ref_pr, df_neo_cat3_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Neoguard Pulse Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
-### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
+
+### Respiratory Rate (against Masimo reference device)
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_neo_cat1_l$ref_rracoustic, df_neo_cat1_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard Respiratory Rate (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
@@ -792,19 +803,27 @@ bland.altman.plot(df_neo_cat2_l$ref_rracoustic, df_neo_cat2_l$index_rr, graph.sy
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_neo_cat3_l$ref_rracoustic, df_neo_cat3_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard Respiratory Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
+
+### Respiratory Rate (against video annotation) - data not yet available
+
 ## Onyx PO+RR (Nonin) {.tabset}
-###Oxygen
+
+### Oxygen
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_onyx_cat3_l$ref_o2, df_onyx_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Onyx o2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
+
 ### Pulse Rate
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_onyx_cat3_l$ref_pr, df_onyx_cat3_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Onyx Pulse Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
-##Respiratory Rate
+
+### Respiratory Rate (against Masimo reference device)
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_onyx_cat3_l$ref_rracoustic, df_onyx_cat3_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Onyx Respiratory Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
+
+### Respiratory Rate (against video annotation) - data not yet available
 
 ## Scanbo v8 (Scanbo) {.tabset}
 
@@ -812,22 +831,23 @@ bland.altman.plot(df_onyx_cat3_l$ref_rracoustic, df_onyx_cat3_l$index_rr, graph.
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_scan_cat3_l$ref_temp, df_scan_cat3_l$index_temp, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Scanbo Temperature (12-59 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
+
 ### Oxygen
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_scan_cat3_l$ref_o2, df_scan_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Scanbo o2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
+
 ### Pulse Rate
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_scan_cat3_l$ref_pr, df_scan_cat3_l$index_pr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Scanbo Pulse Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
-### Respiratory Rate -- this will only have one plot per age group using the matched index measurement to what was annotated
+
+### Respiratory Rate (against Masimo reference device)
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_scan_cat3_l$ref_rracoustic, df_scan_cat3_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Scanbo Respiratory Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
-###SPO2
-```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_scan_cat3_l$ref_sp02, df_scan_cat3_l$index_spo2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Scanbo spO2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
-```
+
+### Respiratory Rate (against video annotation) - data not yet available
 
 # Section 4: Intraclass Correlation Coefficients {.tabset}
 Reporting information:
@@ -1333,7 +1353,6 @@ confusion_matrix(df_scan_cat3_l,"ref_tachycardic_59mo","index_tachycardic_59mo",
 ```
 
 # Section 6: Percent Agreement {.tabset}
-Samwel
 
 ```{r, include=FALSE}
 # use binom.exact function from exactci package to calculate percent agreement and associated 95% CI's for each device/measurement/age category
@@ -1803,7 +1822,6 @@ out_fb <- data.frame(col1 = c("", "", "Rad-G", "Biolight", "Neopenda", "Onyx", "
                     
                     col5 = c("0-1 month", "M3", paste(round(pa_radg_fb1_m3$estimate, 2), " (", round(pa_radg_fb1_m3$conf.int[1], 2)," - ", round(pa_radg_fb1_m3$conf.int[2], 2),")", sep = ""),
                              paste(round(pa_bio_fb1_m3$estimate, 2), " (", round(pa_bio_fb1_m3$conf.int[1], 2)," - ", round(pa_bio_fb1_m3$conf.int[2], 2),")", sep = ""),
-                             NA,
                              paste(round(pa_neo_fb1_m3$estimate, 2), " (", round(pa_neo_fb1_m3$conf.int[1], 2)," - ", round(pa_neo_fb1_m3$conf.int[2], 2),")", sep = ""),
                              NA,
                              NA),
@@ -1865,8 +1883,6 @@ fb_pa <- kable(out_fb, col.names = c("Device","Overall", "M1", "M2", "M3","Overa
   column_spec(2, italic = T, border_left = T) %>%
   column_spec(6, italic = T, border_left = T) %>%
   column_spec(10, italic = T, border_left = T)
-
-fb_pa
 ```
 `r fb_pa`
 

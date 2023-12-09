@@ -40,7 +40,7 @@ library(ggplot2)
 
 filename <- Sys.getenv("filename")
 df_og <- read.csv(filename)
-df_og <- df_og %>% select(-c("X"))
+df_og <- df_og %>% select(-c("X", "m1_index_temp_f", "m2_index_temp_f", "m3_index_temp_f"))
 
 # Define country and subset
 COUNTRY <- Sys.getenv("COUNTRY")
@@ -75,7 +75,7 @@ df_og <- df_og %>%
 df_og <- df_og %>% 
   mutate(mean_index_o2 = round(rowMeans(select(df_og, c(m1_index_o2, m2_index_o2, m3_index_o2)), na.rm = TRUE), 1),
          mean_index_pr = round(rowMeans(select(df_og, c(m1_index_pr, m2_index_pr, m3_index_pr)), na.rm = TRUE), 1),
-         mean_index_temp = round(rowMeans(select(df_og, c(m1_therm_skin_temp, m2_therm_skin_temp, m3_therm_skin_temp)), na.rm = TRUE), 1),
+         mean_index_temp = round(rowMeans(select(df_og, c(m1_index_temp, m2_index_temp, m3_index_temp)), na.rm = TRUE), 1),
          mean_index_pi = round(rowMeans(select(df_og, c(m1_index_pi, m2_index_pi, m3_index_pi)), na.rm = TRUE), 1),
          mean_index_rr = round(rowMeans(select(df_og, c(m1_index_rr, m2_index_rr, m3_index_rr)), na.rm = TRUE), 1)) %>%
   rowwise() %>%
