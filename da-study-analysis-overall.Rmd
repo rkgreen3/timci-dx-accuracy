@@ -424,7 +424,7 @@ t1_overall <- print(out1,
 
 # Create row labels -- "6-Grandfather only" removed as does not appear as level (at least for Kenya data)
 t1lab <- c("N", "Age Category (%)", "0-1 month", "2-11 months", "12-59 months", "Sex = Male/Female (%)",
-            "Relationship of caregiver to child (%)", "Community member", "Fater only", "Grandfather only", "Grandmother only", "Mother and father", "Mother and grandmother", "Mother only", "Other", "Other family   
+            "Relationship of caregiver to child (%)", "Community member", "Father only", "Grandfather only", "Grandmother only", "Mother and father", "Mother and grandmother", "Mother only", "Other", "Other family   
               member", "Sibling", "Visited due to Illness (%)", "Visited for Immunization (%)", "Visited for Routine Monitoring (%)", "Visited due to Trauma (%)", "Admission to inpatient unit of the
              facility (%)", "Cough (%)", "Difficulty/Rapid breathing (%)", "Fever (%)", "Diarrhea (%)", "Vomiting (%)", "Other (%)", "Received Diagnosis (%)", "Dehydration", "Respiratory", "Digestive", "Malaria", 
               "Fever", "Measles=False", "Ear infection", "Throat infection", "Other", "Received Treatment (%)", "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other", "Height (cm) (mean (SD))", 
@@ -659,6 +659,12 @@ t1 <- kable(t1_overall) %>%
 # `r scan3_t2`
 ```
 
+# Section 2a: Boxplots {.tabset}
+```{r}
+
+```
+
+
 # Section 3: Bland Altman Plots {.tabset}
 **NOTE:** Legends have been removed from all plots in this section so as not to obstruct data. Colors displayed represent **<span style="color: black;">M1</span>, <span style="color: #EB6864;">M2</span>,** and **<span style="color: #777777;">M3</span>.**
 
@@ -871,68 +877,68 @@ How to interpret the ICC:
 
 # -- Rad-G
 ## Rad-G, Age Cat 1
-df_radg_cat1_temp <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("+index_temp", names(df_radg_cat1_w))]))
-df_radg_cat1_o2 <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("+index_o2", names(df_radg_cat1_w))]))
-df_radg_cat1_pi <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("+index_pi", names(df_radg_cat1_w))]))
-df_radg_cat1_pr <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("+index_pr", names(df_radg_cat1_w))]))
-df_radg_cat1_rr <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("+index_rr", names(df_radg_cat1_w))]))
+df_radg_cat1_temp <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("m[[:digit:]]_index_temp", names(df_radg_cat1_w))]))
+df_radg_cat1_o2 <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("m[[:digit:]]_index_o2", names(df_radg_cat1_w))]))
+df_radg_cat1_pi <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("m[[:digit:]]_index_pi", names(df_radg_cat1_w))]))
+df_radg_cat1_pr <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("m[[:digit:]]_index_pr", names(df_radg_cat1_w))]))
+df_radg_cat1_rr <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("m[[:digit:]]_index_rr", names(df_radg_cat1_w))]))
 ## Rad-G, Age Cat 2
-df_radg_cat2_temp <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("+index_temp", names(df_radg_cat2_w))]))
-df_radg_cat2_o2 <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("+index_o2", names(df_radg_cat2_w))]))
-df_radg_cat2_pi <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("+index_pi", names(df_radg_cat2_w))]))
-df_radg_cat2_pr <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("+index_pr", names(df_radg_cat2_w))]))
-df_radg_cat2_rr <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("+index_rr", names(df_radg_cat2_w))]))
+df_radg_cat2_temp <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("m[[:digit:]]_index_temp", names(df_radg_cat2_w))]))
+df_radg_cat2_o2 <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("m[[:digit:]]_index_o2", names(df_radg_cat2_w))]))
+df_radg_cat2_pi <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("m[[:digit:]]_index_pi", names(df_radg_cat2_w))]))
+df_radg_cat2_pr <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("m[[:digit:]]_index_pr", names(df_radg_cat2_w))]))
+df_radg_cat2_rr <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("m[[:digit:]]_index_rr", names(df_radg_cat2_w))]))
 ## Rad-G, Age Cat 3
-df_radg_cat3_temp <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("+index_temp", names(df_radg_cat3_w))]))
-df_radg_cat3_o2 <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("+index_o2", names(df_radg_cat3_w))]))
-df_radg_cat3_pi <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("+index_pi", names(df_radg_cat3_w))]))
-df_radg_cat3_pr <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("+index_pr", names(df_radg_cat3_w))]))
-df_radg_cat3_rr <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("+index_rr", names(df_radg_cat3_w))]))
+df_radg_cat3_temp <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("m[[:digit:]]_index_temp", names(df_radg_cat3_w))]))
+df_radg_cat3_o2 <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("m[[:digit:]]_index_o2", names(df_radg_cat3_w))]))
+df_radg_cat3_pi <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("m[[:digit:]]_index_pi", names(df_radg_cat3_w))]))
+df_radg_cat3_pr <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("m[[:digit:]]_index_pr", names(df_radg_cat3_w))]))
+df_radg_cat3_rr <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("m[[:digit:]]_index_rr", names(df_radg_cat3_w))]))
 
 # -- Biolight
 ## Biolight, Age Cat 1
-df_bio_cat1_o2 <- df_bio_cat1_w %>% select(colnames(df_bio_cat1_w[grepl("+index_o2", names(df_bio_cat1_w))]))
-df_bio_cat1_pr <- df_bio_cat1_w %>% select(colnames(df_bio_cat1_w[grepl("+index_pr", names(df_bio_cat1_w))]))
-df_bio_cat1_rr <- df_bio_cat1_w %>% select(colnames(df_bio_cat1_w[grepl("+index_rr", names(df_bio_cat1_w))]))
+df_bio_cat1_o2 <- df_bio_cat1_w %>% select(colnames(df_bio_cat1_w[grepl("m[[:digit:]]_index_o2", names(df_bio_cat1_w))]))
+df_bio_cat1_pr <- df_bio_cat1_w %>% select(colnames(df_bio_cat1_w[grepl("m[[:digit:]]_index_pr", names(df_bio_cat1_w))]))
+df_bio_cat1_rr <- df_bio_cat1_w %>% select(colnames(df_bio_cat1_w[grepl("m[[:digit:]]_index_rr", names(df_bio_cat1_w))]))
 ## Biolight, Age Cat 2
-df_bio_cat2_o2 <- df_bio_cat2_w %>% select(colnames(df_bio_cat2_w[grepl("+index_o2", names(df_bio_cat2_w))]))
-df_bio_cat2_pr <- df_bio_cat2_w %>% select(colnames(df_bio_cat2_w[grepl("+index_pr", names(df_bio_cat2_w))]))
-df_bio_cat2_rr <- df_bio_cat2_w %>% select(colnames(df_bio_cat2_w[grepl("+index_rr", names(df_bio_cat2_w))]))
+df_bio_cat2_o2 <- df_bio_cat2_w %>% select(colnames(df_bio_cat2_w[grepl("m[[:digit:]]_index_o2", names(df_bio_cat2_w))]))
+df_bio_cat2_pr <- df_bio_cat2_w %>% select(colnames(df_bio_cat2_w[grepl("m[[:digit:]]_index_pr", names(df_bio_cat2_w))]))
+df_bio_cat2_rr <- df_bio_cat2_w %>% select(colnames(df_bio_cat2_w[grepl("m[[:digit:]]_index_rr", names(df_bio_cat2_w))]))
 ## Biolight, Age Cat 3
-df_bio_cat3_o2 <- df_bio_cat3_w %>% select(colnames(df_bio_cat3_w[grepl("+index_o2", names(df_bio_cat3_w))]))
-df_bio_cat3_pr <- df_bio_cat3_w %>% select(colnames(df_bio_cat3_w[grepl("+index_pr", names(df_bio_cat3_w))]))
-df_bio_cat3_rr <- df_bio_cat3_w %>% select(colnames(df_bio_cat3_w[grepl("+index_rr", names(df_bio_cat3_w))]))
+df_bio_cat3_o2 <- df_bio_cat3_w %>% select(colnames(df_bio_cat3_w[grepl("m[[:digit:]]_index_o2", names(df_bio_cat3_w))]))
+df_bio_cat3_pr <- df_bio_cat3_w %>% select(colnames(df_bio_cat3_w[grepl("m[[:digit:]]_index_pr", names(df_bio_cat3_w))]))
+df_bio_cat3_rr <- df_bio_cat3_w %>% select(colnames(df_bio_cat3_w[grepl("m[[:digit:]]_index_rr", names(df_bio_cat3_w))]))
 
 # -- NeoGuard
 ## NeoGuard, Age Cat 1
-df_neo_cat1_temp <- df_neo_cat1_w %>% select(colnames(df_neo_cat1_w[grepl("+index_temp", names(df_neo_cat1_w))]))
-df_neo_cat1_o2 <- df_neo_cat1_w %>% select(colnames(df_neo_cat1_w[grepl("+index_o2", names(df_neo_cat1_w))]))
-df_neo_cat1_pr <- df_neo_cat1_w %>% select(colnames(df_neo_cat1_w[grepl("+index_pr", names(df_neo_cat1_w))]))
-df_neo_cat1_rr <- df_neo_cat1_w %>% select(colnames(df_neo_cat1_w[grepl("+index_rr", names(df_neo_cat1_w))]))
+df_neo_cat1_temp <- df_neo_cat1_w %>% select(colnames(df_neo_cat1_w[grepl("m[[:digit:]]_index_temp", names(df_neo_cat1_w))]))
+df_neo_cat1_o2 <- df_neo_cat1_w %>% select(colnames(df_neo_cat1_w[grepl("m[[:digit:]]_index_o2", names(df_neo_cat1_w))]))
+df_neo_cat1_pr <- df_neo_cat1_w %>% select(colnames(df_neo_cat1_w[grepl("m[[:digit:]]_index_pr", names(df_neo_cat1_w))]))
+df_neo_cat1_rr <- df_neo_cat1_w %>% select(colnames(df_neo_cat1_w[grepl("m[[:digit:]]_index_rr", names(df_neo_cat1_w))]))
 ## NeoGuard, Age Cat 2
-df_neo_cat2_temp <- df_neo_cat2_w %>% select(colnames(df_neo_cat2_w[grepl("+index_temp", names(df_neo_cat2_w))]))
-df_neo_cat2_o2 <- df_neo_cat2_w %>% select(colnames(df_neo_cat2_w[grepl("+index_o2", names(df_neo_cat2_w))]))
-df_neo_cat2_pr <- df_neo_cat2_w %>% select(colnames(df_neo_cat2_w[grepl("+index_pr", names(df_neo_cat2_w))]))
-df_neo_cat2_rr <- df_neo_cat2_w %>% select(colnames(df_neo_cat2_w[grepl("+index_rr", names(df_neo_cat2_w))]))
+df_neo_cat2_temp <- df_neo_cat2_w %>% select(colnames(df_neo_cat2_w[grepl("m[[:digit:]]_index_temp", names(df_neo_cat2_w))]))
+df_neo_cat2_o2 <- df_neo_cat2_w %>% select(colnames(df_neo_cat2_w[grepl("m[[:digit:]]_index_o2", names(df_neo_cat2_w))]))
+df_neo_cat2_pr <- df_neo_cat2_w %>% select(colnames(df_neo_cat2_w[grepl("m[[:digit:]]_index_pr", names(df_neo_cat2_w))]))
+df_neo_cat2_rr <- df_neo_cat2_w %>% select(colnames(df_neo_cat2_w[grepl("m[[:digit:]]_index_rr", names(df_neo_cat2_w))]))
 ## NeoGuard, Age Cat 3
-df_neo_cat3_temp <- df_neo_cat3_w %>% select(colnames(df_neo_cat3_w[grepl("+index_temp", names(df_neo_cat3_w))]))
-df_neo_cat3_o2 <- df_neo_cat3_w %>% select(colnames(df_neo_cat3_w[grepl("+index_o2", names(df_neo_cat3_w))]))
-df_neo_cat3_pr <- df_neo_cat3_w %>% select(colnames(df_neo_cat3_w[grepl("+index_pr", names(df_neo_cat3_w))]))
-df_neo_cat3_rr <- df_neo_cat3_w %>% select(colnames(df_neo_cat3_w[grepl("+index_rr", names(df_neo_cat3_w))]))
+df_neo_cat3_temp <- df_neo_cat3_w %>% select(colnames(df_neo_cat3_w[grepl("m[[:digit:]]_index_temp", names(df_neo_cat3_w))]))
+df_neo_cat3_o2 <- df_neo_cat3_w %>% select(colnames(df_neo_cat3_w[grepl("m[[:digit:]]_index_o2", names(df_neo_cat3_w))]))
+df_neo_cat3_pr <- df_neo_cat3_w %>% select(colnames(df_neo_cat3_w[grepl("m[[:digit:]]_index_pr", names(df_neo_cat3_w))]))
+df_neo_cat3_rr <- df_neo_cat3_w %>% select(colnames(df_neo_cat3_w[grepl("m[[:digit:]]_index_rr", names(df_neo_cat3_w))]))
 
 # -- Scanbo
 ## Scanbo, Age Cat 3
-df_scan_cat3_temp <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("+index_temp", names(df_scan_cat3_w))]))
-df_scan_cat3_sp02 <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("+index_sp02", names(df_scan_cat3_w))]))
-df_scan_cat3_o2 <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("+index_o2", names(df_scan_cat3_w))]))
-df_scan_cat3_pr <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("+index_pr", names(df_scan_cat3_w))]))
-df_scan_cat3_rr <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("+index_rr", names(df_scan_cat3_w))]))
+df_scan_cat3_temp <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("m[[:digit:]]_index_temp", names(df_scan_cat3_w))]))
+df_scan_cat3_sp02 <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("m[[:digit:]]_index_sp02", names(df_scan_cat3_w))]))
+df_scan_cat3_o2 <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("m[[:digit:]]_index_o2", names(df_scan_cat3_w))]))
+df_scan_cat3_pr <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("m[[:digit:]]_index_pr", names(df_scan_cat3_w))]))
+df_scan_cat3_rr <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("m[[:digit:]]_index_rr", names(df_scan_cat3_w))]))
 
 # -- Onyx
 ## Onyx, Age Cat 3
-df_onyx_cat3_o2 <- df_onyx_cat3_w %>% select(colnames(df_onyx_cat3_w[grepl("+index_o2", names(df_onyx_cat3_w))]))
-df_onyx_cat3_pr <- df_onyx_cat3_w %>% select(colnames(df_onyx_cat3_w[grepl("+index_pr", names(df_onyx_cat3_w))]))
-df_onyx_cat3_rr <- df_onyx_cat3_w %>% select(colnames(df_onyx_cat3_w[grepl("+index_rr", names(df_onyx_cat3_w))]))
+df_onyx_cat3_o2 <- df_onyx_cat3_w %>% select(colnames(df_onyx_cat3_w[grepl("m[[:digit:]]_index_o2", names(df_onyx_cat3_w))]))
+df_onyx_cat3_pr <- df_onyx_cat3_w %>% select(colnames(df_onyx_cat3_w[grepl("m[[:digit:]]_index_pr", names(df_onyx_cat3_w))]))
+df_onyx_cat3_rr <- df_onyx_cat3_w %>% select(colnames(df_onyx_cat3_w[grepl("m[[:digit:]]_index_rr", names(df_onyx_cat3_w))]))
 ```
 
 ```{r, include=FALSE}
