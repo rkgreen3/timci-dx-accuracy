@@ -1193,7 +1193,7 @@ confusion_matrix <- function(df, ref_item, index_item, age_cat){
     # normal index does not exist
     if (!("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin))) {
       rownames(item_margin) <- c("Normal (Reference)", "Abnormal (Reference)", "Sum")
-      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Abnormal (Index)","Sum"), caption = age_cat) %>% 
       kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
     }
   } 
@@ -1218,7 +1218,7 @@ confusion_matrix <- function(df, ref_item, index_item, age_cat){
     # normal index does not exist
     if (!("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin))) {
       rownames(item_margin) <- c("Normal (Reference)",  "Sum")
-      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Abnormal (Index)","Sum"), caption = age_cat) %>% 
       kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
     }
   } 
@@ -1242,7 +1242,7 @@ confusion_matrix <- function(df, ref_item, index_item, age_cat){
     # normal index does not exist
     if (!("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin))) {
       rownames(item_margin) <- c("Abnormal (Reference)", "Sum")
-      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Abnormal (Index)","Sum"), caption = "**0-1 month**") %>% 
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Abnormal (Index)","Sum"), caption = age_cat) %>% 
       kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
     }
   }

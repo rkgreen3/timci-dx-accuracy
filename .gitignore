@@ -7,6 +7,7 @@
 timci-dx-accuracy.Rproj
 # Analysis output
 country-analysis-template.html
+*.html
 # Data files
 *.csv
 *.xlsx
@@ -16,3 +17,4 @@ country-analysis-template.html
 country-analysis-template_2023-11-29.html
 country-analysis-template_2023-11-30.html
 da-study-analysis-overall.html
+
