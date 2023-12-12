@@ -794,7 +794,7 @@ bland.altman.plot(df_bio_cat1_l$ref_o2, df_bio_cat1_l$index_o2, graph.sys = "bas
 bland.altman.plot(df_bio_cat2_l$ref_o2, df_bio_cat2_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight o2 (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_bio_cat3_l$ref_o2, df_bio_cat3_l$ref_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight o2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+bland.altman.plot(df_bio_cat3_l$ref_o2, df_bio_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight o2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
 ### Pulse Rate
 ```{r, results='hide', fig.keep='last'}
@@ -810,6 +810,7 @@ bland.altman.plot(df_bio_cat3_l$ref_pr, df_bio_cat3_l$index_pr, graph.sys = "bas
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_bio_cat1_l$ref_rracoustic, df_bio_cat1_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight Respiratory Rate (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
+
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_bio_cat2_l$ref_rracoustic, df_bio_cat2_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Biolight Respiratory Rate (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
@@ -832,11 +833,12 @@ bland.altman.plot(df_neo_cat3_l$ref_temp, df_neo_cat3_l$index_temp, graph.sys = 
 ```{r, include=FALSE}
 bland.altman.plot(df_neo_cat1_l$ref_o2, df_neo_cat1_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard O2 (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
+
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_neo_cat2_l$ref_o2, df_neo_cat2_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard o2 (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_neo_cat3_l$ref_o2, df_neo_cat3_l$ref_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard o2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+bland.altman.plot(df_neo_cat3_l$ref_o2, df_neo_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard o2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
 ### Pulse Rate
 ```{r, results='hide', fig.keep='last'}
