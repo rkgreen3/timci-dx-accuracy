@@ -725,6 +725,170 @@ scan3_t2 <- kable(cat3_scan, col.names = c("Participant ID","Temperature", "Oxyg
 ### 12-59 months
 `r scan3_t2`
 
+# Section 2a: Boxplots {.tabset}
+
+## Rad-G Temp (Masimo) {.tabset}
+
+### Temperature
+```{r}
+boxplot(index_temp~grp*age_cat, data = df_radg_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "Rad-G Temp (Masimo) Temperature Measurement",
+        ylab = "Temperature", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+### Oxygen
+```{r}
+boxplot(index_o2~grp*age_cat, data = df_radg_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "Rad-G Temp (Masimo) Oxygen Measurement",
+        ylab = "Oxygen", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+### Profusion Index
+```{r}
+boxplot(index_pi~grp*age_cat, data = df_radg_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "Rad-G Temp (Masimo) Profusion Index Measurement",
+        ylab = "Profusion Index", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+### Pulse Rate
+```{r}
+boxplot(index_pr~grp*age_cat, data = df_radg_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "Rad-G Temp (Masimo) Pulse Rate Measurement",
+        ylab = "Pulse Rate", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+### Respiratory Rate
+```{r}
+boxplot(index_rr~grp*age_cat, data = df_radg_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "Rad-G Temp (Masimo) Respiratory Rate Measurement",
+        ylab = "Respiratory Rate", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+## m800 (Biolight) {.tabset}
+
+### Oxygen
+```{r}
+boxplot(index_o2~grp*age_cat, data = df_bio_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "m800 (Biolight) Oxygen Measurement",
+        ylab = "Oxygen", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+### Pulse Rate
+```{r}
+boxplot(index_pr~grp*age_cat, data = df_bio_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "m800 (Biolight) Pulse Rate Measurement",
+        ylab = "Pulse Rate", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+### Respiratory Rate
+```{r}
+boxplot(index_rr~grp*age_cat, data = df_bio_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "m800 (Biolight) Respiratory Rate Measurement",
+        ylab = "Respiratory Rate", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+## NeoGuard (Neopenda) {.tabset}
+
+### Temperature
+```{r}
+boxplot(index_temp~grp*age_cat, data = df_neo_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "NeoGuard (Neopenda) Temperature Measurement",
+        ylab = "Temperature", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+### Oxygen
+```{r}
+boxplot(index_o2~grp*age_cat, data = df_neo_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "NeoGuard (Neopenda) Oxygen Measurement",
+        ylab = "Oxygen", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+### Pulse Rate
+```{r}
+boxplot(index_pr~grp*age_cat, data = df_neo_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "NeoGuard (Neopenda) Pulse Rate Measurement",
+        ylab = "Pulse Rate", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+### Respiratory Rate
+```{r}
+boxplot(index_rr~grp*age_cat, data = df_neo_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "NeoGuard (Neopenda) Respiratory Rate Measurement",
+        ylab = "Respiratory Rate", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+## Onyx PO+RR (Nonin) {.tabset}
+
+### Oxygen
+```{r}
+boxplot(index_o2~grp*age_cat, data = df_onyx_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "Onyx PO+RR (Nonin) Oxygen Measurement",
+        ylab = "Oxygen", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+### Pulse Rate
+```{r}
+boxplot(index_pr~grp*age_cat, data = df_onyx_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "Onyx PO+RR (Nonin) Pulse Rate Measurement",
+        ylab = "Pulse Rate", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+### Respiratory Rate
+```{r}
+boxplot(index_rr~grp*age_cat, data = df_onyx_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "Onyx PO+RR (Nonin) Respiratory Rate Measurement",
+        ylab = "Respiratory Rate", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+## Scanbo v8 (Scanbo) {.tabset}
+
+### Temperature
+```{r}
+boxplot(index_temp~grp*age_cat, data = df_scan_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "Scanbo v8 (Scanbo) Temperature Measurement",
+        ylab = "Temperature", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+### Oxygen
+```{r}
+boxplot(index_o2~grp*age_cat, data = df_scan_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "Scanbo v8 (Scanbo) Oxygen Measurement",
+        ylab = "Oxygen", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+### Pulse Rate
+```{r}
+boxplot(index_pr~grp*age_cat, data = df_scan_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "Scanbo v8 (Scanbo) Pulse Rate Measurement",
+        ylab = "Pulse Rate", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
+### Respiratory Rate
+```{r}
+boxplot(index_rr~grp*age_cat, data = df_scan_l, col=c("#20292f", "#EB6864", "#777777"), 
+        main = "Scanbo v8 (Scanbo) Respiratory Rate Measurement",
+        ylab = "Respiratory Rate", xlab = "Measurement by Age Category",
+        names = c("M1, 0-1m", "M2, 0-1m", "M3, 0-1m", "M1, 2-11m", "M2, 2-11m", "M3, 2-11m", "M1, 12-59m", "M2, 12-59m", "M3, 12-59m"))
+```
+
 # Section 3: Bland Altman Plots {.tabset}
 **NOTE:** Legends have been removed from all plots in this section so as not to obstruct data. Colors displayed represent **<span style="color: black;">M1</span>, <span style="color: #EB6864;">M2</span>,** and **<span style="color: #777777;">M3</span>.**
 
