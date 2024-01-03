@@ -75,6 +75,8 @@ df$tx_multiple <- ifelse(df$tx_sum>1, 1, 0)
 
 # Replace all 999 with NA
 ## M1
+df$m1_index_o2 <- as.numeric(df$m1_index_o2) #remove imaginary numbers
+
 df$m1_index_temp <- ifelse(df$m1_index_temp>=999, NA, df$m1_index_temp)
 df$m1_index_spo2 <- ifelse(df$m1_index_spo2>=999, NA, df$m1_index_spo2)
 df$m1_ref_sp02 <- ifelse(df$m1_ref_sp02>=999, NA, df$m1_ref_sp02)
@@ -107,6 +109,8 @@ df$m2_ref_rracoustic <- ifelse(df$m2_ref_rracoustic>=999, NA, df$m2_ref_rracoust
 df$m2_ref_thb <- ifelse(df$m2_ref_thb>=999, NA, df$m2_ref_thb)
 
 ## M3
+df$m3_index_o2 <- as.numeric(df$m3_index_o2) #remove imaginary numbers
+
 df$m3_index_temp <- ifelse(df$m3_index_temp>=999, NA, df$m3_index_temp)
 df$m3_index_spo2 <- ifelse(df$m3_index_spo2>=999, NA, df$m3_index_spo2)
 df$m3_ref_sp02 <- ifelse(df$m3_ref_sp02>=999, NA, df$m3_ref_sp02)
