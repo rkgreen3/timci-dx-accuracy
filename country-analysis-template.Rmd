@@ -33,7 +33,7 @@ library(ggplot2)
 
 # Read in (cleaned) data 
 # Create a text file with the name ".Renviron", then define the variables as defined below
-# filename = "dx-accuracy-data_clean_2023-11-17.csv"
+# filename = "dx-accuracy-data_clean_2024-01-03.csv"
 # COUNTRY = "Tanzania"
 # After adding the file and content restart R session and you are good to go
 # The Renviron will be ingored when pushing changes to Github
@@ -118,9 +118,6 @@ mdf_reshaped_i <- subset(mdf_reshaped, grepl("index", mdf_reshaped$mes))
 mdf_reshaped_i_temp <- subset(mdf_reshaped_i, grepl("temp", mdf_reshaped_i$mes)) # Temp
 names(mdf_reshaped_i_temp)[5] <- paste(mdf_reshaped_i_temp$mes)
 mdf_reshaped_i_temp <- mdf_reshaped_i_temp %>% select(-c(mes))
-mdf_reshaped_i_spo2 <- subset(mdf_reshaped_i, grepl("spo2", mdf_reshaped_i$mes)) # SpO2
-names(mdf_reshaped_i_spo2)[5] <- paste(mdf_reshaped_i_spo2$mes)
-mdf_reshaped_i_spo2 <- mdf_reshaped_i_spo2 %>% select(-c(mes))
 mdf_reshaped_i_o2 <- subset(mdf_reshaped_i, grepl("_o2", mdf_reshaped_i$mes)) # O2
 names(mdf_reshaped_i_o2)[5] <- paste(mdf_reshaped_i_o2$mes)
 mdf_reshaped_i_o2 <- mdf_reshaped_i_o2 %>% select(-c(mes))
@@ -135,7 +132,6 @@ names(mdf_reshaped_i_rr)[5] <- paste(mdf_reshaped_i_rr$mes)
 mdf_reshaped_i_rr <- mdf_reshaped_i_rr %>% select(-c(mes))
 ## Join back to one df for recreation of full df
 mdf_reshaped_i <- left_join(mdf_reshaped_i_temp, mdf_reshaped_i_o2, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
-mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_spo2, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
 mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_pr, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
 mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_pi, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
 mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_rr, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
@@ -144,9 +140,6 @@ mdf_reshaped_r <- subset(mdf_reshaped, grepl("ref", mdf_reshaped$mes))
 mdf_reshaped_r_temp <- subset(mdf_reshaped_r, grepl("temp", mdf_reshaped_r$mes)) # Temp
 names(mdf_reshaped_r_temp)[5] <- paste(mdf_reshaped_r_temp$mes)
 mdf_reshaped_r_temp <- mdf_reshaped_r_temp %>% select(-c(mes))
-mdf_reshaped_r_spo2 <- subset(mdf_reshaped_r, grepl("sp02", mdf_reshaped_r$mes)) # SpO2
-names(mdf_reshaped_r_spo2)[5] <- paste(mdf_reshaped_r_spo2$mes)
-mdf_reshaped_r_spo2 <- mdf_reshaped_r_spo2 %>% select(-c(mes))
 mdf_reshaped_r_o2 <- subset(mdf_reshaped_r, grepl("_o2", mdf_reshaped_r$mes)) # O2
 names(mdf_reshaped_r_o2)[5] <- paste(mdf_reshaped_r_o2$mes)
 mdf_reshaped_r_o2 <- mdf_reshaped_r_o2 %>% select(-c(mes))
@@ -161,7 +154,6 @@ names(mdf_reshaped_r_rr)[5] <- paste(mdf_reshaped_r_rr$mes)
 mdf_reshaped_r_rr <- mdf_reshaped_r_rr %>% select(-c(mes))
 ## Join back to one df for recreation of full df
 mdf_reshaped_r <- left_join(mdf_reshaped_r_temp, mdf_reshaped_r_o2, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
-mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_spo2, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
 mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_pr, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
 mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_pi, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
 mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_rr, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
@@ -1056,10 +1048,6 @@ bland.altman.plot(df_scan_cat3_l$ref_pr, df_scan_cat3_l$index_pr, graph.sys = "b
 ```{r, results='hide', fig.keep='last'}
 bland.altman.plot(df_scan_cat3_l$ref_rracoustic, df_scan_cat3_l$index_rr, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Scanbo Respiratory Rate (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
-###SPO2
-```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_scan_cat3_l$ref_sp02, df_scan_cat3_l$index_spo2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Scanbo spO2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
-```
 
 # Section 4: Intraclass Correlation Coefficients {.tabset}
 Reporting information:
@@ -1135,7 +1123,6 @@ df_neo_cat3_rr <- df_neo_cat3_w %>% select(colnames(df_neo_cat3_w[grepl("m[[:dig
 # -- Scanbo
 ## Scanbo, Age Cat 3
 df_scan_cat3_temp <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("m[[:digit:]]_index_temp", names(df_scan_cat3_w))]))
-df_scan_cat3_sp02 <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("m[[:digit:]]_index_sp02", names(df_scan_cat3_w))]))
 df_scan_cat3_o2 <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("m[[:digit:]]_index_o2", names(df_scan_cat3_w))]))
 df_scan_cat3_pr <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("m[[:digit:]]_index_pr", names(df_scan_cat3_w))]))
 df_scan_cat3_rr <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("m[[:digit:]]_index_rr", names(df_scan_cat3_w))]))
@@ -1204,7 +1191,6 @@ icc_neo_cat3_rr <- icc(df_neo_cat3_rr, model = "twoway", type = "agreement", uni
 # Scanbo ICC objects
 ## Age Cat 3
 icc_scan_cat3_temp <- icc(df_scan_cat3_temp, model = "twoway", type = "agreement", unit = "single")
-icc_scan_cat3_sp02 <- icc(df_scan_cat3_sp02, model = "twoway", type = "agreement", unit = "single")
 icc_scan_cat3_o2 <- icc(df_scan_cat3_o2, model = "twoway", type = "agreement", unit = "single")
 icc_scan_cat3_pr <- icc(df_scan_cat3_pr, model = "twoway", type = "agreement", unit = "single")
 icc_scan_cat3_rr <- icc(df_scan_cat3_rr, model = "twoway", type = "agreement", unit = "single")
