@@ -1008,7 +1008,7 @@ bland.altman.plot(df_scan_cat3_l$ref_rracoustic, df_scan_cat3_l$index_rr, graph.
 # Section 4: Intraclass Correlation Coefficients {.tabset}
 Reporting information:
 
-- Model: Two-way mixed effects [NOTE: no functional difference between 2-way random and mixed effects...seems the difference is more conceptual than mathematical but should confirm w/Laina]
+- Model: Two-way mixed effects
   - Justification: Repeated measurements cannot be considered random samples.
 - Type: Single measurement
   - Justification: In clinical practice, a single measurement rather than the mean of multiple measurements is considered as the unit of analysis.
@@ -1025,6 +1025,7 @@ How to interpret the ICC:
 ```{r, include=FALSE}
 # Create M1-3 matrices by age category, device, and measurement type
 
+#============INDEX MEASUREMENTS==============
 # -- Rad-G
 ## Rad-G, Age Cat 1
 df_radg_cat1_temp <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("m[[:digit:]]_index_temp", names(df_radg_cat1_w))]))
@@ -1088,11 +1089,77 @@ df_scan_cat3_rr <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("m[[:
 df_onyx_cat3_o2 <- df_onyx_cat3_w %>% select(colnames(df_onyx_cat3_w[grepl("m[[:digit:]]_index_o2", names(df_onyx_cat3_w))]))
 df_onyx_cat3_pr <- df_onyx_cat3_w %>% select(colnames(df_onyx_cat3_w[grepl("m[[:digit:]]_index_pr", names(df_onyx_cat3_w))]))
 df_onyx_cat3_rr <- df_onyx_cat3_w %>% select(colnames(df_onyx_cat3_w[grepl("m[[:digit:]]_index_rr", names(df_onyx_cat3_w))]))
+
+#============REFERENCE MEASUREMENTS==============
+# -- Rad-G
+## Rad-G, Age Cat 1
+df_radg_cat1_temp_ref <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("m[[:digit:]]_therm_skin_temp", names(df_radg_cat1_w))]))
+df_radg_cat1_o2_ref <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("m[[:digit:]]_ref_o2", names(df_radg_cat1_w))]))
+df_radg_cat1_pi_ref <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("m[[:digit:]]_ref_pi", names(df_radg_cat1_w))]))
+df_radg_cat1_pr_ref <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("m[[:digit:]]_ref_pr", names(df_radg_cat1_w))]))
+df_radg_cat1_rr_ref <- df_radg_cat1_w %>% select(colnames(df_radg_cat1_w[grepl("m[[:digit:]]_ref_rr", names(df_radg_cat1_w))]))
+## Rad-G, Age Cat 2
+df_radg_cat2_temp_ref <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("m[[:digit:]]_therm_skin_temp", names(df_radg_cat2_w))]))
+df_radg_cat2_o2_ref <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("m[[:digit:]]_ref_o2", names(df_radg_cat2_w))]))
+df_radg_cat2_pi_ref <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("m[[:digit:]]_ref_pi", names(df_radg_cat2_w))]))
+df_radg_cat2_pr_ref <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("m[[:digit:]]_ref_pr", names(df_radg_cat2_w))]))
+df_radg_cat2_rr_ref <- df_radg_cat2_w %>% select(colnames(df_radg_cat2_w[grepl("m[[:digit:]]_ref_rr", names(df_radg_cat2_w))]))
+## Rad-G, Age Cat 3
+df_radg_cat3_temp_ref <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("m[[:digit:]]_therm_skin_temp", names(df_radg_cat3_w))]))
+df_radg_cat3_o2_ref <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("m[[:digit:]]_ref_o2", names(df_radg_cat3_w))]))
+df_radg_cat3_pi_ref <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("m[[:digit:]]_ref_pi", names(df_radg_cat3_w))]))
+df_radg_cat3_pr_ref <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("m[[:digit:]]_ref_pr", names(df_radg_cat3_w))]))
+df_radg_cat3_rr_ref <- df_radg_cat3_w %>% select(colnames(df_radg_cat3_w[grepl("m[[:digit:]]_ref_rr", names(df_radg_cat3_w))]))
+
+# -- Biolight
+## Biolight, Age Cat 1
+df_bio_cat1_o2_ref <- df_bio_cat1_w %>% select(colnames(df_bio_cat1_w[grepl("m[[:digit:]]_ref_o2", names(df_bio_cat1_w))]))
+df_bio_cat1_pr_ref <- df_bio_cat1_w %>% select(colnames(df_bio_cat1_w[grepl("m[[:digit:]]_ref_pr", names(df_bio_cat1_w))]))
+df_bio_cat1_rr_ref <- df_bio_cat1_w %>% select(colnames(df_bio_cat1_w[grepl("m[[:digit:]]_ref_rr", names(df_bio_cat1_w))]))
+## Biolight, Age Cat 2
+df_bio_cat2_o2_ref <- df_bio_cat2_w %>% select(colnames(df_bio_cat2_w[grepl("m[[:digit:]]_ref_o2", names(df_bio_cat2_w))]))
+df_bio_cat2_pr_ref <- df_bio_cat2_w %>% select(colnames(df_bio_cat2_w[grepl("m[[:digit:]]_ref_pr", names(df_bio_cat2_w))]))
+df_bio_cat2_rr_ref <- df_bio_cat2_w %>% select(colnames(df_bio_cat2_w[grepl("m[[:digit:]]_ref_rr", names(df_bio_cat2_w))]))
+## Biolight, Age Cat 3
+df_bio_cat3_o2_ref <- df_bio_cat3_w %>% select(colnames(df_bio_cat3_w[grepl("m[[:digit:]]_ref_o2", names(df_bio_cat3_w))]))
+df_bio_cat3_pr_ref <- df_bio_cat3_w %>% select(colnames(df_bio_cat3_w[grepl("m[[:digit:]]_ref_pr", names(df_bio_cat3_w))]))
+df_bio_cat3_rr_ref <- df_bio_cat3_w %>% select(colnames(df_bio_cat3_w[grepl("m[[:digit:]]_ref_rr", names(df_bio_cat3_w))]))
+
+# -- NeoGuard
+## NeoGuard, Age Cat 1
+df_neo_cat1_temp_ref <- df_neo_cat1_w %>% select(colnames(df_neo_cat1_w[grepl("m[[:digit:]]_therm_skin_temp", names(df_neo_cat1_w))]))
+df_neo_cat1_o2_ref <- df_neo_cat1_w %>% select(colnames(df_neo_cat1_w[grepl("m[[:digit:]]_ref_o2", names(df_neo_cat1_w))]))
+df_neo_cat1_pr_ref <- df_neo_cat1_w %>% select(colnames(df_neo_cat1_w[grepl("m[[:digit:]]_ref_pr", names(df_neo_cat1_w))]))
+df_neo_cat1_rr_ref <- df_neo_cat1_w %>% select(colnames(df_neo_cat1_w[grepl("m[[:digit:]]_ref_rr", names(df_neo_cat1_w))]))
+## NeoGuard, Age Cat 2
+df_neo_cat2_temp_ref <- df_neo_cat2_w %>% select(colnames(df_neo_cat2_w[grepl("m[[:digit:]]_therm_skin_temp", names(df_neo_cat2_w))]))
+df_neo_cat2_o2_ref <- df_neo_cat2_w %>% select(colnames(df_neo_cat2_w[grepl("m[[:digit:]]_ref_o2", names(df_neo_cat2_w))]))
+df_neo_cat2_pr_ref <- df_neo_cat2_w %>% select(colnames(df_neo_cat2_w[grepl("m[[:digit:]]_ref_pr", names(df_neo_cat2_w))]))
+df_neo_cat2_rr_ref <- df_neo_cat2_w %>% select(colnames(df_neo_cat2_w[grepl("m[[:digit:]]_ref_rr", names(df_neo_cat2_w))]))
+## NeoGuard, Age Cat 3
+df_neo_cat3_temp_ref <- df_neo_cat3_w %>% select(colnames(df_neo_cat3_w[grepl("m[[:digit:]]_therm_skin_temp", names(df_neo_cat3_w))]))
+df_neo_cat3_o2_ref <- df_neo_cat3_w %>% select(colnames(df_neo_cat3_w[grepl("m[[:digit:]]_ref_o2", names(df_neo_cat3_w))]))
+df_neo_cat3_pr_ref <- df_neo_cat3_w %>% select(colnames(df_neo_cat3_w[grepl("m[[:digit:]]_ref_pr", names(df_neo_cat3_w))]))
+df_neo_cat3_rr_ref <- df_neo_cat3_w %>% select(colnames(df_neo_cat3_w[grepl("m[[:digit:]]_ref_rr", names(df_neo_cat3_w))]))
+
+# -- Scanbo
+## Scanbo, Age Cat 3
+df_scan_cat3_temp_ref <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("m[[:digit:]]_therm_skin_temp", names(df_scan_cat3_w))]))
+df_scan_cat3_o2_ref <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("m[[:digit:]]_ref_o2", names(df_scan_cat3_w))]))
+df_scan_cat3_pr_ref <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("m[[:digit:]]_ref_pr", names(df_scan_cat3_w))]))
+df_scan_cat3_rr_ref <- df_scan_cat3_w %>% select(colnames(df_scan_cat3_w[grepl("m[[:digit:]]_ref_rr", names(df_scan_cat3_w))]))
+
+# -- Onyx
+## Onyx, Age Cat 3
+df_onyx_cat3_o2_ref <- df_onyx_cat3_w %>% select(colnames(df_onyx_cat3_w[grepl("m[[:digit:]]_ref_o2", names(df_onyx_cat3_w))]))
+df_onyx_cat3_pr_ref <- df_onyx_cat3_w %>% select(colnames(df_onyx_cat3_w[grepl("m[[:digit:]]_ref_pr", names(df_onyx_cat3_w))]))
+df_onyx_cat3_rr_ref <- df_onyx_cat3_w %>% select(colnames(df_onyx_cat3_w[grepl("m[[:digit:]]_ref_rr", names(df_onyx_cat3_w))]))
 ```
 
 ```{r, include=FALSE}
 # Create ICC objects for each age category, device, and measurement type
 
+#==================INDEX===========================================
 # Rad-G ICC objects
 ## Age Cat 1
 icc_radg_cat1_temp <- icc(df_radg_cat1_temp, model = "twoway", type = "agreement", unit = "single")
@@ -1156,12 +1223,78 @@ icc_scan_cat3_rr <- icc(df_scan_cat3_rr, model = "twoway", type = "agreement", u
 icc_onyx_cat3_o2 <- icc(df_onyx_cat3_o2, model = "twoway", type = "agreement", unit = "single")
 icc_onyx_cat3_pr <- icc(df_onyx_cat3_pr, model = "twoway", type = "agreement", unit = "single")
 icc_onyx_cat3_rr <- icc(df_onyx_cat3_rr, model = "twoway", type = "agreement", unit = "single")
+
+#==================REFERENCE===========================================
+# Rad-G ICC objects
+## Age Cat 1
+icc_radg_cat1_temp_ref <- icc(df_radg_cat1_temp_ref, model = "twoway", type = "agreement", unit = "single")
+icc_radg_cat1_o2_ref <- icc(df_radg_cat1_o2_ref, model = "twoway", type = "agreement", unit = "single")
+icc_radg_cat1_pi_ref <- icc(df_radg_cat1_pi_ref, model = "twoway", type = "agreement", unit = "single")
+icc_radg_cat1_pr_ref <- icc(df_radg_cat1_pr_ref, model = "twoway", type = "agreement", unit = "single")
+icc_radg_cat1_rr_ref <- icc(df_radg_cat1_rr_ref, model = "twoway", type = "agreement", unit = "single")
+## Age Cat 2
+icc_radg_cat2_temp_ref <- icc(df_radg_cat2_temp_ref, model = "twoway", type = "agreement", unit = "single")
+icc_radg_cat2_o2_ref <- icc(df_radg_cat2_o2_ref, model = "twoway", type = "agreement", unit = "single")
+icc_radg_cat2_pi_ref <- icc(df_radg_cat2_pi_ref, model = "twoway", type = "agreement", unit = "single")
+icc_radg_cat2_pr_ref <- icc(df_radg_cat2_pr_ref, model = "twoway", type = "agreement", unit = "single")
+icc_radg_cat2_rr_ref <- icc(df_radg_cat2_rr_ref, model = "twoway", type = "agreement", unit = "single")
+## Age Cat 3
+icc_radg_cat3_temp_ref <- icc(df_radg_cat3_temp_ref, model = "twoway", type = "agreement", unit = "single")
+icc_radg_cat3_o2_ref <- icc(df_radg_cat3_o2_ref, model = "twoway", type = "agreement", unit = "single")
+icc_radg_cat3_pi_ref <- icc(df_radg_cat3_pi_ref, model = "twoway", type = "agreement", unit = "single")
+icc_radg_cat3_pr_ref <- icc(df_radg_cat3_pr_ref, model = "twoway", type = "agreement", unit = "single")
+icc_radg_cat3_rr_ref <- icc(df_radg_cat3_rr_ref, model = "twoway", type = "agreement", unit = "single")
+
+# Biolight ICC objects
+## Age Cat 1
+icc_bio_cat1_o2_ref <- icc(df_bio_cat1_o2_ref, model = "twoway", type = "agreement", unit = "single")
+icc_bio_cat1_pr_ref <- icc(df_bio_cat1_pr_ref, model = "twoway", type = "agreement", unit = "single")
+icc_bio_cat1_rr_ref <- icc(df_bio_cat1_rr_ref, model = "twoway", type = "agreement", unit = "single")
+## Age Cat 2
+icc_bio_cat2_o2_ref <- icc(df_bio_cat2_o2_ref, model = "twoway", type = "agreement", unit = "single")
+icc_bio_cat2_pr_ref <- icc(df_bio_cat2_pr_ref, model = "twoway", type = "agreement", unit = "single")
+icc_bio_cat2_rr_ref <- icc(df_bio_cat2_rr_ref, model = "twoway", type = "agreement", unit = "single")
+## Age Cat 3
+icc_bio_cat3_o2_ref <- icc(df_bio_cat3_o2_ref, model = "twoway", type = "agreement", unit = "single")
+icc_bio_cat3_pr_ref <- icc(df_bio_cat3_pr_ref, model = "twoway", type = "agreement", unit = "single")
+icc_bio_cat3_rr_ref <- icc(df_bio_cat3_rr_ref, model = "twoway", type = "agreement", unit = "single")
+
+# NeoGuard ICC objects
+## Age Cat 1
+icc_neo_cat1_temp_ref <- icc(df_neo_cat1_temp_ref, model = "twoway", type = "agreement", unit = "single")
+icc_neo_cat1_o2_ref <- icc(df_neo_cat1_o2_ref, model = "twoway", type = "agreement", unit = "single")
+icc_neo_cat1_pr_ref <- icc(df_neo_cat1_pr_ref, model = "twoway", type = "agreement", unit = "single")
+icc_neo_cat1_rr_ref <- icc(df_neo_cat1_rr_ref, model = "twoway", type = "agreement", unit = "single")
+## Age Cat 2
+icc_neo_cat2_temp_ref <- icc(df_neo_cat2_temp_ref, model = "twoway", type = "agreement", unit = "single")
+icc_neo_cat2_o2_ref <- icc(df_neo_cat2_o2_ref, model = "twoway", type = "agreement", unit = "single")
+icc_neo_cat2_pr_ref <- icc(df_neo_cat2_pr_ref, model = "twoway", type = "agreement", unit = "single")
+icc_neo_cat2_rr_ref <- icc(df_neo_cat2_rr_ref, model = "twoway", type = "agreement", unit = "single")
+## Age Cat 3
+icc_neo_cat3_temp_ref <- icc(df_neo_cat3_temp_ref, model = "twoway", type = "agreement", unit = "single")
+icc_neo_cat3_o2_ref <- icc(df_neo_cat3_o2_ref, model = "twoway", type = "agreement", unit = "single")
+icc_neo_cat3_pr_ref <- icc(df_neo_cat3_pr_ref, model = "twoway", type = "agreement", unit = "single")
+icc_neo_cat3_rr_ref <- icc(df_neo_cat3_rr_ref, model = "twoway", type = "agreement", unit = "single")
+
+# Scanbo ICC objects
+## Age Cat 3
+icc_scan_cat3_temp_ref <- icc(df_scan_cat3_temp_ref, model = "twoway", type = "agreement", unit = "single")
+icc_scan_cat3_o2_ref <- icc(df_scan_cat3_o2_ref, model = "twoway", type = "agreement", unit = "single")
+icc_scan_cat3_pr_ref <- icc(df_scan_cat3_pr_ref, model = "twoway", type = "agreement", unit = "single")
+icc_scan_cat3_rr_ref <- icc(df_scan_cat3_rr_ref, model = "twoway", type = "agreement", unit = "single")
+
+# Onyx ICC objects
+## Age Cat 3
+icc_onyx_cat3_o2_ref <- icc(df_onyx_cat3_o2_ref, model = "twoway", type = "agreement", unit = "single")
+icc_onyx_cat3_pr_ref <- icc(df_onyx_cat3_pr_ref, model = "twoway", type = "agreement", unit = "single")
+icc_onyx_cat3_rr_ref <- icc(df_onyx_cat3_rr_ref, model = "twoway", type = "agreement", unit = "single")
 ```
 
 ```{r, include=FALSE}
 # Build a table of ICC [95%CI] for each age category
 # $value = icc point estimate; $lbound = lower bound of CI; $ubound = upper bound of CI
 
+#==================INDEX==================
 ## Age Cat 1
 out1 <- data.frame(cc = c("", "", "", "", "", "", "", "", "", ""),
                    radg = c(round(icc_radg_cat1_temp$value, 2), paste("(", round(icc_radg_cat1_temp$lbound, 2)," - ", round(icc_radg_cat1_temp$ubound, 2),")", sep = ""), 
@@ -1249,17 +1382,117 @@ icc_t3 <- kable(out3, col.names = c("","Rad-G Temp (Masimo)", "M800 (Biolight)",
   pack_rows("Pulse Rate", 7, 8) %>%
   pack_rows("Respiratory Rate", 9, 10) %>%
   add_header_above(c(" ", "Intraclass correlation coefficient for clinical measures across devices for participantss aged 12-59 months (95%CI)" = 5))
+
+#==================REFERENCE==================
+## Age Cat 1
+out1_ref <- data.frame(cc = c("", "", "", "", "", "", "", "", "", ""),
+                   radg = c(round(icc_radg_cat1_temp_ref$value, 2), paste("(", round(icc_radg_cat1_temp_ref$lbound, 2)," - ", round(icc_radg_cat1_temp_ref$ubound, 2),")", sep = ""), 
+                            round(icc_radg_cat1_o2_ref$value, 2), paste("(", round(icc_radg_cat1_o2_ref$lbound, 2)," - ", round(icc_radg_cat1_o2_ref$ubound, 2),")", sep = ""), 
+                            round(icc_radg_cat1_pi_ref$value, 2), paste("(", round(icc_radg_cat1_pi_ref$lbound, 2)," - ", round(icc_radg_cat1_pi_ref$ubound, 2), ")", sep = ""),
+                            round(icc_radg_cat1_pr_ref$value, 2), paste("(", round(icc_radg_cat1_pr_ref$lbound, 2) ," - ", round(icc_radg_cat1_pr_ref$ubound, 2) ,")", sep = ""),
+                            round(icc_radg_cat1_rr_ref$value, 2), paste("(", round(icc_radg_cat1_rr_ref$lbound, 2)," - ", round(icc_radg_cat1_rr_ref$ubound, 2),")", sep = "")), 
+                   bio = c(NA, NA,
+                           round(icc_bio_cat1_o2_ref$value, 2), paste("(", round(icc_bio_cat1_o2_ref$lbound, 2)," - ", round(icc_bio_cat1_o2_ref$ubound, 2), ")", sep = ""),
+                           NA, NA,
+                           round(icc_bio_cat1_pr_ref$value, 2), paste("(", round(icc_bio_cat1_pr_ref$lbound, 2), " - ", round(icc_bio_cat1_pr_ref$ubound, 2),")", sep = ""),
+                           round(icc_bio_cat1_rr_ref$value, 2), paste("(", round(icc_bio_cat1_rr_ref$lbound, 2) ," - ", round(icc_bio_cat1_rr_ref$ubound, 2),")", sep = "")),
+                   neo = c(round(icc_neo_cat1_temp_ref$value, 2), paste("(", round(icc_neo_cat1_temp_ref$lbound, 2)," - ", round(icc_neo_cat1_temp_ref$ubound, 2), ")", sep = ""),
+                           round(icc_neo_cat1_o2_ref$value, 2), paste("(", round(icc_neo_cat1_o2_ref$lbound, 2), " - ", round(icc_neo_cat1_o2_ref$ubound, 2), ")", sep = ""),
+                           NA, NA,
+                           round(icc_neo_cat1_pr_ref$value, 2), paste("(", round(icc_neo_cat1_pr_ref$lbound, 2), " - ", round(icc_neo_cat1_pr_ref$ubound, 2),")", sep = ""),
+                           round(icc_neo_cat1_rr_ref$value, 2), paste("(", round(icc_neo_cat1_rr_ref$lbound, 2), " - ", round(icc_neo_cat1_rr_ref$ubound, 2), ")", sep = "")))
+icc_t1_ref <- kable(out1_ref, col.names = c("","Rad-G Temp (Masimo)", "M800 (Biolight)", "NeoGuard (Neopenda)")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
+  pack_rows("Temperature", 1, 2) %>%
+  pack_rows("Oxygen", 3, 4) %>%
+  pack_rows("Profusion Index", 5, 6) %>%
+  pack_rows("Pulse Rate", 7, 8) %>%
+  pack_rows("Respiratory Rate", 9, 10) %>%
+  add_header_above(c(" ", "Intraclass correlation coefficient for reference clinical measures across devices for participantss aged 0-1 month (95%CI)" = 3))
+
+# Age Cat 2
+out2_ref <- data.frame(cc = c("", "", "", "", "", "", "", "", "", ""),
+                   radg = c(round(icc_radg_cat2_temp_ref$value, 2), paste("(", round(icc_radg_cat2_temp_ref$lbound, 2)," - ", round(icc_radg_cat2_temp_ref$ubound, 2),")", sep = ""), 
+                            round(icc_radg_cat2_o2_ref$value, 2), paste("(", round(icc_radg_cat2_o2_ref$lbound, 2)," - ", round(icc_radg_cat2_o2_ref$ubound, 2),")", sep = ""), 
+                            round(icc_radg_cat2_pi_ref$value, 2), paste("(", round(icc_radg_cat2_pi_ref$lbound, 2)," - ", round(icc_radg_cat2_pi_ref$ubound, 2), ")", sep = ""),
+                            round(icc_radg_cat2_pr_ref$value, 2), paste("(", round(icc_radg_cat2_pr_ref$lbound, 2) ," - ", round(icc_radg_cat2_pr_ref$ubound, 2) ,")", sep = ""),
+                            round(icc_radg_cat2_rr_ref$value, 2), paste("(", round(icc_radg_cat2_rr_ref$lbound, 2)," - ", round(icc_radg_cat2_rr_ref$ubound, 2),")", sep = "")), 
+                   bio = c(NA, NA,
+                           round(icc_bio_cat2_o2_ref$value, 2), paste("(", round(icc_bio_cat2_o2_ref$lbound, 2)," - ", round(icc_bio_cat2_o2_ref$ubound, 2), ")", sep = ""),
+                           NA, NA,
+                           round(icc_bio_cat2_pr_ref$value, 2), paste("(", round(icc_bio_cat2_pr_ref$lbound, 2), " - ", round(icc_bio_cat2_pr_ref$ubound, 2),")", sep = ""),
+                           round(icc_bio_cat2_rr_ref$value, 2), paste("(", round(icc_bio_cat2_rr_ref$lbound, 2) ," - ", round(icc_bio_cat2_rr_ref$ubound, 2),")", sep = "")),
+                   neo = c(round(icc_neo_cat2_temp_ref$value, 2), paste("(", round(icc_neo_cat2_temp_ref$lbound, 2)," - ", round(icc_neo_cat2_temp_ref$ubound, 2), ")", sep = ""),
+                           round(icc_neo_cat2_o2_ref$value, 2), paste("(", round(icc_neo_cat2_o2_ref$lbound, 2), " - ", round(icc_neo_cat2_o2_ref$ubound, 2), ")", sep = ""),
+                           NA, NA,
+                           round(icc_neo_cat2_pr_ref$value, 2), paste("(", round(icc_neo_cat2_pr_ref$lbound, 2), " - ", round(icc_neo_cat2_pr_ref$ubound, 2),")", sep = ""),
+                           round(icc_neo_cat2_rr_ref$value, 2), paste("(", round(icc_neo_cat2_rr_ref$lbound, 2), " - ", round(icc_neo_cat2_rr_ref$ubound, 2), ")", sep = "")))
+icc_t2_ref <- kable(out2_ref, col.names = c("","Rad-G Temp (Masimo)", "M800 (Biolight)", "NeoGuard (Neopenda)")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
+  pack_rows("Temperature", 1, 2) %>%
+  pack_rows("Oxygen", 3, 4) %>%
+  pack_rows("Profusion Index", 5, 6) %>%
+  pack_rows("Pulse Rate", 7, 8) %>%
+  pack_rows("Respiratory Rate", 9, 10) %>%
+  add_header_above(c(" ", "Intraclass correlation coefficient for reference clinical measures across devices for participantss aged 2-11 months (95%CI)" = 3))
+
+# Age Cat 3
+out3_ref <- data.frame(cc = c("", "", "", "", "", "", "", "", "", ""),
+                   radg = c(round(icc_radg_cat3_temp_ref$value, 2), paste("(", round(icc_radg_cat3_temp_ref$lbound, 2)," - ", round(icc_radg_cat3_temp_ref$ubound, 2),")", sep = ""), 
+                            round(icc_radg_cat3_o2_ref$value, 2), paste("(", round(icc_radg_cat3_o2_ref$lbound, 2)," - ", round(icc_radg_cat3_o2_ref$ubound, 2),")", sep = ""), 
+                            round(icc_radg_cat3_pi_ref$value, 2), paste("(", round(icc_radg_cat3_pi_ref$lbound, 2)," - ", round(icc_radg_cat3_pi_ref$ubound, 2), ")", sep = ""),
+                            round(icc_radg_cat3_pr_ref$value, 2), paste("(", round(icc_radg_cat3_pr_ref$lbound, 2) ," - ", round(icc_radg_cat3_pr_ref$ubound, 2) ,")", sep = ""),
+                            round(icc_radg_cat3_rr_ref$value, 2), paste("(", round(icc_radg_cat3_rr_ref$lbound, 2)," - ", round(icc_radg_cat3_rr_ref$ubound, 2),")", sep = "")), 
+                   bio = c(NA, NA,
+                           round(icc_bio_cat3_o2_ref$value, 2), paste("(", round(icc_bio_cat3_o2_ref$lbound, 2)," - ", round(icc_bio_cat3_o2_ref$ubound, 2), ")", sep = ""),
+                           NA, NA,
+                           round(icc_bio_cat3_pr_ref$value, 2), paste("(", round(icc_bio_cat3_pr_ref$lbound, 2), " - ", round(icc_bio_cat3_pr_ref$ubound, 2),")", sep = ""),
+                           round(icc_bio_cat3_rr_ref$value, 2), paste("(", round(icc_bio_cat3_rr_ref$lbound, 2) ," - ", round(icc_bio_cat3_rr_ref$ubound, 2),")", sep = "")),
+                   scan = c(round(icc_scan_cat3_temp_ref$value, 2), paste("(", round(icc_scan_cat3_temp_ref$lbound, 2)," - ", round(icc_scan_cat3_temp_ref$ubound, 2), ")", sep = ""),
+                           round(icc_scan_cat3_o2_ref$value, 2), paste("(", round(icc_scan_cat3_o2_ref$lbound, 2), " - ", round(icc_scan_cat3_o2_ref$ubound, 2), ")", sep = ""),
+                           NA, NA,
+                           round(icc_scan_cat3_pr_ref$value, 2), paste("(", round(icc_scan_cat3_pr_ref$lbound, 2), " - ", round(icc_scan_cat3_pr_ref$ubound, 2),")", sep = ""),
+                           round(icc_scan_cat3_rr_ref$value, 2), paste("(", round(icc_scan_cat3_rr_ref$lbound, 2), " - ", round(icc_scan_cat3_rr_ref$ubound, 2), ")", sep = "")),
+                   onyx = c(NA, NA,
+                           round(icc_onyx_cat3_o2_ref$value, 2), paste("(", round(icc_onyx_cat3_o2_ref$lbound, 2)," - ", round(icc_onyx_cat3_o2_ref$ubound, 2), ")", sep = ""),
+                           NA, NA,
+                           round(icc_onyx_cat3_pr_ref$value, 2), paste("(", round(icc_onyx_cat3_pr_ref$lbound, 2), " - ", round(icc_onyx_cat3_pr_ref$ubound, 2),")", sep = ""),
+                           round(icc_onyx_cat3_rr_ref$value, 2), paste("(", round(icc_onyx_cat3_rr_ref$lbound, 2) ," - ", round(icc_onyx_cat3_rr_ref$ubound, 2),")", sep = "")),
+                   neo = c(round(icc_neo_cat3_temp_ref$value, 2), paste("(", round(icc_neo_cat3_temp_ref$lbound, 2)," - ", round(icc_neo_cat3_temp_ref$ubound, 2), ")", sep = ""),
+                           round(icc_neo_cat3_o2_ref$value, 2), paste("(", round(icc_neo_cat3_o2_ref$lbound, 2), " - ", round(icc_neo_cat3_o2_ref$ubound, 2), ")", sep = ""),
+                           NA, NA,
+                           round(icc_neo_cat3_pr_ref$value, 2), paste("(", round(icc_neo_cat3_pr_ref$lbound, 2), " - ", round(icc_neo_cat3_pr_ref$ubound, 2),")", sep = ""),
+                           round(icc_neo_cat3_rr_ref$value, 2), paste("(", round(icc_neo_cat3_rr_ref$lbound, 2), " - ", round(icc_neo_cat3_rr_ref$ubound, 2), ")", sep = "")))
+icc_t3_ref <- kable(out3_ref, col.names = c("","Rad-G Temp (Masimo)", "M800 (Biolight)", "Scanbo v8 (Scanbo)", "Onyx PO+RR (Nonin)", "NeoGuard (Neopenda)")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
+  pack_rows("Temperature", 1, 2) %>%
+  pack_rows("Oxygen", 3, 4) %>%
+  pack_rows("Profusion Index", 5, 6) %>%
+  pack_rows("Pulse Rate", 7, 8) %>%
+  pack_rows("Respiratory Rate", 9, 10) %>%
+  add_header_above(c(" ", "Intraclass correlation coefficient for reference clinical measures across devices for participantss aged 12-59 months (95%CI)" = 5))
 ```
 
-## 0-1 month
+## Index Measurements {.tabset}
+
+### 0-1 month
 `r icc_t1`
-## 2-11 months
+### 2-11 months
 `r icc_t2`
-## 12-59 months
+### 12-59 months
 `r icc_t3`
 
+## Reference Measurements {.tabset}
+
+### 0-1 month
+`r icc_t1_ref`
+### 2-11 months
+`r icc_t2_ref`
+### 12-59 months
+`r icc_t3_ref`
+
 # Section 5: Confusion Matrices {.tabset}
-Samwel
+
 Clinical thresholds used in the section are as follows:
 
 - Hypoxemia: <90%
