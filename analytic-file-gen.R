@@ -10,8 +10,9 @@ df_og <- read.csv("C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accura
 
 # Basic cleaning, create new df object to preserve original data
 df <- subset(df_og, redcap_data_access_group!="") #remove if DAG missing, N=2
-df <- subset(df, cg_consent_yn==1) #remove non-consented records, N=147
-df <- subset(df, is.na(df$exclude_data_rsn)) #remove duplicates, requested withdrawals, and insufficient data, N = 94
+df <- subset(df, is.na(exclude_data_rsn) | exclude_data_rsn!=2) # remove duplicate records, N=48
+df <- subset(df, cg_consent_yn==1) #remove non-consented records, N=142
+df <- subset(df, is.na(df$exclude_data_rsn)) #remove requested withdrawals and insufficient data, N = 50
 df <- df %>% select(-c("jan_date", "date_diff", "bdate_diff", "age_cat_calc", "m1_ref_rrpleth", "m2_ref_rrpleth", "m3_ref_rrpleth")) #remove unnecessary fields
 
 # Add device names and cg relationships for codes
