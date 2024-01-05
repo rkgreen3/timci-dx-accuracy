@@ -130,6 +130,7 @@ df$m3_ref_thb <- ifelse(df$m3_ref_thb>=999, NA, df$m3_ref_thb)
 df$country <- case_when(df$facility_name=="TZN01"|df$facility_name=="TZN02" ~ "Tanzania",
                         df$facility_name=="IND01"|df$facility_name=="IND02" ~ "India",
                         df$facility_name=="KYA01"|df$facility_name=="KYA02" ~ "Kenya")
+df$bmi <- (df$weight/(df$height^2))*10000
 
 # Recalculate age
 df$bdate <- paste(df$birth_year, df$birth_month, "15", sep = "-")
