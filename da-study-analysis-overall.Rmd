@@ -64,6 +64,11 @@ df_og <- df_og %>%
          cv_ref_pr = round(sd_ref_pr/mean_ref_pr, 1)*100,
          cv_ref_temp = round(sd_ref_temp/mean_ref_temp, 1)*100,
          cv_ref_pi = round(sd_ref_pi/mean_ref_pi, 1)*100)
+df_og <- df_og %>% 
+          mutate(mean_ref_o2_abnorm = ifelse(mean_ref_o2<90, 1, 0),
+                 mean_ref_pr_abnorm = ifelse((age_months<12 & mean_ref_pr>179) | (age_months>11 & mean_ref_pr>139), 1, 0),
+                 mean_ref_temp_abnorm = ifelse(mean_ref_temp>37 , 1, 0),
+                 mean_ref_pi_abnorm = ifelse(mean_ref_pi<0.5, 1, 0))
 ## Index values
 df_og <- df_og %>% 
   mutate(mean_index_o2 = round(rowMeans(select(df_og, c(m1_index_o2, m2_index_o2, m3_index_o2)), na.rm = TRUE), 1),
@@ -391,7 +396,7 @@ factorVars <- c("age_cat", "sex","cg_relationship",
                 "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
                 "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_other",
                 "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
-                "tx_other")
+                "tx_other", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm")
 
 # Specify all the variables to include in table 1 (both continuous and categorical)
 myVars <- c("age_cat", "sex","cg_relationship", 
@@ -401,7 +406,7 @@ myVars <- c("age_cat", "sex","cg_relationship",
             "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
             "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_other",
             "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
-            "tx_other", "height", "weight", "muac", "head_circumference", "hemocue_hb", "mean_ref_o2", "mean_ref_pr", "mean_ref_temp", "mean_ref_pi")
+            "tx_other", "height", "weight", "muac", "head_circumference", "hemocue_hb", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm")
 
 # CreateTableOne:
 out1 <- CreateTableOne(vars = myVars,
@@ -420,8 +425,8 @@ t1lab <- c("N", "Age Category (%)", "0-1 month", "2-11 months", "12-59 months", 
               member", "Sibling", "Visited due to Illness (%)", "Visited for Immunization (%)", "Visited for Routine Monitoring (%)", "Visited due to Trauma (%)", "Admission to inpatient unit of the
              facility (%)", "Cough (%)", "Difficulty/Rapid breathing (%)", "Fever (%)", "Diarrhea (%)", "Vomiting (%)", "Other (%)", "Received Diagnosis (%)", "Dehydration", "Respiratory", "Digestive", "Malaria", 
               "Fever", "Measles=False", "Ear infection", "Throat infection", "Other", "Received Treatment (%)", "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other", "Height (cm) (mean (SD))", 
-            "Weight (kg) (mean (SD))", "MUAC (cm) (mean (SD))", "Head Circumference (cm) (mean (SD))", "Hemocue (g/dL) (mean (SD))", "SpO2 (reference) (mean (SD))", "Pulse Rate (reference) (mean (SD))",  "Temperature 
-              (reference) (mean (SD))", "Profusion Index (reference) (mean (SD))")
+            "Weight (kg) (mean (SD))", "MUAC (cm) (mean (SD))", "Head Circumference (cm) (mean (SD))", "Hemocue (g/dL) (mean (SD))", "Abnormal SpO2 (reference) (%)", "Abnormal Pulse Rate (reference) (mean (SD))",  
+            "Abnormal Temperature (reference) (%)", "Abnormal Profusion Index (reference) (%)")
 
 # Add row labels
 rownames(t1_overall) <- c(t1lab)

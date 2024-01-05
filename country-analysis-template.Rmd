@@ -71,6 +71,11 @@ df_og <- df_og %>%
          cv_ref_pr = round(sd_ref_pr/mean_ref_pr, 1)*100,
          cv_ref_temp = round(sd_ref_temp/mean_ref_temp, 1)*100,
          cv_ref_pi = round(sd_ref_pi/mean_ref_pi, 1)*100)
+df_og <- df_og %>% 
+          mutate(mean_ref_o2_abnorm = ifelse(mean_ref_o2<90, 1, 0),
+                 mean_ref_pr_abnorm = ifelse((age_months<12 & mean_ref_pr>179) | (age_months>11 & mean_ref_pr>139), 1, 0),
+                 mean_ref_temp_abnorm = ifelse(mean_ref_temp>37 , 1, 0),
+                 mean_ref_pi_abnorm = ifelse(mean_ref_pi<0.5, 1, 0))
 ## Index values
 df_og <- df_og %>% 
   mutate(mean_index_o2 = round(rowMeans(select(df_og, c(m1_index_o2, m2_index_o2, m3_index_o2)), na.rm = TRUE), 1),
@@ -398,7 +403,7 @@ factorVars <- c("age_cat", "sex","cg_relationship",
                 "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
                 "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_other",
                 "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
-                "tx_other")
+                "tx_other", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm")
 
 # Relevel the age_cat factors
 
@@ -416,7 +421,7 @@ myVars <- c("age_cat", "sex","cg_relationship",
             "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
             "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_other",
             "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
-            "tx_other", "height", "weight", "muac", "head_circumference", "hemocue_hb", "mean_ref_o2", "mean_ref_pr", "mean_ref_temp", "mean_ref_pi")
+            "tx_other", "height", "weight", "muac", "head_circumference", "hemocue_hb", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm")
 
 # CreateTableOne:
 out1 <- CreateTableOne(vars = myVars,
