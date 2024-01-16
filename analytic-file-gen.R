@@ -137,11 +137,12 @@ df$bdate <- paste(df$birth_year, df$birth_month, "15", sep = "-")
 df$bdate <- as.Date(df$bdate)
 df$visit_date <- as.Date(df$visit_date)
 df$month_diff <- interval(df$bdate, df$visit_date) %/% days(1) / (365/12)
-df$age_cat2 <- case_when(df$month_diff<2 ~ "0-1 month",
-                         df$month_diff>=2 & df$month_diff<12 ~ "2-11 months",
-                         df$month_diff>=12 ~ "12-59 months")
-df$age_cat <- df$age_cat2
 df$age_months <- round(df$month_diff, 0)
+df$age_cat2 <- case_when(df$age_months<2 ~ "0-1 month",
+                         df$age_months>=2 & df$age_months<12 ~ "2-11 months",
+                         df$age_months>=12 ~ "12-59 months")
+df$age_cat <- df$age_cat2
+
 
 # Convert crazy high temps from F to C
 df$m1_index_temp_f <- ifelse(df$m1_index_temp>40, df$m1_index_temp, NA)
