@@ -4,6 +4,7 @@
 library(plyr)
 library(dplyr)
 library(lubridate)
+library(zscorer)
 
 # Read in REDCap data for Kenya, Tanzania, and India (saved in Box)
 df_og <- read.csv("C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_2024-01-18.csv") #update file path to local machine
@@ -142,6 +143,7 @@ df$age_cat2 <- case_when(df$age_months<2 ~ "0-1 month",
                          df$age_months>=2 & df$age_months<12 ~ "2-11 months",
                          df$age_months>=12 ~ "12-59 months")
 df$age_cat <- df$age_cat2
+df$age_months <- ifelse(df$age_months<0, 0.5, df$age_months)
 
 # Reconcile calculated age and assigned age category against country-provided information
 india_age_df <- read.csv("C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/india-da-ages.csv")
@@ -168,6 +170,31 @@ df$m2_index_temp_f <- ifelse(df$m2_index_temp>40, df$m2_index_temp, NA)
 df$m2_index_temp <- ifelse(df$m2_index_temp>40, ((df$m2_index_temp_f-32) * (5/9)), df$m2_index_temp)
 df$m3_index_temp_f <- ifelse(df$m3_index_temp>40, df$m3_index_temp, NA)
 df$m3_index_temp <- ifelse(df$m3_index_temp>40, ((df$m3_index_temp_f-32) * (5/9)), df$m3_index_temp)
+
+# Calculate z-scores for nutrition metrics; use to create indicator variables
+df$sex_z <- ifelse(df$sex==0, 1, 2)
+df$age_days <- ifelse(df$age_months<6, df$age_months * (365.25 / 12), df$age_months * 30.42)
+df$height_z <- round(df$height, 0)
+df <- addWGSR(data=df, sex="sex_z", firstPart = "weight", secondPart = "height_z", index = "wfh") #weight-for-height
+df <- addWGSR(data=df, sex="sex_z", firstPart = "height_z", secondPart = "age_days", index = "hfa") #height/length-for-age
+df <- addWGSR(data=df, sex="sex_z", firstPart = "muac", secondPart = "age_days", index = "mfa") #muac-for-age
+df <- addWGSR(data=df, sex="sex_z", firstPart = "head_circumference", secondPart = "age_days", index = "hca") #head circumference-for-age
+df <- df %>% mutate(
+              stunted = case_when(hfaz <=-3 ~ "severe",
+                                  hfaz <=-2 & hfaz >-3 ~ "moderate",
+                                  hfaz >-2 ~ "normal"),
+              wasted_overweight = case_when(wfhz <= -3 ~ "severely wasted",
+                                            wfhz <=-2 & wfhz >-3 ~ "moderately wasted",
+                                            wfhz <=2 & wfhz >-2 ~ "normal",
+                                            wfhz >2 ~ "overweight")
+)
+
+# Create anemia status variable (based on WHO guidelines: WHO/NMH/NHD/MNM/11.1)
+df$anemia_status <- case_when(df$hemocue_hb<7.0 ~ "severe",
+                              df$hemocue_hb<10 & df$hemocue_hb>=7.0 ~ "moderate",
+                              df$hemocue_hb<11 & df$hemocue_hb>=10.0 ~ "mild",
+                              df$hemocue_hb>=11.0 ~ "none")
+df$anemia_status <- ifelse(df$age_months<6, NA, df$anemia_status)
 
 # Remove unnecessary variables 
 df <- df %>% select(-c(bdate, age_cat2, month_diff, m1_30s_pic, m1_90s_pic, m2_30s_pic, m2_90s_pic, m3_30s_pic, m3_90s_pic, m1_index_spo2, m1_ref_sp02, m2_index_spo2, m2_ref_sp02, m3_index_spo2, m3_ref_sp02, cg_interview_yn, cg_sex, cg_edu_mother, cg_edu_mother_oth, cg_overall_comfort, cg_like_most, cg_like_least, cg_prov_challenges_yn, cg_prov_challenges, cg_overall_satisfied, cg_confident_use, cg_confident_performance, cg_adequate_assess_yn,  cg_adequate_assess_rsn, cg_advantage, cg_concerns, cg_compare_assess, cg_compare_assess_rsn, cg_useful, cg_useful_rsn, cg_rec_device, cg_rec_device_rsn, cg_rec_facility, cg_rec_facility_rsn,  cg_major_considerations, cg_provider_use_yn, cg_provider_use, cg_overall_impression, cg_advantages, cg_disadvantages, cg_understand_purpose, cg_discomfort, cg_discomfort_des, cg_recommend,  cg_change_desire, cg_oth_comments, caregiver_interview_complete))
