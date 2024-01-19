@@ -1,4 +1,4 @@
-# Version date: 2024-01-03
+# Version date: 2024-01-19
 
 # Load packages
 library(plyr)
@@ -11,8 +11,8 @@ df_og <- read.csv("C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accura
 # Basic cleaning, create new df object to preserve original data
 df <- subset(df_og, redcap_data_access_group!="") #remove if DAG missing, N=2
 df <- subset(df, is.na(exclude_data_rsn) | exclude_data_rsn!=2) # remove duplicate records, N=50
-df <- subset(df, cg_consent_yn==1) #remove non-consented records, N=142
-df <- subset(df, is.na(df$exclude_data_rsn)) #remove requested withdrawals and insufficient data, N = 50
+df <- subset(df, cg_consent_yn==1) #remove non-consented records, N=141
+df <- subset(df, is.na(df$exclude_data_rsn)) #remove requested withdrawals, insufficient data, and other, N = 97
 df <- df %>% select(-c("jan_date", "date_diff", "bdate_diff", "age_cat_calc", "m1_ref_rrpleth", "m2_ref_rrpleth", "m3_ref_rrpleth")) #remove unnecessary fields
 
 # Add device names and cg relationships for codes
@@ -143,6 +143,23 @@ df$age_cat2 <- case_when(df$age_months<2 ~ "0-1 month",
                          df$age_months>=12 ~ "12-59 months")
 df$age_cat <- df$age_cat2
 
+# Reconcile calculated age and assigned age category against country-provided information
+india_age_df <- read.csv("C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/india-da-ages.csv")
+mathare_age_df <- read.csv("C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/mathare-da-age-groups.csv")
+age_df <- df %>% select(ppt_id, country, age_months, age_cat)
+age_df <- left_join(age_df, india_age_df, by = "ppt_id")
+age_df <- left_join(age_df, mathare_age_df, by = "ppt_id")
+age_df$age_months <- ifelse(!is.na(age_df$age_in_months) & age_df$country=="India", age_df$age_in_months, age_df$age_months)
+age_df$age_category <- case_when(age_df$age_category == "12-59mo" ~ "12-59 months",
+                                 age_df$age_category == "2-12mo" ~ "2-11 months",
+                                 age_df$age_category == "0-2mo" ~ "0-1 month")
+age_df$discrepant_cat <- ifelse(age_df$age_cat!=age_df$age_category, 1, 0)
+age_df$age_cat <- ifelse(age_df$discrepant_cat==1 & startsWith(age_df$ppt_id, "13407"), age_df$age_category, age_df$age_cat)
+age_df$age_months <- ifelse(age_df$ppt_id=="13407-175", 11.90, age_df$age_months)
+age_df$age_months <- ifelse(age_df$ppt_id=="13407-191", 1.90, age_df$age_months)
+age_df <- age_df %>% select(-c(age_in_months, age_category, country, discrepant_cat)) #prepare to join back to main df
+df <- df %>% select(-c(age_months, age_cat))
+df <- left_join(df, age_df, by="ppt_id")
 
 # Convert crazy high temps from F to C
 df$m1_index_temp_f <- ifelse(df$m1_index_temp>40, df$m1_index_temp, NA)
