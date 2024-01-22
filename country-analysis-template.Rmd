@@ -74,7 +74,7 @@ df_og <- df_og %>%
 df_og <- df_og %>% 
           mutate(mean_ref_o2_abnorm = ifelse(mean_ref_o2<90, 1, 0),
                  mean_ref_pr_abnorm = ifelse((age_months<12 & mean_ref_pr>179) | (age_months>11 & mean_ref_pr>139), 1, 0),
-                 mean_ref_temp_abnorm = ifelse(mean_ref_temp>37 , 1, 0),
+                 mean_ref_temp_abnorm = ifelse(mean_ref_temp>37.9 , 1, 0),
                  mean_ref_pi_abnorm = ifelse(mean_ref_pi<0.5, 1, 0))
 ## Index values
 df_og <- df_og %>% 
@@ -168,8 +168,8 @@ mdf_reshaped <- left_join(mdf_reshaped_i, mdf_reshaped_r, by = c("ppt_id", "inde
 # Add indicator variables here for clinical thresholds (long format) -- Note: From the SAP, these are defined for the user in Section 5, if changed here be sure to change there and below
 mdf_reshaped$index_hypoxic <- ifelse(mdf_reshaped$index_o2<90, 1, 0)
 mdf_reshaped$ref_hypoxic <- ifelse(mdf_reshaped$ref_o2<90, 1, 0)
-mdf_reshaped$index_fever <- ifelse(mdf_reshaped$index_temp>37, 1, 0)
-mdf_reshaped$ref_fever <- ifelse(mdf_reshaped$ref_temp>37, 1, 0)
+mdf_reshaped$index_fever <- ifelse(mdf_reshaped$index_temp>37.9, 1, 0)
+mdf_reshaped$ref_fever <- ifelse(mdf_reshaped$ref_temp>37.9, 1, 0)
 mdf_reshaped$index_fastbreath_12mo <- ifelse(mdf_reshaped$index_rr>49 & mdf_reshaped$age_months<12, 1, 0)
 mdf_reshaped$ref_fastbreath_12mo <- ifelse(mdf_reshaped$ref_rr>49 & mdf_reshaped$age_months<12, 1, 0)
 mdf_reshaped$index_fastbreath_35mo <- ifelse(mdf_reshaped$index_rr>39 & (mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36), 1, 0)
@@ -249,8 +249,8 @@ df_scan_cat4fb_l <- subset(df_scan_l, age_cat_fastbreathe=="36-59 months")
 ## M1
 df_og$m1_index_hypoxic <- ifelse(df_og$m1_index_o2<90, 1, 0)
 df_og$m1_ref_hypoxic <- ifelse(df_og$m1_ref_o2<90, 1, 0)
-df_og$m1_index_fever <- ifelse(df_og$m1_index_temp>37, 1, 0)
-df_og$m1_ref_fever <- ifelse(df_og$m1_therm_skin_temp>37, 1, 0)
+df_og$m1_index_fever <- ifelse(df_og$m1_index_temp>37.9, 1, 0)
+df_og$m1_ref_fever <- ifelse(df_og$m1_therm_skin_temp>37.9, 1, 0)
 df_og$m1_index_fastbreath_12mo <- ifelse(df_og$m1_index_rr>49 & df_og$age_months<12, 1, 0)
 df_og$m1_ref_fastbreath_12mo <- ifelse(df_og$m1_ref_rracoustic>49 & df_og$age_months<12, 1, 0)
 df_og$m1_index_fastbreath_35mo <- ifelse(df_og$m1_index_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
@@ -264,8 +264,8 @@ df_og$m1_ref_tachycardic_59mo <- ifelse(df_og$m1_ref_pr>139 & df_og$age_months>1
 ## M2
 df_og$m2_index_hypoxic <- ifelse(df_og$m2_index_o2<90, 1, 0)
 df_og$m2_ref_hypoxic <- ifelse(df_og$m2_ref_o2<90, 1, 0)
-df_og$m2_index_fever <- ifelse(df_og$m2_index_temp>37, 1, 0)
-df_og$m2_ref_fever <- ifelse(df_og$m2_therm_skin_temp>37, 1, 0)
+df_og$m2_index_fever <- ifelse(df_og$m2_index_temp>37.9, 1, 0)
+df_og$m2_ref_fever <- ifelse(df_og$m2_therm_skin_temp>37.9, 1, 0)
 df_og$m2_index_fastbreath_12mo <- ifelse(df_og$m2_index_rr>49 & df_og$age_months<12, 1, 0)
 df_og$m2_ref_fastbreath_12mo <- ifelse(df_og$m2_ref_rracoustic>49 & df_og$age_months<12, 1, 0)
 df_og$m2_index_fastbreath_35mo <- ifelse(df_og$m2_index_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
@@ -279,8 +279,8 @@ df_og$m2_ref_tachycardic_59mo <- ifelse(df_og$m2_ref_pr>139 & df_og$age_months>1
 ## M3
 df_og$m3_index_hypoxic <- ifelse(df_og$m3_index_o2<90, 1, 0)
 df_og$m3_ref_hypoxic <- ifelse(df_og$m3_ref_o2<90, 1, 0)
-df_og$m3_index_fever <- ifelse(df_og$m3_index_temp>37, 1, 0)
-df_og$m3_ref_fever <- ifelse(df_og$m3_therm_skin_temp>37, 1, 0)
+df_og$m3_index_fever <- ifelse(df_og$m3_index_temp>37.9, 1, 0)
+df_og$m3_ref_fever <- ifelse(df_og$m3_therm_skin_temp>37.9, 1, 0)
 df_og$m3_index_fastbreath_12mo <- ifelse(df_og$m3_index_rr>49 & df_og$age_months<12, 1, 0)
 df_og$m3_ref_fastbreath_12mo <- ifelse(df_og$m3_ref_rracoustic>49 & df_og$age_months<12, 1, 0)
 df_og$m3_index_fastbreath_35mo <- ifelse(df_og$m3_index_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
@@ -1547,7 +1547,7 @@ Clinical thresholds used in the section are as follows:
 - Hypoxemia: <90%
 - Fast breathing: <12 months (>49 bpm); 12-35 months (>39 bpm); 36-60 months (>29 bpm)
 - Tachycardia: <12 months (>179 bpm); 12-60 months (>139 bpm)
-- Fever: >37C (≥100.4F)
+- Fever: >37.9C (≥100.4F)
 
 ## Rad-G Temp (Masimo) {.tabset}
 ```{r, include=FALSE}
