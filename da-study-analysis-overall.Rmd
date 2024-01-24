@@ -32,12 +32,15 @@ library(reshape2)
 library(ggplot2)
 
 # Read in (cleaned) data 
-filename <- "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2024-01-19.csv"
+filename <- "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2024-01-23.csv"
 df_og <- read.csv(filename)
 df_og <- df_og %>% select(-c("X", "m1_index_temp_f", "m2_index_temp_f", "m3_index_temp_f"))
 
-# Relevel the age_cat factors
+# Relevel age_cat and nutrition vars as factors
 df_og$age_cat <- factor(df_og$age_cat,levels = c("0-1 month","2-11 months","12-59 months"))
+df_og$stunted <- factor(df_og$stunted, levels = c("severe", "moderate", "normal"))
+df_og$wasted_overweight <- factor(df_og$wasted_overweight, levels = c("severely wasted", "moderately wasted", "normal", "overweight"))
+df_og$anemia_status <- factor(df_og$anemia_status, levels = c("severe", "moderate", "mild", "none"))
 
 # Create variables for the mean, SD, min, max, and %CV of reference and index measures across all 3 measurements per row (to be used in Table 1 and Section 2 tables)
 ## Reference values
@@ -106,6 +109,7 @@ df_og <- df_og %>%
 ## use regular expressions to identify measurement-related columns and trim to only variables needed
 df_reshaped <- df_og %>% select(ppt_id, index_device_name, age_months, age_cat, colnames(df_og[grepl("m[[:digit:]]_index_+", names(df_og))]), colnames(df_og[grepl("therm", names(df_og))]), colnames(df_og[grepl("m[[:digit:]]_ref_+", names(df_og))]))
 df_reshaped <- df_reshaped %>% select(-c(colnames(df_og[grepl("error", names(df_og))]), colnames(df_og[grepl("attempt", names(df_og))]), colnames(df_og[grepl("thb", names(df_og))])))
+df_reshaped <- df_reshaped %>% select(-c(colnames(df_reshaped[grepl("confident", names(df_reshaped))])))
 mdf_reshaped <- melt(df_reshaped, id.vars = c("ppt_id", "index_device_name", "age_months", "age_cat")) ## Melt df into long format, maintaining ID vars
 mdf_reshaped$grp <- toupper(substr(mdf_reshaped$variable, start = 1, stop = 2)) # Extract measurement number into grouping variable
 mdf_reshaped$mes <- substr(mdf_reshaped$variable, start = 4, stop = nchar(as.character(mdf_reshaped$variable))) # Extract index/ref and measurement type into variable
@@ -147,14 +151,19 @@ mdf_reshaped_r_pr <- mdf_reshaped_r_pr %>% select(-c(mes))
 mdf_reshaped_r_pi <- subset(mdf_reshaped_r, grepl("pi", mdf_reshaped_r$mes)) # PI
 names(mdf_reshaped_r_pi)[5] <- paste(mdf_reshaped_r_pi$mes)
 mdf_reshaped_r_pi <- mdf_reshaped_r_pi %>% select(-c(mes))
-mdf_reshaped_r_rr <- subset(mdf_reshaped_r, grepl("rr", mdf_reshaped_r$mes)) # RR
+mdf_reshaped_r_rr <- subset(mdf_reshaped_r, grepl("rr", mdf_reshaped_r$mes)) # RR-all
+mdf_reshaped_r_rrac <- subset(mdf_reshaped_r_rr, grepl("rracoustic", mdf_reshaped_r_rr$mes)) # RR-acoustic
+names(mdf_reshaped_r_rrac)[5] <- paste(mdf_reshaped_r_rrac$mes)
+mdf_reshaped_r_rr <- subset(mdf_reshaped_r_rr, !grepl("rracoustic", mdf_reshaped_r_rr$mes)) # RR
 names(mdf_reshaped_r_rr)[5] <- paste(mdf_reshaped_r_rr$mes)
 mdf_reshaped_r_rr <- mdf_reshaped_r_rr %>% select(-c(mes))
+mdf_reshaped_r_rrac <- mdf_reshaped_r_rrac %>% select(-c(mes))
 ## Join back to one df for recreation of full df
 mdf_reshaped_r <- left_join(mdf_reshaped_r_temp, mdf_reshaped_r_o2, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
 mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_pr, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
 mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_pi, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
 mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_rr, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_rrac, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
 # Join index and ref df's back to one melted df
 mdf_reshaped <- left_join(mdf_reshaped_i, mdf_reshaped_r, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp")) #long format df w/index & ref measurements for all devices & measurement types
 
@@ -396,7 +405,7 @@ factorVars <- c("age_cat", "sex","cg_relationship",
                 "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
                 "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_other",
                 "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
-                "tx_other", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm")
+                "tx_other", "stunted", "wasted_overweight", "anemia_status", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm")
 
 # Specify all the variables to include in table 1 (both continuous and categorical)
 myVars <- c("age_cat", "sex","cg_relationship", 
@@ -406,7 +415,7 @@ myVars <- c("age_cat", "sex","cg_relationship",
             "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
             "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_other",
             "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
-            "tx_other", "height", "weight", "muac", "head_circumference", "hemocue_hb", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm")
+            "tx_other", "stunted", "wasted_overweight", "anemia_status", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm")
 
 # CreateTableOne:
 out1 <- CreateTableOne(vars = myVars,
@@ -424,8 +433,7 @@ t1lab <- c("N", "Age Category (%)", "0-1 month", "2-11 months", "12-59 months", 
             "Relationship of caregiver to child (%)", "Community member", "Father only", "Grandfather only", "Grandmother only", "Mother and father", "Mother and grandmother", "Mother only", "Other", "Other family   
               member", "Sibling", "Visited due to Illness (%)", "Visited for Immunization (%)", "Visited for Routine Monitoring (%)", "Visited due to Trauma (%)", "Admission to inpatient unit of the
              facility (%)", "Cough (%)", "Difficulty/Rapid breathing (%)", "Fever (%)", "Diarrhea (%)", "Vomiting (%)", "Other (%)", "Received Diagnosis (%)", "Dehydration", "Respiratory", "Digestive", "Malaria", 
-              "Fever", "Measles=False", "Ear infection", "Throat infection", "Other", "Received Treatment (%)", "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other", "Height (cm) (mean (SD))", 
-            "Weight (kg) (mean (SD))", "MUAC (cm) (mean (SD))", "Head Circumference (cm) (mean (SD))", "Hemocue (g/dL) (mean (SD))", "Abnormal SpO2 (reference) (%)", "Abnormal Pulse Rate (reference) (mean (SD))",  
+              "Fever", "Measles=False", "Ear infection", "Throat infection", "Other", "Received Treatment (%)", "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other", "Stunting (%)", "Severe", "Moderate", "Normal", "Wasting (%)", "Severely Wasted", "Moderately Wasted", "Normal", "Overweight", "Anemia (%)", "Severe", "Moderate", "Mild", "Normal", "Abnormal SpO2 (reference) (%)", "Abnormal Pulse Rate (reference) (mean (SD))",  
             "Abnormal Temperature (reference) (%)", "Abnormal Profusion Index (reference) (%)")
 
 # Add row labels
@@ -433,14 +441,14 @@ rownames(t1_overall) <- c(t1lab)
 
 t1 <- kable(t1_overall) %>%
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
-  add_indent(c(3:5, 8:17)) %>%
+  add_indent(c(3:5, 8:17, 46:48, 50:53, 55:58)) %>%
   pack_rows("Demographic Characteristics", 2, 17) %>%
   pack_rows("Reason for visit to clinic", 18, 22) %>%
   pack_rows("Symptoms Present", 23, 28) %>%
   pack_rows("Diagnosis", 29, 38) %>%
   pack_rows("Treatment received", 39, 44) %>%
-  pack_rows("Physical Characteristics", 45, 48) %>%
-  pack_rows("Reference Measurements", 49, 53)
+  pack_rows("Physical Characteristics", 45, 58) %>%
+  pack_rows("Reference Measurements", 59, 62)
 ```
 `r t1`
 
