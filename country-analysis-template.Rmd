@@ -403,7 +403,7 @@ This report contains data from **`r COUNTRY`**.
 # Section 1: Participant Characteristics {.tabset}
 
 ## Table 1: Participant Characteristics Overall and by Facility
-Note: Reference measure summaries presented in this table (for measurements obtained at more than one time point) are the population mean/SD of the summarized measures (i.e., mean of the mean of M1-3).
+Note: Reference measure summaries presented in this table (for measurements obtained at more than one time point) are the population mean/SD of the summarized measures (i.e., mean of the mean of M1-3). Z-scores calculated for weight-for-height, height-for-age, MUAC-for-age, and head circumference-for-age; WFH and HFA are used to define stunting and wasting. MUAC tables start at 3 months (<3mo excluded); missing height data results in NA's for WFH and HFA. HCA is available for all participants. MFA and HCA are not displayed.
 
 ```{r include = FALSE}
 # Specify all the variables you want to treat as factors

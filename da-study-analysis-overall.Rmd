@@ -393,7 +393,7 @@ This report contains data from **ALL COUNTRY DATA**.
 # Section 1: Participant Characteristics {.tabset}
 
 ## Table 1: Participant Characteristics Overall and by Facility
-Note: Reference measure summaries presented in this table (for measurements obtained at more than one time point) are the population mean/SD of the summarized measures (i.e., mean of the mean of M1-3).
+Note: Reference measure summaries presented in this table (for measurements obtained at more than one time point) are the population mean/SD of the summarized measures (i.e., mean of the mean of M1-3). Z-scores calculated for weight-for-height, height-for-age, MUAC-for-age, and head circumference-for-age; WFH and HFA are used to define stunting and wasting. MUAC tables start at 3 months (<3mo excluded); missing height data results in NA's for WFH and HFA. HCA is available for all participants. MFA and HCA are not displayed.
 
 ```{r include = FALSE}
 # Specify all the variables you want to treat as factors
@@ -433,7 +433,7 @@ t1lab <- c("N", "Age Category (%)", "0-1 month", "2-11 months", "12-59 months", 
             "Relationship of caregiver to child (%)", "Community member", "Father only", "Grandfather only", "Grandmother only", "Mother and father", "Mother and grandmother", "Mother only", "Other", "Other family   
               member", "Sibling", "Visited due to Illness (%)", "Visited for Immunization (%)", "Visited for Routine Monitoring (%)", "Visited due to Trauma (%)", "Admission to inpatient unit of the
              facility (%)", "Cough (%)", "Difficulty/Rapid breathing (%)", "Fever (%)", "Diarrhea (%)", "Vomiting (%)", "Other (%)", "Received Diagnosis (%)", "Dehydration", "Respiratory", "Digestive", "Malaria", 
-              "Fever", "Measles=False", "Ear infection", "Throat infection", "Other", "Received Treatment (%)", "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other", "Stunting (%)", "Severe", "Moderate", "Normal", "Wasting (%)", "Severely Wasted", "Moderately Wasted", "Normal", "Overweight", "Anemia (%)", "Severe", "Moderate", "Mild", "Normal", "Abnormal SpO2 (reference) (%)", "Abnormal Pulse Rate (reference) (mean (SD))",  
+              "Fever", "Measles=False", "Ear infection", "Throat infection", "Other", "Received Treatment (%)", "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other", "Stunting (%)", "Severe", "Moderate", "Normal", "Wasting (%)", "Severely Wasted", "Moderately Wasted", "Normal", "Overweight", "Anemia* (%)", "Severe", "Moderate", "Mild", "Normal", "Abnormal SpO2 (reference) (%)", "Abnormal Pulse Rate (reference) (mean (SD))",  
             "Abnormal Temperature (reference) (%)", "Abnormal Profusion Index (reference) (%)")
 
 # Add row labels
@@ -448,7 +448,8 @@ t1 <- kable(t1_overall) %>%
   pack_rows("Diagnosis", 29, 38) %>%
   pack_rows("Treatment received", 39, 44) %>%
   pack_rows("Physical Characteristics", 45, 58) %>%
-  pack_rows("Reference Measurements", 59, 62)
+  pack_rows("Reference Measurements", 59, 62) %>%
+  add_footnote("Participants <6mo of age excluded per available WHO thresholds", notation = "symbol")
 ```
 `r t1`
 

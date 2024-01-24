@@ -76,6 +76,11 @@ df$tx_sum <- df$tx_antibiotic + df$tx_antimalarial + df$tx_dehydration + df$tx_b
 df$tx_multiple <- ifelse(df$tx_sum>1, 1, 0)
 
 # Replace all 999 with NA
+df$weight <- ifelse(df$weight>=999, NA, df$weight)
+df$height <- ifelse(df$height>=999, NA, df$height)
+df$muac <- ifelse(df$muac>=999, NA, df$muac)
+df$head_circumference <- ifelse(df$head_circumference>=999, NA, df$head_circumference)
+
 ## M1
 df$m1_index_o2 <- as.numeric(df$m1_index_o2) #remove imaginary numbers
 
