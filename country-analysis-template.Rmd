@@ -498,7 +498,8 @@ t1_overall <- print(out1,
 
 t1 <- kable(t1_overall) %>%
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
-  add_indent(c(3:5))
+  add_indent(c(3:5)) %>%
+  add_footnote("Participants <6mo of age excluded from anemia classification per available WHO thresholds")
 ```
 `r t1`
 
