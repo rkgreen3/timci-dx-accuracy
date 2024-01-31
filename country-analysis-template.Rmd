@@ -119,7 +119,7 @@ df_og <- df_og %>%
 ## use regular expressions to identify measurement-related columns and trim to only variables needed
 df_reshaped <- df_og %>% select(ppt_id, index_device_name, age_months, age_cat, colnames(df_og[grepl("m[[:digit:]]_index_+", names(df_og))]), colnames(df_og[grepl("therm", names(df_og))]), colnames(df_og[grepl("m[[:digit:]]_ref_+", names(df_og))]))
 df_reshaped <- df_reshaped %>% select(-c(colnames(df_og[grepl("error", names(df_og))]), colnames(df_og[grepl("attempt", names(df_og))]), colnames(df_og[grepl("thb", names(df_og))])))
-df_reshaped <- df_reshaped %>% select(-c(colnames(df_reshaped[grepl("confident", names(df_reshaped))]), colnames(df_reshaped[grepl("rracoustic", names(df_reshaped))])))
+df_reshaped <- df_reshaped %>% select(-c(colnames(df_reshaped[grepl("confident", names(df_reshaped))])))
 mdf_reshaped <- melt(df_reshaped, id.vars = c("ppt_id", "index_device_name", "age_months", "age_cat")) ## Melt df into long format, maintaining ID vars
 mdf_reshaped$grp <- toupper(substr(mdf_reshaped$variable, start = 1, stop = 2)) # Extract measurement number into grouping variable
 mdf_reshaped$mes <- substr(mdf_reshaped$variable, start = 4, stop = nchar(as.character(mdf_reshaped$variable))) # Extract index/ref and measurement type into variable
