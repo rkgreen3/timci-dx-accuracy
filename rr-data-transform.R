@@ -136,4 +136,4 @@ export_df <- left_join(jdf1, jdf2, by = "ppt_id")
 export_df <- left_join(export_df, jdf3, by = "ppt_id")
 
 # write to csv -- update file name
-write.csv(export_df, "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/tanzania_annotated_rr_import_2024-01-19.csv")
+write.csv(export_df, "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/india_annotated_rr_import_2024-02-01.csv")
