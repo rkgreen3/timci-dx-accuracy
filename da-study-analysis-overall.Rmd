@@ -400,7 +400,7 @@ This report contains data from **ALL COUNTRY DATA**.
 # Section 1: Participant Characteristics {.tabset}
 
 ## Table 1: Participant Characteristics Overall and by Facility
-Note: Reference measure summaries presented in this table (for measurements obtained at more than one time point) are the population mean/SD of the summarized measures (i.e., mean of the mean of M1-3). Z-scores calculated for weight-for-height, height-for-age, MUAC-for-age, and head circumference-for-age; WFH and HFA are used to define stunting and wasting. MUAC tables start at 3 months (<3mo excluded); missing height data results in NA's for WFH and HFA. HCA is available for all participants. MFA and HCA are not displayed.
+Note: Abnormal reference measure proportions presented in this table are based on the overall mean of measures summarized (i.e., mean of the mean of M1-3). Z-scores calculated for weight-for-height, height-for-age, MUAC-for-age, and head circumference-for-age; WFH and HFA are used to define stunting and wasting. MUAC tables start at 3 months (<3mo excluded); missing height data results in NA's for WFH and HFA. HCA is available for all participants. MFA and HCA are not displayed.
 
 ```{r include = FALSE}
 # Specify all the variables you want to treat as factors
@@ -435,12 +435,12 @@ out1 <- CreateTableOne(vars = myVars,
 t1_overall <- print(out1,
             cramVars = "sex")
 
-# Create row labels -- "6-Grandfather only" removed as does not appear as level (at least for Kenya data)
+# Create row labels
 t1lab <- c("N", "Age Category (%)", "0-1 month", "2-11 months", "12-59 months", "Sex = Male/Female (%)",
             "Relationship of caregiver to child (%)", "Community member", "Father only", "Grandfather only", "Grandmother only", "Mother and father", "Mother and grandmother", "Mother only", "Other", "Other family   
               member", "Sibling", "Visited due to Illness (%)", "Visited for Immunization (%)", "Visited for Routine Monitoring (%)", "Visited due to Trauma (%)", "Admission to inpatient unit of the
              facility (%)", "Cough (%)", "Difficulty/Rapid breathing (%)", "Fever (%)", "Diarrhea (%)", "Vomiting (%)", "Other (%)", "Received Diagnosis (%)", "Dehydration", "Respiratory", "Digestive", "Malaria", 
-              "Fever", "Measles=False", "Ear infection", "Throat infection", "Other", "Received Treatment (%)", "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other", "Stunting (%)", "Severe", "Moderate", "Normal", "Wasting (%)", "Severely Wasted", "Moderately Wasted", "Normal", "Overweight", "Anemia* (%)", "Severe", "Moderate", "Mild", "Normal", "Abnormal SpO2 (reference) (%)", "Abnormal Pulse Rate (reference) (mean (SD))",  
+              "Fever", "Measles=False", "Ear infection", "Throat infection", "Other", "Received Treatment (%)", "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other", "Stunting (%)", "Severe", "Moderate", "Normal", "Wasting (%)", "Severely Wasted", "Moderately Wasted", "Normal", "Overweight", "Anemia* (%)", "Severe", "Moderate", "Mild", "Normal", "Abnormal SpO2 (reference) (%)", "Abnormal Pulse Rate (reference) (%)",  
             "Abnormal Temperature (reference) (%)", "Abnormal Profusion Index (reference) (%)")
 
 # Add row labels
