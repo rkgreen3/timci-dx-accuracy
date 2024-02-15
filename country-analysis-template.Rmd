@@ -379,9 +379,9 @@ df_og$m1_ref_hypoxic_tri <- case_when(df_og$m1_ref_o2<=90 ~ 2,
 df_og$m1_index_fever_tri <- case_when(df_og$m1_index_temp>39.1 ~ 2,
                                             df_og$m1_index_temp<=39.1 & df_og$m1_index_temp>=38 ~ 1,
                                             df_og$m1_index_temp<38 ~ 0)
-df_og$m1_ref_fever_tri <- case_when(df_og$m1_ref_temp>39.1 ~ 2,
-                                            df_og$m1_ref_temp<=39.1 & df_og$m1_ref_temp>=38 ~ 1,
-                                            df_og$m1_ref_temp<38 ~ 0)
+df_og$m1_ref_fever_tri <- case_when(df_og$m1_therm_skin_temp>39.1 ~ 2,
+                                            df_og$m1_therm_skin_temp<=39.1 & df_og$m1_therm_skin_temp>=38 ~ 1,
+                                            df_og$m1_therm_skin_temp<38 ~ 0)
 df_og$m1_index_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m1_index_rr>55 ~ 2,
                                             df_og$age_months<12 & df_og$m1_index_rr<=55 & df_og$m1_index_rr>=50 ~ 1,
                                             df_og$age_months<12 & df_og$m1_index_rr<50 ~ 0)
@@ -422,9 +422,9 @@ df_og$m2_ref_hypoxic_tri <- case_when(df_og$m2_ref_o2<=90 ~ 2,
 df_og$m2_index_fever_tri <- case_when(df_og$m2_index_temp>39.1 ~ 2,
                                             df_og$m2_index_temp<=39.1 & df_og$m2_index_temp>=38 ~ 1,
                                             df_og$m2_index_temp<38 ~ 0)
-df_og$m2_ref_fever_tri <- case_when(df_og$m2_ref_temp>39.1 ~ 2,
-                                            df_og$m2_ref_temp<=39.1 & df_og$m2_ref_temp>=38 ~ 1,
-                                            df_og$m2_ref_temp<38 ~ 0)
+df_og$m2_ref_fever_tri <- case_when(df_og$m2_therm_skin_temp>39.1 ~ 2,
+                                            df_og$m2_therm_skin_temp<=39.1 & df_og$m2_therm_skin_temp>=38 ~ 1,
+                                            df_og$m2_therm_skin_temp<38 ~ 0)
 df_og$m2_index_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m2_index_rr>55 ~ 2,
                                             df_og$age_months<12 & df_og$m2_index_rr<=55 & df_og$m2_index_rr>=50 ~ 1,
                                             df_og$age_months<12 & df_og$m2_index_rr<50 ~ 0)
@@ -465,9 +465,9 @@ df_og$m3_ref_hypoxic_tri <- case_when(df_og$m3_ref_o2<=90 ~ 2,
 df_og$m3_index_fever_tri <- case_when(df_og$m3_index_temp>39.1 ~ 2,
                                             df_og$m3_index_temp<=39.1 & df_og$m3_index_temp>=38 ~ 1,
                                             df_og$m3_index_temp<38 ~ 0)
-df_og$m3_ref_fever_tri <- case_when(df_og$m3_ref_temp>39.1 ~ 2,
-                                            df_og$m3_ref_temp<=39.1 & df_og$m3_ref_temp>=38 ~ 1,
-                                            df_og$m3_ref_temp<38 ~ 0)
+df_og$m3_ref_fever_tri <- case_when(df_og$m3_therm_skin_temp>39.1 ~ 2,
+                                            df_og$m3_therm_skin_temp<=39.1 & df_og$m3_therm_skin_temp>=38 ~ 1,
+                                            df_og$m3_therm_skin_temp<38 ~ 0)
 df_og$m3_index_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m3_index_rr>55 ~ 2,
                                             df_og$age_months<12 & df_og$m3_index_rr<=55 & df_og$m3_index_rr>=50 ~ 1,
                                             df_og$age_months<12 & df_og$m3_index_rr<50 ~ 0)
