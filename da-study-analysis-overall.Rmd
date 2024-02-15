@@ -553,7 +553,7 @@ df_og$m1_ref_index_pres_fb59mo_tri <- ifelse(!is.na(df_og$m1_ref_fastbreath_59mo
 df_og$m1_ref_index_agree_fb59mo_tri <- ifelse(df_og$m1_ref_fastbreath_59mo_tri==df_og$m1_index_fastbreath_59mo_tri, 1, 0)
 df_og$m1_ref_index_pres_tachy12mo_tri <- ifelse(!is.na(df_og$m1_ref_tachycardic_12mo_tri) & !is.na(df_og$m1_index_tachycardic_12mo_tri), 1, 0)
 df_og$m1_ref_index_agree_tachy12mo_tri <- ifelse(df_og$m1_ref_tachycardic_12mo_tri==df_og$m1_index_tachycardic_12mo_tri, 1, 0)
-df_og$m1_ref_index_pres_tachy59mo_tri <- ifelse(!is.na(df_og$m1_ref_tachycardic_tri_59mo) & !is.na(df_og$m1_index_tachycardic_59mo_tri), 1, 0)
+df_og$m1_ref_index_pres_tachy59mo_tri <- ifelse(!is.na(df_og$m1_ref_tachycardic_59mo_tri) & !is.na(df_og$m1_index_tachycardic_59mo_tri), 1, 0)
 df_og$m1_ref_index_agree_tachy59mo_tri <- ifelse(df_og$m1_ref_tachycardic_59mo_tri==df_og$m1_index_tachycardic_59mo_tri, 1, 0)
 ### M2
 df_og$m2_ref_index_pres_hypoxic_tri <- ifelse(!is.na(df_og$m2_ref_hypoxic_tri) & !is.na(df_og$m2_index_hypoxic_tri), 1, 0)
