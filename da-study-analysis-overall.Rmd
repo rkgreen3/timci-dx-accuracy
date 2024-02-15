@@ -360,134 +360,134 @@ df_og$m3_index_tachycardic_59mo <- ifelse(df_og$m3_index_pr>139 & df_og$age_mont
 df_og$m3_ref_tachycardic_59mo <- ifelse(df_og$m3_ref_pr>139 & df_og$age_months>11, 1, 0)
 ## Add 3-level indicator variables for clinical thresholds (wide format) -- Note: From the SAP, these are defined for the user in Section 5, if changed here be sure to change there and above
 ### M1
-mdf_reshaped$m1_index_hypoxic_tri <- case_when(mdf_reshaped$m1_index_o2<=90 ~ 2,
-                                            mdf_reshaped$m1_index_o2<=92 & mdf_reshaped$m1_index_o2>90 ~ 1,
-                                            mdf_reshaped$m1_index_o2>92 ~ 0)
-mdf_reshaped$m1_ref_hypoxic_tri <- case_when(mdf_reshaped$m1_ref_o2<=90 ~ 2,
-                                            mdf_reshaped$m1_ref_o2<=92 & mdf_reshaped$m1_ref_o2>90 ~ 1,
-                                            mdf_reshaped$m1_ref_o2>92 ~ 0)
-mdf_reshaped$m1_index_fever_tri <- case_when(mdf_reshaped$m1_index_temp>39.1 ~ 2,
-                                            mdf_reshaped$m1_index_temp<=39.1 & mdf_reshaped$m1_index_temp>=38 ~ 1,
-                                            mdf_reshaped$m1_index_temp<38 ~ 0)
-mdf_reshaped$m1_ref_fever_tri <- case_when(mdf_reshaped$m1_ref_temp>39.1 ~ 2,
-                                            mdf_reshaped$m1_ref_temp<=39.1 & mdf_reshaped$m1_ref_temp>=38 ~ 1,
-                                            mdf_reshaped$m1_ref_temp<38 ~ 0)
-mdf_reshaped$m1_index_fastbreath_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$m1_index_rr>55 ~ 2,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m1_index_rr<=55 & mdf_reshaped$m1_index_rr>=50 ~ 1,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m1_index_rr<50 ~ 0)
-mdf_reshaped$m1_ref_fastbreath_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$m1_ref_rr>55 ~ 2,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m1_ref_rr<=55 & mdf_reshaped$m1_ref_rr>=50 ~ 1,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m1_ref_rr<50 ~ 0)
-mdf_reshaped$m1_index_fastbreath_35mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m1_index_rr>45 ~ 2,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m1_index_rr<=45 & mdf_reshaped$m1_index_rr>=40 ~ 1,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m1_index_rr<40 ~ 0)
-mdf_reshaped$m1_ref_fastbreath_35mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m1_ref_rr>45 ~ 2,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m1_ref_rr<=45 & mdf_reshaped$m1_ref_rr>=40 ~ 1,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m1_ref_rr<40 ~ 0)
-mdf_reshaped$m1_index_fastbreath_59mo_tri <- case_when(mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m1_index_rr>35 ~ 2,
-                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m1_index_rr<=35 & mdf_reshaped$m1_index_rr>=30 ~ 1,
-                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m1_index_rr<30 ~ 0)
-mdf_reshaped$m1_ref_fastbreath_59mo_tri <- case_when(mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m1_ref_rr>35 ~ 2,
-                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m1_ref_rr<=35 & mdf_reshaped$m1_ref_rr>=30 ~ 1,
-                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m1_ref_rr<30 ~ 0)
-mdf_reshaped$m1_index_tachycardic_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$m1_index_pr>190 ~ 2,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m1_index_pr<=190 & mdf_reshaped$m1_index_pr>=180 ~ 1,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m1_index_pr<180 ~ 0)
-mdf_reshaped$m1_ref_tachycardic_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$m1_ref_pr>190 ~ 2,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m1_ref_pr<=190 & mdf_reshaped$m1_ref_pr>=180 ~ 1,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m1_ref_pr<180 ~ 0)
-mdf_reshaped$m1_index_tachycardic_59mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$m1_index_pr>150 ~ 2,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$m1_index_pr<=150 & mdf_reshaped$m1_index_pr>=140 ~ 1,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$m1_index_pr<140 ~ 0)
-mdf_reshaped$m1_ref_tachycardic_59mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$m1_ref_pr>150 ~ 2,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$m1_ref_pr<=150 & mdf_reshaped$m1_ref_pr>=140 ~ 1,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$m1_ref_pr<140 ~ 0)
+df_og$m1_index_hypoxic_tri <- case_when(df_og$m1_index_o2<=90 ~ 2,
+                                            df_og$m1_index_o2<=92 & df_og$m1_index_o2>90 ~ 1,
+                                            df_og$m1_index_o2>92 ~ 0)
+df_og$m1_ref_hypoxic_tri <- case_when(df_og$m1_ref_o2<=90 ~ 2,
+                                            df_og$m1_ref_o2<=92 & df_og$m1_ref_o2>90 ~ 1,
+                                            df_og$m1_ref_o2>92 ~ 0)
+df_og$m1_index_fever_tri <- case_when(df_og$m1_index_temp>39.1 ~ 2,
+                                            df_og$m1_index_temp<=39.1 & df_og$m1_index_temp>=38 ~ 1,
+                                            df_og$m1_index_temp<38 ~ 0)
+df_og$m1_ref_fever_tri <- case_when(df_og$m1_ref_temp>39.1 ~ 2,
+                                            df_og$m1_ref_temp<=39.1 & df_og$m1_ref_temp>=38 ~ 1,
+                                            df_og$m1_ref_temp<38 ~ 0)
+df_og$m1_index_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m1_index_rr>55 ~ 2,
+                                            df_og$age_months<12 & df_og$m1_index_rr<=55 & df_og$m1_index_rr>=50 ~ 1,
+                                            df_og$age_months<12 & df_og$m1_index_rr<50 ~ 0)
+df_og$m1_ref_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m1_ref_rr>55 ~ 2,
+                                            df_og$age_months<12 & df_og$m1_ref_rr<=55 & df_og$m1_ref_rr>=50 ~ 1,
+                                            df_og$age_months<12 & df_og$m1_ref_rr<50 ~ 0)
+df_og$m1_index_fastbreath_35mo_tri <- case_when(df_og$age_months>11 & df_og$age_months<36 & df_og$m1_index_rr>45 ~ 2,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m1_index_rr<=45 & df_og$m1_index_rr>=40 ~ 1,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m1_index_rr<40 ~ 0)
+df_og$m1_ref_fastbreath_35mo_tri <- case_when(df_og$age_months>11 & df_og$age_months<36 & df_og$m1_ref_rr>45 ~ 2,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m1_ref_rr<=45 & df_og$m1_ref_rr>=40 ~ 1,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m1_ref_rr<40 ~ 0)
+df_og$m1_index_fastbreath_59mo_tri <- case_when(df_og$age_months>35 & df_og$age_months<60 & df_og$m1_index_rr>35 ~ 2,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m1_index_rr<=35 & df_og$m1_index_rr>=30 ~ 1,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m1_index_rr<30 ~ 0)
+df_og$m1_ref_fastbreath_59mo_tri <- case_when(df_og$age_months>35 & df_og$age_months<60 & df_og$m1_ref_rr>35 ~ 2,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m1_ref_rr<=35 & df_og$m1_ref_rr>=30 ~ 1,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m1_ref_rr<30 ~ 0)
+df_og$m1_index_tachycardic_12mo_tri <- case_when(df_og$age_months<12 & df_og$m1_index_pr>190 ~ 2,
+                                            df_og$age_months<12 & df_og$m1_index_pr<=190 & df_og$m1_index_pr>=180 ~ 1,
+                                            df_og$age_months<12 & df_og$m1_index_pr<180 ~ 0)
+df_og$m1_ref_tachycardic_12mo_tri <- case_when(df_og$age_months<12 & df_og$m1_ref_pr>190 ~ 2,
+                                            df_og$age_months<12 & df_og$m1_ref_pr<=190 & df_og$m1_ref_pr>=180 ~ 1,
+                                            df_og$age_months<12 & df_og$m1_ref_pr<180 ~ 0)
+df_og$m1_index_tachycardic_59mo_tri <- case_when(df_og$age_months>11 & df_og$m1_index_pr>150 ~ 2,
+                                            df_og$age_months>11 & df_og$m1_index_pr<=150 & df_og$m1_index_pr>=140 ~ 1,
+                                            df_og$age_months>11 & df_og$m1_index_pr<140 ~ 0)
+df_og$m1_ref_tachycardic_59mo_tri <- case_when(df_og$age_months>11 & df_og$m1_ref_pr>150 ~ 2,
+                                            df_og$age_months>11 & df_og$m1_ref_pr<=150 & df_og$m1_ref_pr>=140 ~ 1,
+                                            df_og$age_months>11 & df_og$m1_ref_pr<140 ~ 0)
 ### M2
-mdf_reshaped$m2_index_hypoxic_tri <- case_when(mdf_reshaped$m2_index_o2<=90 ~ 2,
-                                            mdf_reshaped$m2_index_o2<=92 & mdf_reshaped$m2_index_o2>90 ~ 1,
-                                            mdf_reshaped$m2_index_o2>92 ~ 0)
-mdf_reshaped$m2_ref_hypoxic_tri <- case_when(mdf_reshaped$m2_ref_o2<=90 ~ 2,
-                                            mdf_reshaped$m2_ref_o2<=92 & mdf_reshaped$m2_ref_o2>90 ~ 1,
-                                            mdf_reshaped$m2_ref_o2>92 ~ 0)
-mdf_reshaped$m2_index_fever_tri <- case_when(mdf_reshaped$m2_index_temp>39.1 ~ 2,
-                                            mdf_reshaped$m2_index_temp<=39.1 & mdf_reshaped$m2_index_temp>=38 ~ 1,
-                                            mdf_reshaped$m2_index_temp<38 ~ 0)
-mdf_reshaped$m2_ref_fever_tri <- case_when(mdf_reshaped$m2_ref_temp>39.1 ~ 2,
-                                            mdf_reshaped$m2_ref_temp<=39.1 & mdf_reshaped$m2_ref_temp>=38 ~ 1,
-                                            mdf_reshaped$m2_ref_temp<38 ~ 0)
-mdf_reshaped$m2_index_fastbreath_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$m2_index_rr>55 ~ 2,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m2_index_rr<=55 & mdf_reshaped$m2_index_rr>=50 ~ 1,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m2_index_rr<50 ~ 0)
-mdf_reshaped$m2_ref_fastbreath_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$m2_ref_rr>55 ~ 2,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m2_ref_rr<=55 & mdf_reshaped$m2_ref_rr>=50 ~ 1,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m2_ref_rr<50 ~ 0)
-mdf_reshaped$m2_index_fastbreath_35mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m2_index_rr>45 ~ 2,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m2_index_rr<=45 & mdf_reshaped$m2_index_rr>=40 ~ 1,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m2_index_rr<40 ~ 0)
-mdf_reshaped$m2_ref_fastbreath_35mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m2_ref_rr>45 ~ 2,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m2_ref_rr<=45 & mdf_reshaped$m2_ref_rr>=40 ~ 1,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m2_ref_rr<40 ~ 0)
-mdf_reshaped$m2_index_fastbreath_59mo_tri <- case_when(mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m2_index_rr>35 ~ 2,
-                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m2_index_rr<=35 & mdf_reshaped$m2_index_rr>=30 ~ 1,
-                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m2_index_rr<30 ~ 0)
-mdf_reshaped$m2_ref_fastbreath_59mo_tri <- case_when(mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m2_ref_rr>35 ~ 2,
-                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m2_ref_rr<=35 & mdf_reshaped$m2_ref_rr>=30 ~ 1,
-                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m2_ref_rr<30 ~ 0)
-mdf_reshaped$m2_index_tachycardic_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$m2_index_pr>190 ~ 2,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m2_index_pr<=190 & mdf_reshaped$m2_index_pr>=180 ~ 1,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m2_index_pr<180 ~ 0)
-mdf_reshaped$m2_ref_tachycardic_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$m2_ref_pr>190 ~ 2,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m2_ref_pr<=190 & mdf_reshaped$m2_ref_pr>=180 ~ 1,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m2_ref_pr<180 ~ 0)
-mdf_reshaped$m2_index_tachycardic_59mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$m2_index_pr>150 ~ 2,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$m2_index_pr<=150 & mdf_reshaped$m2_index_pr>=140 ~ 1,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$m2_index_pr<140 ~ 0)
-mdf_reshaped$m2_ref_tachycardic_59mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$m2_ref_pr>150 ~ 2,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$m2_ref_pr<=150 & mdf_reshaped$m2_ref_pr>=140 ~ 1,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$m2_ref_pr<140 ~ 0)
+df_og$m2_index_hypoxic_tri <- case_when(df_og$m2_index_o2<=90 ~ 2,
+                                            df_og$m2_index_o2<=92 & df_og$m2_index_o2>90 ~ 1,
+                                            df_og$m2_index_o2>92 ~ 0)
+df_og$m2_ref_hypoxic_tri <- case_when(df_og$m2_ref_o2<=90 ~ 2,
+                                            df_og$m2_ref_o2<=92 & df_og$m2_ref_o2>90 ~ 1,
+                                            df_og$m2_ref_o2>92 ~ 0)
+df_og$m2_index_fever_tri <- case_when(df_og$m2_index_temp>39.1 ~ 2,
+                                            df_og$m2_index_temp<=39.1 & df_og$m2_index_temp>=38 ~ 1,
+                                            df_og$m2_index_temp<38 ~ 0)
+df_og$m2_ref_fever_tri <- case_when(df_og$m2_ref_temp>39.1 ~ 2,
+                                            df_og$m2_ref_temp<=39.1 & df_og$m2_ref_temp>=38 ~ 1,
+                                            df_og$m2_ref_temp<38 ~ 0)
+df_og$m2_index_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m2_index_rr>55 ~ 2,
+                                            df_og$age_months<12 & df_og$m2_index_rr<=55 & df_og$m2_index_rr>=50 ~ 1,
+                                            df_og$age_months<12 & df_og$m2_index_rr<50 ~ 0)
+df_og$m2_ref_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m2_ref_rr>55 ~ 2,
+                                            df_og$age_months<12 & df_og$m2_ref_rr<=55 & df_og$m2_ref_rr>=50 ~ 1,
+                                            df_og$age_months<12 & df_og$m2_ref_rr<50 ~ 0)
+df_og$m2_index_fastbreath_35mo_tri <- case_when(df_og$age_months>11 & df_og$age_months<36 & df_og$m2_index_rr>45 ~ 2,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m2_index_rr<=45 & df_og$m2_index_rr>=40 ~ 1,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m2_index_rr<40 ~ 0)
+df_og$m2_ref_fastbreath_35mo_tri <- case_when(df_og$age_months>11 & df_og$age_months<36 & df_og$m2_ref_rr>45 ~ 2,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m2_ref_rr<=45 & df_og$m2_ref_rr>=40 ~ 1,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m2_ref_rr<40 ~ 0)
+df_og$m2_index_fastbreath_59mo_tri <- case_when(df_og$age_months>35 & df_og$age_months<60 & df_og$m2_index_rr>35 ~ 2,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m2_index_rr<=35 & df_og$m2_index_rr>=30 ~ 1,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m2_index_rr<30 ~ 0)
+df_og$m2_ref_fastbreath_59mo_tri <- case_when(df_og$age_months>35 & df_og$age_months<60 & df_og$m2_ref_rr>35 ~ 2,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m2_ref_rr<=35 & df_og$m2_ref_rr>=30 ~ 1,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m2_ref_rr<30 ~ 0)
+df_og$m2_index_tachycardic_12mo_tri <- case_when(df_og$age_months<12 & df_og$m2_index_pr>190 ~ 2,
+                                            df_og$age_months<12 & df_og$m2_index_pr<=190 & df_og$m2_index_pr>=180 ~ 1,
+                                            df_og$age_months<12 & df_og$m2_index_pr<180 ~ 0)
+df_og$m2_ref_tachycardic_12mo_tri <- case_when(df_og$age_months<12 & df_og$m2_ref_pr>190 ~ 2,
+                                            df_og$age_months<12 & df_og$m2_ref_pr<=190 & df_og$m2_ref_pr>=180 ~ 1,
+                                            df_og$age_months<12 & df_og$m2_ref_pr<180 ~ 0)
+df_og$m2_index_tachycardic_59mo_tri <- case_when(df_og$age_months>11 & df_og$m2_index_pr>150 ~ 2,
+                                            df_og$age_months>11 & df_og$m2_index_pr<=150 & df_og$m2_index_pr>=140 ~ 1,
+                                            df_og$age_months>11 & df_og$m2_index_pr<140 ~ 0)
+df_og$m2_ref_tachycardic_59mo_tri <- case_when(df_og$age_months>11 & df_og$m2_ref_pr>150 ~ 2,
+                                            df_og$age_months>11 & df_og$m2_ref_pr<=150 & df_og$m2_ref_pr>=140 ~ 1,
+                                            df_og$age_months>11 & df_og$m2_ref_pr<140 ~ 0)
 ### M3
-mdf_reshaped$m3_index_hypoxic_tri <- case_when(mdf_reshaped$m3_index_o2<=90 ~ 2,
-                                            mdf_reshaped$m3_index_o2<=92 & mdf_reshaped$m3_index_o2>90 ~ 1,
-                                            mdf_reshaped$m3_index_o2>92 ~ 0)
-mdf_reshaped$m3_ref_hypoxic_tri <- case_when(mdf_reshaped$m3_ref_o2<=90 ~ 2,
-                                            mdf_reshaped$m3_ref_o2<=92 & mdf_reshaped$m3_ref_o2>90 ~ 1,
-                                            mdf_reshaped$m3_ref_o2>92 ~ 0)
-mdf_reshaped$m3_index_fever_tri <- case_when(mdf_reshaped$m3_index_temp>39.1 ~ 2,
-                                            mdf_reshaped$m3_index_temp<=39.1 & mdf_reshaped$m3_index_temp>=38 ~ 1,
-                                            mdf_reshaped$m3_index_temp<38 ~ 0)
-mdf_reshaped$m3_ref_fever_tri <- case_when(mdf_reshaped$m3_ref_temp>39.1 ~ 2,
-                                            mdf_reshaped$m3_ref_temp<=39.1 & mdf_reshaped$m3_ref_temp>=38 ~ 1,
-                                            mdf_reshaped$m3_ref_temp<38 ~ 0)
-mdf_reshaped$m3_index_fastbreath_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$m3_index_rr>55 ~ 2,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m3_index_rr<=55 & mdf_reshaped$m3_index_rr>=50 ~ 1,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m3_index_rr<50 ~ 0)
-mdf_reshaped$m3_ref_fastbreath_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$m3_ref_rr>55 ~ 2,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m3_ref_rr<=55 & mdf_reshaped$m3_ref_rr>=50 ~ 1,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m3_ref_rr<50 ~ 0)
-mdf_reshaped$m3_index_fastbreath_35mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m3_index_rr>45 ~ 2,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m3_index_rr<=45 & mdf_reshaped$m3_index_rr>=40 ~ 1,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m3_index_rr<40 ~ 0)
-mdf_reshaped$m3_ref_fastbreath_35mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m3_ref_rr>45 ~ 2,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m3_ref_rr<=45 & mdf_reshaped$m3_ref_rr>=40 ~ 1,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$m3_ref_rr<40 ~ 0)
-mdf_reshaped$m3_index_fastbreath_59mo_tri <- case_when(mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m3_index_rr>35 ~ 2,
-                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m3_index_rr<=35 & mdf_reshaped$m3_index_rr>=30 ~ 1,
-                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m3_index_rr<30 ~ 0)
-mdf_reshaped$m3_ref_fastbreath_59mo_tri <- case_when(mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m3_ref_rr>35 ~ 2,
-                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m3_ref_rr<=35 & mdf_reshaped$m3_ref_rr>=30 ~ 1,
-                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$m3_ref_rr<30 ~ 0)
-mdf_reshaped$m3_index_tachycardic_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$m3_index_pr>190 ~ 2,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m3_index_pr<=190 & mdf_reshaped$m3_index_pr>=180 ~ 1,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m3_index_pr<180 ~ 0)
-mdf_reshaped$m3_ref_tachycardic_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$m3_ref_pr>190 ~ 2,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m3_ref_pr<=190 & mdf_reshaped$m3_ref_pr>=180 ~ 1,
-                                            mdf_reshaped$age_months<12 & mdf_reshaped$m3_ref_pr<180 ~ 0)
-mdf_reshaped$m3_index_tachycardic_59mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$m3_index_pr>150 ~ 2,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$m3_index_pr<=150 & mdf_reshaped$m3_index_pr>=140 ~ 1,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$m3_index_pr<140 ~ 0)
-mdf_reshaped$m3_ref_tachycardic_59mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$m3_ref_pr>150 ~ 2,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$m3_ref_pr<=150 & mdf_reshaped$m3_ref_pr>=140 ~ 1,
-                                            mdf_reshaped$age_months>11 & mdf_reshaped$m3_ref_pr<140 ~ 0)
+df_og$m3_index_hypoxic_tri <- case_when(df_og$m3_index_o2<=90 ~ 2,
+                                            df_og$m3_index_o2<=92 & df_og$m3_index_o2>90 ~ 1,
+                                            df_og$m3_index_o2>92 ~ 0)
+df_og$m3_ref_hypoxic_tri <- case_when(df_og$m3_ref_o2<=90 ~ 2,
+                                            df_og$m3_ref_o2<=92 & df_og$m3_ref_o2>90 ~ 1,
+                                            df_og$m3_ref_o2>92 ~ 0)
+df_og$m3_index_fever_tri <- case_when(df_og$m3_index_temp>39.1 ~ 2,
+                                            df_og$m3_index_temp<=39.1 & df_og$m3_index_temp>=38 ~ 1,
+                                            df_og$m3_index_temp<38 ~ 0)
+df_og$m3_ref_fever_tri <- case_when(df_og$m3_ref_temp>39.1 ~ 2,
+                                            df_og$m3_ref_temp<=39.1 & df_og$m3_ref_temp>=38 ~ 1,
+                                            df_og$m3_ref_temp<38 ~ 0)
+df_og$m3_index_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m3_index_rr>55 ~ 2,
+                                            df_og$age_months<12 & df_og$m3_index_rr<=55 & df_og$m3_index_rr>=50 ~ 1,
+                                            df_og$age_months<12 & df_og$m3_index_rr<50 ~ 0)
+df_og$m3_ref_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m3_ref_rr>55 ~ 2,
+                                            df_og$age_months<12 & df_og$m3_ref_rr<=55 & df_og$m3_ref_rr>=50 ~ 1,
+                                            df_og$age_months<12 & df_og$m3_ref_rr<50 ~ 0)
+df_og$m3_index_fastbreath_35mo_tri <- case_when(df_og$age_months>11 & df_og$age_months<36 & df_og$m3_index_rr>45 ~ 2,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m3_index_rr<=45 & df_og$m3_index_rr>=40 ~ 1,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m3_index_rr<40 ~ 0)
+df_og$m3_ref_fastbreath_35mo_tri <- case_when(df_og$age_months>11 & df_og$age_months<36 & df_og$m3_ref_rr>45 ~ 2,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m3_ref_rr<=45 & df_og$m3_ref_rr>=40 ~ 1,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m3_ref_rr<40 ~ 0)
+df_og$m3_index_fastbreath_59mo_tri <- case_when(df_og$age_months>35 & df_og$age_months<60 & df_og$m3_index_rr>35 ~ 2,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m3_index_rr<=35 & df_og$m3_index_rr>=30 ~ 1,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m3_index_rr<30 ~ 0)
+df_og$m3_ref_fastbreath_59mo_tri <- case_when(df_og$age_months>35 & df_og$age_months<60 & df_og$m3_ref_rr>35 ~ 2,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m3_ref_rr<=35 & df_og$m3_ref_rr>=30 ~ 1,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m3_ref_rr<30 ~ 0)
+df_og$m3_index_tachycardic_12mo_tri <- case_when(df_og$age_months<12 & df_og$m3_index_pr>190 ~ 2,
+                                            df_og$age_months<12 & df_og$m3_index_pr<=190 & df_og$m3_index_pr>=180 ~ 1,
+                                            df_og$age_months<12 & df_og$m3_index_pr<180 ~ 0)
+df_og$m3_ref_tachycardic_12mo_tri <- case_when(df_og$age_months<12 & df_og$m3_ref_pr>190 ~ 2,
+                                            df_og$age_months<12 & df_og$m3_ref_pr<=190 & df_og$m3_ref_pr>=180 ~ 1,
+                                            df_og$age_months<12 & df_og$m3_ref_pr<180 ~ 0)
+df_og$m3_index_tachycardic_59mo_tri <- case_when(df_og$age_months>11 & df_og$m3_index_pr>150 ~ 2,
+                                            df_og$age_months>11 & df_og$m3_index_pr<=150 & df_og$m3_index_pr>=140 ~ 1,
+                                            df_og$age_months>11 & df_og$m3_index_pr<140 ~ 0)
+df_og$m3_ref_tachycardic_59mo_tri <- case_when(df_og$age_months>11 & df_og$m3_ref_pr>150 ~ 2,
+                                            df_og$age_months>11 & df_og$m3_ref_pr<=150 & df_og$m3_ref_pr>=140 ~ 1,
+                                            df_og$age_months>11 & df_og$m3_ref_pr<140 ~ 0)
 # Add clinical age category for fast breathing, ensuring groupings fall within study age categories as well
 df_og$age_cat_fastbreathe <- case_when(df_og$age_months<2 ~ "0-1 month",
                                         df_og$age_months>1 & df_og$age_months<12 ~ "2-11 months",
@@ -2038,6 +2038,335 @@ confusion_matrix(df_scan_cat4fb_l,"ref_fastbreath_59mo","index_fastbreath_59mo",
 ### Tachycardia
 ```{r}
 confusion_matrix(df_scan_cat3_l,"ref_tachycardic_59mo","index_tachycardic_59mo", "*12-59 months*")
+```
+
+# Section 5a: 3-Level Confusion Matrices {.tabset}
+
+Clinical thresholds used in the section are as follows:
+
+- Hypoxemia:
++	≤90% (severe)
++	90.1% ≤ SpO2 ≤ 92% (moderate)
++	>92% (normal)
+
+- Fast breathing: 
++ <12 months
+++	>55 bpm (severe)
+++	50≤RR≤55 bpm (moderate)
+++	<50 bpm (normal)
++ 12-35 months
+++	>45 bpm (severe)
+++	40≤RR≤45 bpm (moderate)
+++	<40 bpm (normal)
++ 36-60 months
+++	>35 bpm (severe)
+++	30≤RR≤35 bpm (moderate)
+++	<30 bpm (normal)
+
+- Tachycardia: 
++ <12 months
+++	>190 bpm (severe)
+++	180≤PR≤190 bpm (moderate)
+++	<180 bpm (normal)
++ 12-60 months
+++	>150 bpm (severe)
+++	140≤PR≤150 bpm (moderate)
+++	<140 bpm (normal)
+
+- Fever:
++	>39.1C (severe)
++	38C ≤ temperature ≤ 39.1C (moderate)
++	< 38C (normal)
+
+```{r helper_fn3}
+# Function to create the 3x3 confusion matrix
+# It takes the dataset, reference variable name and index variable name 
+# It handles labeling for different cases
+
+confusion_matrix3 <- function(df, ref_item, index_item, age_cat){
+  item_margin <- addmargins(table(df[[ref_item]], df[[index_item]]))
+  
+  # ===================== If all reference (Normal and Moderate and Severe exist)
+  if (("0" %in% rownames(item_margin)) & ("1" %in% rownames(item_margin)) & ("2" %in% rownames(item_margin))) {
+    # Index(Normal and moderate and severe) exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Moderate (Reference)", "Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # moderate index does not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Moderate (Reference)", "Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c( "Normal (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # severe index does not exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Moderate (Reference)", "Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c( "Normal (Index)","Moderate (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # normal index does not exist
+    if (!("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Moderate (Reference)", "Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Moderate (Index)", "Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # moderate and severe index do not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Moderate (Reference)", "Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # normal and severe index do not exist
+    if (!("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Moderate (Reference)", "Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Moderate (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # normal and moderate index do not exist
+    if (!("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Moderate (Reference)", "Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+  } 
+  
+ 
+  # ================ If severe reference does not exist
+  if (("0" %in% rownames(item_margin)) & ("1" %in% rownames(item_margin)) & !("2" %in% rownames(item_margin))) {
+    #Index(Normal and moderate and severe) exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)","Moderate (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # severe index does not exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)","Moderate (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # moderate index does not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)","Moderate (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # normal index does not exist
+    if (!("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)","Moderate (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+  } 
+  # ================ If moderate reference does not exist 
+  if (("0" %in% rownames(item_margin)) & !("1" %in% rownames(item_margin)) & ("2" %in% rownames(item_margin))) {
+    #Index(Normal and moderate and severe) exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)","Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # severe index does not exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)","Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # moderate index does not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)","Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # normal index does not exist
+    if (!("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)","Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+  } 
+  
+   # ================ If normal reference does not exist 
+  if (!("0" %in% rownames(item_margin)) & ("1" %in% rownames(item_margin)) & ("2" %in% rownames(item_margin))) {
+    #Index(Normal and moderate and severe) exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Moderate (Reference)","Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # severe index does not exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Moderate (Reference)","Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # moderate index does not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Moderate (Reference)","Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # normal index does not exist
+    if (!("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Moderate (Reference)","Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+  } 
+  
+  
+  return(kb)
+  
+}
+```
+
+## Rad-G Temp (Masimo) {.tabset}
+
+### Hypoxia
+```{r}
+# Long format (overall)
+confusion_matrix(df_radg_cat1_l,"ref_hypoxic_tri","index_hypoxic_tri","*0-1 month*")
+confusion_matrix(df_radg_cat2_l,"ref_hypoxic_tri","index_hypoxic_tri", "*2-11 months*")
+confusion_matrix(df_radg_cat3_l,"ref_hypoxic_tri","index_hypoxic_tri","*12-59 months*")
+```
+
+### Fever
+```{r}
+# Long format (overall)
+confusion_matrix(df_radg_cat1_l,"ref_fever_tri","index_fever_tri", "*0-1 month*")
+confusion_matrix(df_radg_cat2_l,"ref_fever_tri","index_fever_tri", "*2-11 months*")
+confusion_matrix(df_radg_cat3_l,"ref_fever_tri","index_fever_tri","*12-59 months*")
+```
+
+### Fast Breathing
+```{r}
+# Long format
+confusion_matrix(df_radg_cat1fb_l,"ref_fastbreath_12mo_tri","index_fastbreath_12mo_tri", "*0-1 month*")
+confusion_matrix(df_radg_cat2fb_l,"ref_fastbreath_12mo_tri","index_fastbreath_12mo_tri", "*2-11 months*")
+confusion_matrix(df_radg_cat3fb_l,"ref_fastbreath_35mo_tri","index_fastbreath_35mo_tri", "*12-35 months*")
+confusion_matrix(df_radg_cat4fb_l,"ref_fastbreath_59mo_tri","index_fastbreath_59mo_tri", "*36-59 months*")
+```
+
+### Tachycardia
+```{r}
+# Long
+confusion_matrix(df_radg_cat1_l,"ref_tachycardic_12mo_tri","index_tachycardic_12mo_tri", "*0-1 month*")
+confusion_matrix(df_radg_cat2_l,"ref_tachycardic_12mo_tri","index_tachycardic_12mo_tri", "*2-11 months*")
+confusion_matrix(df_radg_cat3_l,"ref_tachycardic_59mo_tri","index_tachycardic_59mo_tri", "*12-59 months*")
+```
+
+## m800 (Biolight) {.tabset}
+
+### Hypoxia
+```{r}
+confusion_matrix(df_bio_cat1_l,"ref_hypoxic_tri","index_hypoxic_tri","*0-1 month*")
+confusion_matrix(df_bio_cat2_l,"ref_hypoxic_tri","index_hypoxic_tri", "*2-11 months*")
+confusion_matrix(df_bio_cat3_l,"ref_hypoxic_tri","index_hypoxic_tri","*12-59 months*")
+```
+
+### Fast Breathing
+```{r}
+confusion_matrix(df_bio_cat1fb_l,"ref_fastbreath_12mo_tri","index_fastbreath_12mo_tri", "*0-1 month*")
+confusion_matrix(df_bio_cat2fb_l,"ref_fastbreath_12mo_tri","index_fastbreath_12mo_tri", "*2-11 months*")
+confusion_matrix(df_bio_cat3fb_l,"ref_fastbreath_35mo_tri","index_fastbreath_35mo_tri", "*12-35 months*")
+confusion_matrix(df_bio_cat4fb_l,"ref_fastbreath_59mo_tri","index_fastbreath_59mo_tri", "*36-59 months*")
+```
+
+### Tachycardia
+```{r}
+confusion_matrix(df_bio_cat1_l,"ref_tachycardic_12mo_tri","index_tachycardic_12mo_tri", "*0-1 month*")
+confusion_matrix(df_bio_cat2_l,"ref_tachycardic_12mo_tri","index_tachycardic_12mo_tri", "*2-11 months*")
+confusion_matrix(df_bio_cat3_l,"ref_tachycardic_59mo_tri","index_tachycardic_59mo_tri", "*12-59 months*")
+```
+
+## NeoGuard (Neopenda) {.tabset}
+
+### Hypoxia
+```{r}
+confusion_matrix(df_neo_cat1_l,"ref_hypoxic_tri","index_hypoxic_tri","*0-1 month*")
+confusion_matrix(df_neo_cat2_l,"ref_hypoxic_tri","index_hypoxic_tri", "*2-11 months*")
+confusion_matrix(df_neo_cat3_l,"ref_hypoxic_tri","index_hypoxic_tri","*12-59 months*")
+```
+
+### Fever
+```{r}
+confusion_matrix(df_neo_cat1_l,"ref_fever_tri","index_fever_tri", "*0-1 month*")
+confusion_matrix(df_neo_cat2_l,"ref_fever_tri","index_fever_tri", "*2-11 months*")
+confusion_matrix(df_neo_cat3_l,"ref_fever_tri","index_fever_tri","*12-59 months*")
+```
+
+### Fast Breathing
+```{r}
+confusion_matrix(df_neo_cat1fb_l,"ref_fastbreath_12mo_tri","index_fastbreath_12mo_tri", "*0-1 month*")
+confusion_matrix(df_neo_cat2fb_l,"ref_fastbreath_12mo_tri","index_fastbreath_12mo_tri", "*2-11 months*")
+confusion_matrix(df_neo_cat3fb_l,"ref_fastbreath_35mo_tri","index_fastbreath_35mo_tri", "*12-35 months*")
+confusion_matrix(df_neo_cat4fb_l,"ref_fastbreath_59mo_tri","index_fastbreath_59mo_tri", "*36-59 months*")
+```
+
+### Tachycardia
+```{r}
+confusion_matrix(df_neo_cat1_l,"ref_tachycardic_12mo_tri","index_tachycardic_12mo_tri", "*0-1 month*")
+confusion_matrix(df_neo_cat2_l,"ref_tachycardic_12mo_tri","index_tachycardic_12mo_tri", "*2-11 months*")
+confusion_matrix(df_neo_cat3_l,"ref_tachycardic_59mo_tri","index_tachycardic_59mo_tri", "*12-59 months*")
+```
+
+## Onyx PO+RR (Nonin) {.tabset}
+
+### Hypoxia
+```{r}
+confusion_matrix(df_onyx_cat3_l,"ref_hypoxic_tri","index_hypoxic_tri","*12-59 months*")
+```
+
+### Fast Breathing
+```{r}
+confusion_matrix(df_onyx_cat3fb_l,"ref_fastbreath_35mo_tri","index_fastbreath_35mo_tri", "*12-35 months*")
+confusion_matrix(df_onyx_cat4fb_l,"ref_fastbreath_35mo_tri","index_fastbreath_59mo_tri", "*36-59 months*")
+```
+
+### Tachycardia
+```{r}
+confusion_matrix(df_neo_cat3_l,"ref_tachycardic_59mo_tri","index_tachycardic_59mo_tri", "*12-59 months*")
+```
+
+## Scanbo v8 (Scanbo) {.tabset}
+
+### Hypoxia
+```{r}
+# Long
+confusion_matrix(df_scan_cat3_l,"ref_hypoxic_tri","index_hypoxic_tri","*12-59 months*")
+```
+
+### Fever
+```{r}
+confusion_matrix(df_scan_cat3_l,"ref_fever_tri","index_fever_tri","*12-59 months*")
+```
+
+### Fast Breathing
+```{r}
+confusion_matrix(df_scan_cat3fb_l,"ref_fastbreath_35mo_tri","index_fastbreath_35mo_tri", "*12-35 months*")
+confusion_matrix(df_scan_cat4fb_l,"ref_fastbreath_59mo_tri","index_fastbreath_59mo_tri", "*36-59 months*")
+```
+
+### Tachycardia
+```{r}
+confusion_matrix(df_scan_cat3_l,"ref_tachycardic_59mo_tri","index_tachycardic_59mo_tri", "*12-59 months*")
 ```
 
 # Section 6: Percent Agreement {.tabset}
