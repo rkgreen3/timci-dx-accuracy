@@ -2087,6 +2087,469 @@ confusion_matrix(df_scan_cat4fb_l,"ref_fastbreath_59mo","index_fastbreath_59mo",
 confusion_matrix(df_scan_cat3_l,"ref_tachycardic_59mo","index_tachycardic_59mo", "*12-59 months*")
 ```
 
+# Section 5a: 3-Level Confusion Matrices {.tabset}
+
+Clinical thresholds used in the section are as follows:
+
+- Hypoxemia:
+  +	≤90% (severe)
+  +	90.1% ≤ SpO2 ≤ 92% (moderate)
+  +	`>`92% (normal)
+
+- Fast breathing: 
+  + <12 months
+    +	`>`55 bpm (severe)
+    +	50≤RR≤55 bpm (moderate)
+    +	<50 bpm (normal)
+  + 12-35 months
+    +	`>`45 bpm (severe)
+    +	40≤RR≤45 bpm (moderate)
+    +	<40 bpm (normal)
+  + 36-60 months
+    +	`>`35 bpm (severe)
+    +	30≤RR≤35 bpm (moderate)
+    +	<30 bpm (normal)
+
+- Tachycardia: 
+  + <12 months
+    +	`>`190 bpm (severe)
+    +	180≤PR≤190 bpm (moderate)
+    +	<180 bpm (normal)
+  + 12-60 months
+    +	`>`150 bpm (severe)
+    +	140≤PR≤150 bpm (moderate)
+    +	<140 bpm (normal)
+
+- Fever:
+  +	`>`39.1C (severe)
+  +	38C ≤ temperature ≤ 39.1C (moderate)
+  +	< 38C (normal)
+
+```{r helper_fn3}
+# Function to create the 3x3 confusion matrix
+# It takes the dataset, reference variable name and index variable name 
+# It handles labeling for different cases
+
+confusion_matrix3 <- function(df, ref_item, index_item, age_cat){
+  item_margin <- addmargins(table(df[[ref_item]], df[[index_item]]))
+  
+  # ===================== If all reference (Normal and Moderate and Severe exist)
+  if (("0" %in% rownames(item_margin)) & ("1" %in% rownames(item_margin)) & ("2" %in% rownames(item_margin))) {
+    # Index(Normal and moderate and severe) exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Moderate (Reference)", "Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # moderate index does not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Moderate (Reference)", "Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c( "Normal (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # severe index does not exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Moderate (Reference)", "Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c( "Normal (Index)","Moderate (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # normal index does not exist
+    if (!("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Moderate (Reference)", "Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Moderate (Index)", "Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # moderate and severe index do not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Moderate (Reference)", "Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # normal and severe index do not exist
+    if (!("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Moderate (Reference)", "Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Moderate (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # normal and moderate index do not exist
+    if (!("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Moderate (Reference)", "Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+  } 
+  
+ 
+  # ================ If severe reference does not exist
+  if (("0" %in% rownames(item_margin)) & ("1" %in% rownames(item_margin)) & !("2" %in% rownames(item_margin))) {
+    #Index(Normal and moderate and severe) exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)","Moderate (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # severe index does not exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)","Moderate (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # moderate index does not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)","Moderate (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # normal index does not exist
+    if (!("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)","Moderate (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # moderate and severe index do not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Moderate (Reference)" , "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+  } 
+  # ================ If moderate reference does not exist 
+  if (("0" %in% rownames(item_margin)) & !("1" %in% rownames(item_margin)) & ("2" %in% rownames(item_margin))) {
+    #Index(Normal and moderate and severe) exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)","Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # severe index does not exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)","Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # moderate index does not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)","Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # normal index does not exist
+    if (!("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)","Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # moderate and severe index do not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+  } 
+  
+   # ================ If normal reference does not exist 
+  if (!("0" %in% rownames(item_margin)) & ("1" %in% rownames(item_margin)) & ("2" %in% rownames(item_margin))) {
+    #Index(Normal and moderate and severe) exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Moderate (Reference)","Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # severe index does not exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Moderate (Reference)","Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # moderate index does not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Moderate (Reference)","Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # normal index does not exist
+    if (!("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Moderate (Reference)","Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # moderate and severe index do not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Moderate (Reference)", "Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+  } 
+  
+  # ================ If normal and moderate reference do not exist 
+  if (!("0" %in% rownames(item_margin)) & !("1" %in% rownames(item_margin)) & ("2" %in% rownames(item_margin))) {
+    #Index(Normal and moderate and severe) exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # severe index does not exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # moderate index does not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # normal index does not exist
+    if (!("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # moderate and severe index do not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Severe (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+  } 
+  
+  # ================ If normal and severe reference do not exist 
+  if (!("0" %in% rownames(item_margin)) & ("1" %in% rownames(item_margin)) & !("2" %in% rownames(item_margin))) {
+    #Index(Normal and moderate and severe) exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Moderate (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # severe index does not exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Moderate (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # moderate index does not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Moderate (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # normal index does not exist
+    if (!("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Moderate (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # moderate and severe index do not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Moderate (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+  } 
+  
+  # ================ If moderate and severe reference do not exist 
+  if (("0" %in% rownames(item_margin)) & !("1" %in% rownames(item_margin)) & !("2" %in% rownames(item_margin))) {
+    #Index(Normal and moderate and severe) exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # severe index does not exist
+    if (("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Moderate (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    } 
+    
+    # moderate index does not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # normal index does not exist
+    if (!("0" %in% colnames(item_margin)) & ("1" %in% colnames(item_margin)) & ("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Moderate (Index)","Severe (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+    
+    # moderate and severe index do not exist
+    if (("0" %in% colnames(item_margin)) & !("1" %in% colnames(item_margin)) & !("2" %in% colnames(item_margin))) {
+      rownames(item_margin) <- c("Normal (Reference)", "Sum")
+      kb <- kable(item_margin, format = "html", row.names = T, col.names = c("Normal (Index)","Sum"), caption = age_cat) %>% 
+      kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center")
+    }
+  }  
+  
+  return(kb)
+  
+}
+```
+
+## Rad-G Temp (Masimo) {.tabset}
+
+### Hypoxia
+```{r}
+# Long format (overall)
+confusion_matrix3(df_radg_cat1_l,"ref_hypoxic_tri","index_hypoxic_tri","*0-1 month*")
+confusion_matrix3(df_radg_cat2_l,"ref_hypoxic_tri","index_hypoxic_tri", "*2-11 months*")
+confusion_matrix3(df_radg_cat3_l,"ref_hypoxic_tri","index_hypoxic_tri","*12-59 months*")
+```
+
+### Fever
+```{r}
+# Long format (overall)
+confusion_matrix3(df_radg_cat1_l,"ref_fever_tri","index_fever_tri", "*0-1 month*")
+confusion_matrix3(df_radg_cat2_l,"ref_fever_tri","index_fever_tri", "*2-11 months*")
+confusion_matrix3(df_radg_cat3_l,"ref_fever_tri","index_fever_tri","*12-59 months*")
+```
+
+### Fast Breathing
+```{r}
+# Long format
+confusion_matrix3(df_radg_cat1fb_l,"ref_fastbreath_12mo_tri","index_fastbreath_12mo_tri", "*0-1 month*")
+confusion_matrix3(df_radg_cat2fb_l,"ref_fastbreath_12mo_tri","index_fastbreath_12mo_tri", "*2-11 months*")
+confusion_matrix3(df_radg_cat3fb_l,"ref_fastbreath_35mo_tri","index_fastbreath_35mo_tri", "*12-35 months*")
+confusion_matrix3(df_radg_cat4fb_l,"ref_fastbreath_59mo_tri","index_fastbreath_59mo_tri", "*36-59 months*")
+```
+
+### Tachycardia
+```{r}
+# Long
+confusion_matrix3(df_radg_cat1_l,"ref_tachycardic_12mo_tri","index_tachycardic_12mo_tri", "*0-1 month*")
+confusion_matrix3(df_radg_cat2_l,"ref_tachycardic_12mo_tri","index_tachycardic_12mo_tri", "*2-11 months*")
+confusion_matrix3(df_radg_cat3_l,"ref_tachycardic_59mo_tri","index_tachycardic_59mo_tri", "*12-59 months*")
+```
+
+## m800 (Biolight) {.tabset}
+
+### Hypoxia
+```{r}
+confusion_matrix3(df_bio_cat1_l,"ref_hypoxic_tri","index_hypoxic_tri","*0-1 month*")
+confusion_matrix3(df_bio_cat2_l,"ref_hypoxic_tri","index_hypoxic_tri", "*2-11 months*")
+confusion_matrix3(df_bio_cat3_l,"ref_hypoxic_tri","index_hypoxic_tri","*12-59 months*")
+```
+
+### Fast Breathing
+```{r}
+confusion_matrix3(df_bio_cat1fb_l,"ref_fastbreath_12mo_tri","index_fastbreath_12mo_tri", "*0-1 month*")
+confusion_matrix3(df_bio_cat2fb_l,"ref_fastbreath_12mo_tri","index_fastbreath_12mo_tri", "*2-11 months*")
+confusion_matrix3(df_bio_cat3fb_l,"ref_fastbreath_35mo_tri","index_fastbreath_35mo_tri", "*12-35 months*")
+confusion_matrix3(df_bio_cat4fb_l,"ref_fastbreath_59mo_tri","index_fastbreath_59mo_tri", "*36-59 months*")
+```
+
+### Tachycardia
+```{r}
+confusion_matrix3(df_bio_cat1_l,"ref_tachycardic_12mo_tri","index_tachycardic_12mo_tri", "*0-1 month*")
+confusion_matrix3(df_bio_cat2_l,"ref_tachycardic_12mo_tri","index_tachycardic_12mo_tri", "*2-11 months*")
+confusion_matrix3(df_bio_cat3_l,"ref_tachycardic_59mo_tri","index_tachycardic_59mo_tri", "*12-59 months*")
+```
+
+## NeoGuard (Neopenda) {.tabset}
+
+### Hypoxia
+```{r}
+confusion_matrix3(df_neo_cat1_l,"ref_hypoxic_tri","index_hypoxic_tri","*0-1 month*")
+confusion_matrix3(df_neo_cat2_l,"ref_hypoxic_tri","index_hypoxic_tri", "*2-11 months*")
+confusion_matrix3(df_neo_cat3_l,"ref_hypoxic_tri","index_hypoxic_tri","*12-59 months*")
+```
+
+### Fever
+```{r}
+confusion_matrix3(df_neo_cat1_l,"ref_fever_tri","index_fever_tri", "*0-1 month*")
+confusion_matrix3(df_neo_cat2_l,"ref_fever_tri","index_fever_tri", "*2-11 months*")
+confusion_matrix3(df_neo_cat3_l,"ref_fever_tri","index_fever_tri","*12-59 months*")
+```
+
+### Fast Breathing
+```{r}
+confusion_matrix3(df_neo_cat1fb_l,"ref_fastbreath_12mo_tri","index_fastbreath_12mo_tri", "*0-1 month*")
+confusion_matrix3(df_neo_cat2fb_l,"ref_fastbreath_12mo_tri","index_fastbreath_12mo_tri", "*2-11 months*")
+confusion_matrix3(df_neo_cat3fb_l,"ref_fastbreath_35mo_tri","index_fastbreath_35mo_tri", "*12-35 months*")
+confusion_matrix3(df_neo_cat4fb_l,"ref_fastbreath_59mo_tri","index_fastbreath_59mo_tri", "*36-59 months*")
+```
+
+### Tachycardia
+```{r}
+confusion_matrix3(df_neo_cat1_l,"ref_tachycardic_12mo_tri","index_tachycardic_12mo_tri", "*0-1 month*")
+confusion_matrix3(df_neo_cat2_l,"ref_tachycardic_12mo_tri","index_tachycardic_12mo_tri", "*2-11 months*")
+confusion_matrix3(df_neo_cat3_l,"ref_tachycardic_59mo_tri","index_tachycardic_59mo_tri", "*12-59 months*")
+```
+
+## Onyx PO+RR (Nonin) {.tabset}
+
+### Hypoxia
+```{r}
+confusion_matrix3(df_onyx_cat3_l,"ref_hypoxic_tri","index_hypoxic_tri","*12-59 months*")
+```
+
+### Fast Breathing
+```{r}
+confusion_matrix3(df_onyx_cat3fb_l,"ref_fastbreath_35mo_tri","index_fastbreath_35mo_tri", "*12-35 months*")
+confusion_matrix3(df_onyx_cat4fb_l,"ref_fastbreath_59mo_tri","index_fastbreath_59mo_tri", "*36-59 months*")
+```
+
+### Tachycardia
+```{r}
+confusion_matrix3(df_neo_cat3_l,"ref_tachycardic_59mo_tri","index_tachycardic_59mo_tri", "*12-59 months*")
+```
+
+## Scanbo v8 (Scanbo) {.tabset}
+
+### Hypoxia
+```{r}
+# Long
+confusion_matrix3(df_scan_cat3_l,"ref_hypoxic_tri","index_hypoxic_tri","*12-59 months*")
+```
+
+### Fever
+```{r}
+confusion_matrix3(df_scan_cat3_l,"ref_fever_tri","index_fever_tri","*12-59 months*")
+```
+
+### Fast Breathing
+```{r}
+confusion_matrix3(df_scan_cat3fb_l,"ref_fastbreath_35mo_tri","index_fastbreath_35mo_tri", "*12-35 months*")
+confusion_matrix3(df_scan_cat4fb_l,"ref_fastbreath_59mo_tri","index_fastbreath_59mo_tri", "*36-59 months*")
+```
+
+### Tachycardia
+```{r}
+confusion_matrix3(df_scan_cat3_l,"ref_tachycardic_59mo_tri","index_tachycardic_59mo_tri", "*12-59 months*")
+```
+
 # Section 6: Percent Agreement {.tabset}
 
 
