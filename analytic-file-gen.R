@@ -7,7 +7,7 @@ library(lubridate)
 library(zscorer)
 
 # Read in REDCap data for Kenya, Tanzania, and India (saved in Box)
-df_og <- read.csv("C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_2024-02-01.csv") #update file path to local machine
+df_og <- read.csv("C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_2024-02-23.csv") #update file path to local machine
 
 # Basic cleaning, create new df object to preserve original data
 df <- subset(df_og, redcap_data_access_group!="") #remove if DAG missing, N=2
@@ -221,4 +221,4 @@ df$m3_ref_rr_confident <- case_when(df$m3_annotation_confident_r1==0 & df$m3_ann
 df <- df %>% select(-c(bdate, age_cat2, month_diff, m1_30s_pic, m1_90s_pic, m2_30s_pic, m2_90s_pic, m3_30s_pic, m3_90s_pic, m1_index_spo2, m1_ref_sp02, m2_index_spo2, m2_ref_sp02, m3_index_spo2, m3_ref_sp02, cg_interview_yn, cg_sex, cg_edu_mother, cg_edu_mother_oth, cg_overall_comfort, cg_like_most, cg_like_least, cg_prov_challenges_yn, cg_prov_challenges, cg_overall_satisfied, cg_confident_use, cg_confident_performance, cg_adequate_assess_yn,  cg_adequate_assess_rsn, cg_advantage, cg_concerns, cg_compare_assess, cg_compare_assess_rsn, cg_useful, cg_useful_rsn, cg_rec_device, cg_rec_device_rsn, cg_rec_facility, cg_rec_facility_rsn,  cg_major_considerations, cg_provider_use_yn, cg_provider_use, cg_overall_impression, cg_advantages, cg_disadvantages, cg_understand_purpose, cg_discomfort, cg_discomfort_des, cg_recommend,  cg_change_desire, cg_oth_comments, caregiver_interview_complete))
 
 # Write file as .csv to shared Box folder
-write.csv(df, "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2024-02-01.csv")
+write.csv(df, "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2024-02-23.csv")
