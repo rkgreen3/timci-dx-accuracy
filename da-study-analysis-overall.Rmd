@@ -32,7 +32,7 @@ library(reshape2)
 library(ggplot2)
 
 # Read in (cleaned) data 
-filename <- "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2024-02-01.csv"
+filename <- "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2024-03-08.csv"
 df_og <- read.csv(filename)
 df_og <- df_og %>% select(-c("X", "m1_index_temp_f", "m2_index_temp_f", "m3_index_temp_f"))
 
