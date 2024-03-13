@@ -642,21 +642,21 @@ Note: Abnormal reference measure proportions presented in this table are based o
 # Specify all the variables you want to treat as factors
 
 factorVars <- c("age_cat", "sex","cg_relationship", 
-                "visit_rsn_illness", "visit_rsn_immunize", "visit_rsn_routine", "visit_rsn_trauma", "visit_rsn_admit",
+                "visit_rsn_illness", "visit_rsn_immunize", "visit_rsn_routine",
                 "ill_sxs_cough", "ill_sxs_rapidbreathing", "ill_sxs_fever",
                 "ill_sxs_diarrhea", "ill_sxs_vomit", "ill_sxs_other",
                 "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
-                "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_other",
+                "dx_fever", "dx_earinfection", "dx_throatinfection", "dx_other",
                 "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
                 "tx_other", "stunted", "wasted_overweight", "anemia_status", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm", "mean_ref_rr_abnorm")
 
 # Specify all the variables to include in table 1 (both continuous and categorical)
 myVars <- c("age_cat", "sex","cg_relationship", 
-            "visit_rsn_illness", "visit_rsn_immunize", "visit_rsn_routine", "visit_rsn_trauma", "visit_rsn_admit",
+            "visit_rsn_illness", "visit_rsn_immunize", "visit_rsn_routine",
             "ill_sxs_cough", "ill_sxs_rapidbreathing", "ill_sxs_fever",
             "ill_sxs_diarrhea", "ill_sxs_vomit", "ill_sxs_other",
             "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
-            "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_other",
+            "dx_fever", "dx_earinfection", "dx_throatinfection", "dx_other",
             "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
             "tx_other", "stunted", "wasted_overweight", "anemia_status", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm", "mean_ref_rr_abnorm")
 
@@ -666,32 +666,44 @@ out1 <- CreateTableOne(vars = myVars,
                factorVars = factorVars,
                strata = "country",
                test = FALSE,
-               addOverall = TRUE)
+               addOverall = TRUE,
+               includeNA = TRUE)
 
 t1_overall <- print(out1,
             cramVars = "sex")
 
 # Create row labels
-t1lab <- c("N", "Age Category (%)", "0-1 month", "2-11 months", "12-59 months", "Sex = Male/Female (%)",
-            "Relationship of caregiver to child (%)", "Community member", "Father only", "Grandfather only", "Grandmother only", "Mother and father", "Mother and grandmother", "Mother only", "Other", "Other family   
-              member", "Sibling", "Visited due to Illness (%)", "Visited for Immunization (%)", "Visited for Routine Monitoring (%)", "Visited due to Trauma (%)", "Admission to inpatient unit of the
-             facility (%)", "Cough (%)", "Difficulty/Rapid breathing (%)", "Fever (%)", "Diarrhea (%)", "Vomiting (%)", "Other (%)", "Received Diagnosis (%)", "Dehydration", "Respiratory", "Digestive", "Malaria", 
-              "Fever", "Measles=False", "Ear infection", "Throat infection", "Other", "Received Treatment (%)", "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other", "Stunting (%)", "Severe", "Moderate", "Normal", "Wasting (%)", "Severely Wasted", "Moderately Wasted", "Normal", "Overweight", "Anemia* (%)", "Severe", "Moderate", "Mild", "Normal", "Abnormal SpO2 (reference) (%)", "Abnormal Pulse Rate (reference) (%)",  
-            "Abnormal Temperature (reference) (%)", "Abnormal Profusion Index (reference) (%)", "Abnormal Respiratory Rate (reference) (%)")
+t1lab <- c("N", "Age Category (%)", "0-1 month", "2-11 months", "12-59 months", 
+           "Sex = Male/Female (%)",
+          "Relationship of caregiver to child (%)", "Community member", "Father only", "Grandfather only", "Grandmother only", "Mother and father", "Mother and grandmother", "Mother only", "Other", "Other family 
+              member", "Sibling", 
+          "Visited due to Illness (%)", "Visited for Immunization (%)", "Visited for Routine Monitoring (%)", 
+          "Cough (%)", "Difficulty/Rapid breathing (%)", "Fever (%)", "Diarrhea (%)", "Vomiting (%)", "Other (%)", 
+          "Received Diagnosis (%)", "No", "Yes", "NA",
+          "Dehydration", "Respiratory", "Digestive", "Malaria", "Fever", "Ear infection", "Throat infection", "Other", 
+          "Received Treatment (%)", "No", "Yes", "NA",
+          "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other", 
+          "Stunting (%)", "Severe", "Moderate", "Normal", "NA",
+          "Wasting (%)", "Severely Wasted", "Moderately Wasted", "Normal", "Overweight", "NA",
+          "Anemia* (%)", "Severe", "Moderate", "Mild", "Normal", "NA",
+          "Abnormal SpO2 (reference) (%)", "Abnormal Pulse Rate (reference) (%)",  
+          "Abnormal Temperature (reference) (%)", "No", "Yes", "NA",
+          "Abnormal Profusion Index (reference) (%)", 
+          "Abnormal Respiratory Rate (reference) (%)", "No", "Yes", "NA")
 
 # Add row labels
 rownames(t1_overall) <- c(t1lab)
 
 t1 <- kable(t1_overall) %>%
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
-  add_indent(c(3:5, 8:17, 46:48, 50:53, 55:58)) %>%
+  add_indent(c(3:5, 8:17, 28:30, 40:42, 49:52, 54:58, 60:64, 68:70, 73:75)) %>%
   pack_rows("Demographic Characteristics", 2, 17) %>%
-  pack_rows("Reason for visit to clinic", 18, 22) %>%
-  pack_rows("Symptoms Present", 23, 28) %>%
-  pack_rows("Diagnosis", 29, 38) %>%
-  pack_rows("Treatment received", 39, 44) %>%
-  pack_rows("Physical Characteristics", 45, 58) %>%
-  pack_rows("Reference Measurements", 59, 63) %>%
+  pack_rows("Reason for visit to clinic", 18, 20) %>%
+  pack_rows("Symptoms Present", 21, 26) %>%
+  pack_rows("Diagnosis", 27, 38) %>%
+  pack_rows("Treatment received", 39, 47) %>%
+  pack_rows("Physical Characteristics", 48, 64) %>%
+  pack_rows("Reference Measurements", 65, 75) %>%
   add_footnote("Participants <6mo of age excluded per available WHO thresholds", notation = "symbol")
 ```
 `r t1`
