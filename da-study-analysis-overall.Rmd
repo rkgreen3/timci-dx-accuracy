@@ -168,10 +168,10 @@ mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_rrac, by = c("ppt_id"
 mdf_reshaped <- left_join(mdf_reshaped_i, mdf_reshaped_r, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp")) #long format df w/index & ref measurements for all devices & measurement types
 
 # Add indicator variables here for clinical thresholds (long format) -- Note: From the SAP, these are defined for the user in Section 5, if changed here be sure to change there and below
-mdf_reshaped$index_hypoxic <- ifelse(mdf_reshaped$index_o2<90, 1, 0)
-mdf_reshaped$ref_hypoxic <- ifelse(mdf_reshaped$ref_o2<90, 1, 0)
-mdf_reshaped$index_fever <- ifelse(mdf_reshaped$index_temp>37.9, 1, 0)
-mdf_reshaped$ref_fever <- ifelse(mdf_reshaped$ref_temp>37.9, 1, 0)
+mdf_reshaped$index_hypoxic <- ifelse(mdf_reshaped$index_o2<=90, 1, 0)
+mdf_reshaped$ref_hypoxic <- ifelse(mdf_reshaped$ref_o2<=90, 1, 0)
+mdf_reshaped$index_fever <- ifelse(mdf_reshaped$index_temp>=37.5, 1, 0)
+mdf_reshaped$ref_fever <- ifelse(mdf_reshaped$ref_temp>=37.5, 1, 0)
 mdf_reshaped$index_fastbreath_12mo <- ifelse(mdf_reshaped$index_rr>49 & mdf_reshaped$age_months<12, 1, 0)
 mdf_reshaped$ref_fastbreath_12mo <- ifelse(mdf_reshaped$ref_rr>49 & mdf_reshaped$age_months<12, 1, 0)
 mdf_reshaped$index_fastbreath_35mo <- ifelse(mdf_reshaped$index_rr>39 & (mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36), 1, 0)
@@ -183,18 +183,18 @@ mdf_reshaped$ref_tachycardic_12mo <- ifelse(mdf_reshaped$ref_pr>179 & mdf_reshap
 mdf_reshaped$index_tachycardic_59mo <- ifelse(mdf_reshaped$index_pr>139 & mdf_reshaped$age_months>11, 1, 0)
 mdf_reshaped$ref_tachycardic_59mo <- ifelse(mdf_reshaped$ref_pr>139 & mdf_reshaped$age_months>11, 1, 0)
 ## Add 3-level indicator variables for clinical thresholds (long format) -- Note: From the SAP, these are defined for the user in Section 5, if changed here be sure to change there and below
-mdf_reshaped$index_hypoxic_tri <- case_when(mdf_reshaped$index_o2<=90 ~ 2,
-                                            mdf_reshaped$index_o2<=92 & mdf_reshaped$index_o2>90 ~ 1,
-                                            mdf_reshaped$index_o2>92 ~ 0)
-mdf_reshaped$ref_hypoxic_tri <- case_when(mdf_reshaped$ref_o2<=90 ~ 2,
-                                            mdf_reshaped$ref_o2<=92 & mdf_reshaped$ref_o2>90 ~ 1,
-                                            mdf_reshaped$ref_o2>92 ~ 0)
-mdf_reshaped$index_fever_tri <- case_when(mdf_reshaped$index_temp>39.1 ~ 2,
-                                            mdf_reshaped$index_temp<=39.1 & mdf_reshaped$index_temp>=38 ~ 1,
-                                            mdf_reshaped$index_temp<38 ~ 0)
-mdf_reshaped$ref_fever_tri <- case_when(mdf_reshaped$ref_temp>39.1 ~ 2,
-                                            mdf_reshaped$ref_temp<=39.1 & mdf_reshaped$ref_temp>=38 ~ 1,
-                                            mdf_reshaped$ref_temp<38 ~ 0)
+mdf_reshaped$index_hypoxic_tri <- case_when(mdf_reshaped$index_o2<88 ~ 2,
+                                            mdf_reshaped$index_o2<90 & mdf_reshaped$index_o2>=88 ~ 1,
+                                            mdf_reshaped$index_o2>=90 ~ 0)
+mdf_reshaped$ref_hypoxic_tri <- case_when(mdf_reshaped$ref_o2<88 ~ 2,
+                                            mdf_reshaped$ref_o2<90 & mdf_reshaped$ref_o2>=88 ~ 1,
+                                            mdf_reshaped$ref_o2>=90 ~ 0)
+mdf_reshaped$index_fever_tri <- case_when(mdf_reshaped$index_temp>=38.5 ~ 2,
+                                            mdf_reshaped$index_temp<38.5 & mdf_reshaped$index_temp>=37.5 ~ 1,
+                                            mdf_reshaped$index_temp<37.5 ~ 0)
+mdf_reshaped$ref_fever_tri <- case_when(mdf_reshaped$ref_temp>=38.5 ~ 2,
+                                            mdf_reshaped$ref_temp<38.5 & mdf_reshaped$ref_temp>=37.5 ~ 1,
+                                            mdf_reshaped$ref_temp<37.5 ~ 0)
 mdf_reshaped$index_fastbreath_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$index_rr>55 ~ 2,
                                             mdf_reshaped$age_months<12 & mdf_reshaped$index_rr<=55 & mdf_reshaped$index_rr>=50 ~ 1,
                                             mdf_reshaped$age_months<12 & mdf_reshaped$index_rr<50 ~ 0)
@@ -314,10 +314,10 @@ df_scan_cat4fb_l <- subset(df_scan_l, age_cat_fastbreathe=="36-59 months")
 
 # Add indicator variables here for clinical thresholds (wide format), each measurement -- Note: From the SAP, these are defined for the user in Section 5, if changed here be sure to change there and above
 ## M1
-df_og$m1_index_hypoxic <- ifelse(df_og$m1_index_o2<90, 1, 0)
-df_og$m1_ref_hypoxic <- ifelse(df_og$m1_ref_o2<90, 1, 0)
-df_og$m1_index_fever <- ifelse(df_og$m1_index_temp>37.9, 1, 0)
-df_og$m1_ref_fever <- ifelse(df_og$m1_therm_skin_temp>37.9, 1, 0)
+df_og$m1_index_hypoxic <- ifelse(df_og$m1_index_o2<=90, 1, 0)
+df_og$m1_ref_hypoxic <- ifelse(df_og$m1_ref_o2<=90, 1, 0)
+df_og$m1_index_fever <- ifelse(df_og$m1_index_temp>=37.5, 1, 0)
+df_og$m1_ref_fever <- ifelse(df_og$m1_therm_skin_temp>=37.5, 1, 0)
 df_og$m1_index_fastbreath_12mo <- ifelse(df_og$m1_index_rr>49 & df_og$age_months<12, 1, 0)
 df_og$m1_ref_fastbreath_12mo <- ifelse(df_og$m1_ref_rr>49 & df_og$age_months<12, 1, 0)
 df_og$m1_index_fastbreath_35mo <- ifelse(df_og$m1_index_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
@@ -329,10 +329,10 @@ df_og$m1_ref_tachycardic_12mo <- ifelse(df_og$m1_ref_pr>179 & df_og$age_months<1
 df_og$m1_index_tachycardic_59mo <- ifelse(df_og$m1_index_pr>139 & df_og$age_months>11, 1, 0)
 df_og$m1_ref_tachycardic_59mo <- ifelse(df_og$m1_ref_pr>139 & df_og$age_months>11, 1, 0)
 ## M2
-df_og$m2_index_hypoxic <- ifelse(df_og$m2_index_o2<90, 1, 0)
-df_og$m2_ref_hypoxic <- ifelse(df_og$m2_ref_o2<90, 1, 0)
-df_og$m2_index_fever <- ifelse(df_og$m2_index_temp>37.9, 1, 0)
-df_og$m2_ref_fever <- ifelse(df_og$m2_therm_skin_temp>37.9, 1, 0)
+df_og$m2_index_hypoxic <- ifelse(df_og$m2_index_o2<=90, 1, 0)
+df_og$m2_ref_hypoxic <- ifelse(df_og$m2_ref_o2<=90, 1, 0)
+df_og$m2_index_fever <- ifelse(df_og$m2_index_temp>=37.5, 1, 0)
+df_og$m2_ref_fever <- ifelse(df_og$m2_therm_skin_temp>=37.5, 1, 0)
 df_og$m2_index_fastbreath_12mo <- ifelse(df_og$m2_index_rr>49 & df_og$age_months<12, 1, 0)
 df_og$m2_ref_fastbreath_12mo <- ifelse(df_og$m2_ref_rr>49 & df_og$age_months<12, 1, 0)
 df_og$m2_index_fastbreath_35mo <- ifelse(df_og$m2_index_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
@@ -344,10 +344,10 @@ df_og$m2_ref_tachycardic_12mo <- ifelse(df_og$m2_ref_pr>179 & df_og$age_months<1
 df_og$m2_index_tachycardic_59mo <- ifelse(df_og$m2_index_pr>139 & df_og$age_months>11, 1, 0)
 df_og$m2_ref_tachycardic_59mo <- ifelse(df_og$m2_ref_pr>139 & df_og$age_months>11, 1, 0)
 ## M3
-df_og$m3_index_hypoxic <- ifelse(df_og$m3_index_o2<90, 1, 0)
-df_og$m3_ref_hypoxic <- ifelse(df_og$m3_ref_o2<90, 1, 0)
-df_og$m3_index_fever <- ifelse(df_og$m3_index_temp>37.9, 1, 0)
-df_og$m3_ref_fever <- ifelse(df_og$m3_therm_skin_temp>37.9, 1, 0)
+df_og$m3_index_hypoxic <- ifelse(df_og$m3_index_o2<=90, 1, 0)
+df_og$m3_ref_hypoxic <- ifelse(df_og$m3_ref_o2<=90, 1, 0)
+df_og$m3_index_fever <- ifelse(df_og$m3_index_temp>=37.5, 1, 0)
+df_og$m3_ref_fever <- ifelse(df_og$m3_therm_skin_temp>=37.5, 1, 0)
 df_og$m3_index_fastbreath_12mo <- ifelse(df_og$m3_index_rr>49 & df_og$age_months<12, 1, 0)
 df_og$m3_ref_fastbreath_12mo <- ifelse(df_og$m3_ref_rr>49 & df_og$age_months<12, 1, 0)
 df_og$m3_index_fastbreath_35mo <- ifelse(df_og$m3_index_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
@@ -360,18 +360,18 @@ df_og$m3_index_tachycardic_59mo <- ifelse(df_og$m3_index_pr>139 & df_og$age_mont
 df_og$m3_ref_tachycardic_59mo <- ifelse(df_og$m3_ref_pr>139 & df_og$age_months>11, 1, 0)
 ## Add 3-level indicator variables for clinical thresholds (wide format) -- Note: From the SAP, these are defined for the user in Section 5, if changed here be sure to change there and above
 ### M1
-df_og$m1_index_hypoxic_tri <- case_when(df_og$m1_index_o2<=90 ~ 2,
-                                            df_og$m1_index_o2<=92 & df_og$m1_index_o2>90 ~ 1,
-                                            df_og$m1_index_o2>92 ~ 0)
-df_og$m1_ref_hypoxic_tri <- case_when(df_og$m1_ref_o2<=90 ~ 2,
-                                            df_og$m1_ref_o2<=92 & df_og$m1_ref_o2>90 ~ 1,
-                                            df_og$m1_ref_o2>92 ~ 0)
-df_og$m1_index_fever_tri <- case_when(df_og$m1_index_temp>39.1 ~ 2,
-                                            df_og$m1_index_temp<=39.1 & df_og$m1_index_temp>=38 ~ 1,
-                                            df_og$m1_index_temp<38 ~ 0)
-df_og$m1_ref_fever_tri <- case_when(df_og$m1_therm_skin_temp>39.1 ~ 2,
-                                            df_og$m1_therm_skin_temp<=39.1 & df_og$m1_therm_skin_temp>=38 ~ 1,
-                                            df_og$m1_therm_skin_temp<38 ~ 0)
+df_og$m1_index_hypoxic_tri <- case_when(df_og$m1_index_o2<88 ~ 2,
+                                            df_og$m1_index_o2<90 & df_og$m1_index_o2>=88 ~ 1,
+                                            df_og$m1_index_o2>90 ~ 0)
+df_og$m1_ref_hypoxic_tri <- case_when(df_og$m1_ref_o2<88 ~ 2,
+                                            df_og$m1_ref_o2<90 & df_og$m1_ref_o2>=88 ~ 1,
+                                            df_og$m1_ref_o2>90 ~ 0)
+df_og$m1_index_fever_tri <- case_when(df_og$m1_index_temp>=38.5 ~ 2,
+                                            df_og$m1_index_temp<38.5 & df_og$m1_index_temp>=37.5 ~ 1,
+                                            df_og$m1_index_temp<37.5 ~ 0)
+df_og$m1_ref_fever_tri <- case_when(df_og$m1_therm_skin_temp>=38.5 ~ 2,
+                                            df_og$m1_therm_skin_temp<38.5 & df_og$m1_therm_skin_temp>=37.5 ~ 1,
+                                            df_og$m1_therm_skin_temp<37.5 ~ 0)
 df_og$m1_index_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m1_index_rr>55 ~ 2,
                                             df_og$age_months<12 & df_og$m1_index_rr<=55 & df_og$m1_index_rr>=50 ~ 1,
                                             df_og$age_months<12 & df_og$m1_index_rr<50 ~ 0)
@@ -403,18 +403,18 @@ df_og$m1_ref_tachycardic_59mo_tri <- case_when(df_og$age_months>11 & df_og$m1_re
                                             df_og$age_months>11 & df_og$m1_ref_pr<=150 & df_og$m1_ref_pr>=140 ~ 1,
                                             df_og$age_months>11 & df_og$m1_ref_pr<140 ~ 0)
 ### M2
-df_og$m2_index_hypoxic_tri <- case_when(df_og$m2_index_o2<=90 ~ 2,
-                                            df_og$m2_index_o2<=92 & df_og$m2_index_o2>90 ~ 1,
-                                            df_og$m2_index_o2>92 ~ 0)
-df_og$m2_ref_hypoxic_tri <- case_when(df_og$m2_ref_o2<=90 ~ 2,
-                                            df_og$m2_ref_o2<=92 & df_og$m2_ref_o2>90 ~ 1,
-                                            df_og$m2_ref_o2>92 ~ 0)
-df_og$m2_index_fever_tri <- case_when(df_og$m2_index_temp>39.1 ~ 2,
-                                            df_og$m2_index_temp<=39.1 & df_og$m2_index_temp>=38 ~ 1,
-                                            df_og$m2_index_temp<38 ~ 0)
-df_og$m2_ref_fever_tri <- case_when(df_og$m2_therm_skin_temp>39.1 ~ 2,
-                                            df_og$m2_therm_skin_temp<=39.1 & df_og$m2_therm_skin_temp>=38 ~ 1,
-                                            df_og$m2_therm_skin_temp<38 ~ 0)
+df_og$m2_index_hypoxic_tri <- case_when(df_og$m2_index_o2<88 ~ 2,
+                                            df_og$m2_index_o2<90 & df_og$m2_index_o2>=88 ~ 1,
+                                            df_og$m2_index_o2>90 ~ 0)
+df_og$m2_ref_hypoxic_tri <- case_when(df_og$m2_ref_o2<88 ~ 2,
+                                            df_og$m2_ref_o2<90 & df_og$m2_ref_o2>=88 ~ 1,
+                                            df_og$m2_ref_o2>90 ~ 0)
+df_og$m2_index_fever_tri <- case_when(df_og$m2_index_temp>=38.5 ~ 2,
+                                            df_og$m2_index_temp<38.5 & df_og$m2_index_temp>=37.5 ~ 1,
+                                            df_og$m2_index_temp<37.5 ~ 0)
+df_og$m2_ref_fever_tri <- case_when(df_og$m2_therm_skin_temp>=38.5 ~ 2,
+                                            df_og$m2_therm_skin_temp<38.5 & df_og$m2_therm_skin_temp>=37.5 ~ 1,
+                                            df_og$m2_therm_skin_temp<37.5 ~ 0)
 df_og$m2_index_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m2_index_rr>55 ~ 2,
                                             df_og$age_months<12 & df_og$m2_index_rr<=55 & df_og$m2_index_rr>=50 ~ 1,
                                             df_og$age_months<12 & df_og$m2_index_rr<50 ~ 0)
@@ -446,18 +446,18 @@ df_og$m2_ref_tachycardic_59mo_tri <- case_when(df_og$age_months>11 & df_og$m2_re
                                             df_og$age_months>11 & df_og$m2_ref_pr<=150 & df_og$m2_ref_pr>=140 ~ 1,
                                             df_og$age_months>11 & df_og$m2_ref_pr<140 ~ 0)
 ### M3
-df_og$m3_index_hypoxic_tri <- case_when(df_og$m3_index_o2<=90 ~ 2,
-                                            df_og$m3_index_o2<=92 & df_og$m3_index_o2>90 ~ 1,
-                                            df_og$m3_index_o2>92 ~ 0)
-df_og$m3_ref_hypoxic_tri <- case_when(df_og$m3_ref_o2<=90 ~ 2,
-                                            df_og$m3_ref_o2<=92 & df_og$m3_ref_o2>90 ~ 1,
-                                            df_og$m3_ref_o2>92 ~ 0)
-df_og$m3_index_fever_tri <- case_when(df_og$m3_index_temp>39.1 ~ 2,
-                                            df_og$m3_index_temp<=39.1 & df_og$m3_index_temp>=38 ~ 1,
-                                            df_og$m3_index_temp<38 ~ 0)
-df_og$m3_ref_fever_tri <- case_when(df_og$m3_therm_skin_temp>39.1 ~ 2,
-                                            df_og$m3_therm_skin_temp<=39.1 & df_og$m3_therm_skin_temp>=38 ~ 1,
-                                            df_og$m3_therm_skin_temp<38 ~ 0)
+df_og$m3_index_hypoxic_tri <- case_when(df_og$m3_index_o2<88 ~ 2,
+                                            df_og$m3_index_o2<90 & df_og$m3_index_o2>=88 ~ 1,
+                                            df_og$m3_index_o2>90 ~ 0)
+df_og$m3_ref_hypoxic_tri <- case_when(df_og$m3_ref_o2<88 ~ 2,
+                                            df_og$m3_ref_o2<90 & df_og$m3_ref_o2>=88 ~ 1,
+                                            df_og$m3_ref_o2>90 ~ 0)
+df_og$m3_index_fever_tri <- case_when(df_og$m3_index_temp>=38.5 ~ 2,
+                                            df_og$m3_index_temp<38.5 & df_og$m3_index_temp>=37.5 ~ 1,
+                                            df_og$m3_index_temp<37.5 ~ 0)
+df_og$m3_ref_fever_tri <- case_when(df_og$m3_therm_skin_temp>=38.5 ~ 2,
+                                            df_og$m3_therm_skin_temp<38.5 & df_og$m3_therm_skin_temp>=37.5 ~ 1,
+                                            df_og$m3_therm_skin_temp<37.5 ~ 0)
 df_og$m3_index_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m3_index_rr>55 ~ 2,
                                             df_og$age_months<12 & df_og$m3_index_rr<=55 & df_og$m3_index_rr>=50 ~ 1,
                                             df_og$age_months<12 & df_og$m3_index_rr<50 ~ 0)
@@ -1796,10 +1796,10 @@ icc_t3_ref <- kable(out3_ref, col.names = c("","Rad-G Temp (Masimo)", "M800 (Bio
 
 Clinical thresholds used in the section are as follows:
 
-- Hypoxemia: <90%
+- Hypoxemia: ≤90%
 - Fast breathing: <12 months (>49 bpm); 12-35 months (>39 bpm); 36-60 months (>29 bpm)
 - Tachycardia: <12 months (>179 bpm); 12-60 months (>139 bpm)
-- Fever: >37C (≥100.4F)
+- Fever: ≥37.5C
 
 ## Rad-G Temp (Masimo) {.tabset}
 ```{r, include=FALSE}
@@ -2045,9 +2045,9 @@ confusion_matrix(df_scan_cat3_l,"ref_tachycardic_59mo","index_tachycardic_59mo",
 Clinical thresholds used in the section are as follows:
 
 - Hypoxemia:
-  +	≤90% (severe)
-  +	90.1% ≤ SpO2 ≤ 92% (moderate)
-  +	`>`92% (normal)
+  +	<88% (severe)
+  +	88% ≤ SpO2 < 90% (moderate)
+  +	≥90%  (normal)
 
 - Fast breathing: 
   + <12 months
@@ -2074,9 +2074,9 @@ Clinical thresholds used in the section are as follows:
     +	<140 bpm (normal)
 
 - Fever:
-  +	`>`39.1C (severe)
-  +	38C ≤ temperature ≤ 39.1C (moderate)
-  +	< 38C (normal)
+  +	≥38.5C (severe)
+  +	37.5C ≤ temperature < 38.5C (moderate)
+  +	< 37.5C (normal)
 
 ```{r helper_fn3}
 # Function to create the 3x3 confusion matrix
