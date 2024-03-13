@@ -48,7 +48,8 @@ df_og <- df_og %>%
   mutate(mean_ref_o2 = round(rowMeans(select(df_og, c(m1_ref_o2, m2_ref_o2, m3_ref_o2)), na.rm = TRUE), 1),
          mean_ref_pr = round(rowMeans(select(df_og, c(m1_ref_pr, m2_ref_pr, m3_ref_pr)), na.rm = TRUE), 1),
          mean_ref_temp = round(rowMeans(select(df_og, c(m1_therm_skin_temp, m2_therm_skin_temp, m3_therm_skin_temp)), na.rm = TRUE), 1),
-         mean_ref_pi = round(rowMeans(select(df_og, c(m1_ref_pi, m2_ref_pi, m3_ref_pi)), na.rm = TRUE), 1)) %>%
+         mean_ref_pi = round(rowMeans(select(df_og, c(m1_ref_pi, m2_ref_pi, m3_ref_pi)), na.rm = TRUE), 1),
+         mean_ref_rr = round(rowMeans(select(df_og, c(m1_ref_rr, m2_ref_rr, m3_ref_rr)), na.rm = TRUE), 1)) %>%
   rowwise() %>%
   mutate(sd_ref_o2 = round(sd(c(m1_ref_o2, m2_ref_o2, m3_ref_o2), na.rm = TRUE), 1),
          sd_ref_pr = round(sd(c(m1_ref_pr, m2_ref_pr, m3_ref_pr), na.rm = TRUE), 1),
@@ -71,7 +72,8 @@ df_og <- df_og %>%
           mutate(mean_ref_o2_abnorm = ifelse(mean_ref_o2<90, 1, 0),
                  mean_ref_pr_abnorm = ifelse((age_months<12 & mean_ref_pr>179) | (age_months>11 & mean_ref_pr>139), 1, 0),
                  mean_ref_temp_abnorm = ifelse(mean_ref_temp>37 , 1, 0),
-                 mean_ref_pi_abnorm = ifelse(mean_ref_pi<0.5, 1, 0))
+                 mean_ref_pi_abnorm = ifelse(mean_ref_pi<0.5, 1, 0),
+                 mean_ref_rr_abnorm = ifelse((age_months<12 & mean_ref_rr>49) | (age_months>11 & age_months<36 & mean_ref_rr>39) | (age_months>35 & mean_ref_rr>29), 1, 0))
 ## Index values
 df_og <- df_og %>% 
   mutate(mean_index_o2 = round(rowMeans(select(df_og, c(m1_index_o2, m2_index_o2, m3_index_o2)), na.rm = TRUE), 1),
@@ -646,7 +648,7 @@ factorVars <- c("age_cat", "sex","cg_relationship",
                 "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
                 "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_other",
                 "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
-                "tx_other", "stunted", "wasted_overweight", "anemia_status", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm")
+                "tx_other", "stunted", "wasted_overweight", "anemia_status", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm", "mean_ref_rr_abnorm")
 
 # Specify all the variables to include in table 1 (both continuous and categorical)
 myVars <- c("age_cat", "sex","cg_relationship", 
@@ -656,7 +658,7 @@ myVars <- c("age_cat", "sex","cg_relationship",
             "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
             "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_other",
             "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
-            "tx_other", "stunted", "wasted_overweight", "anemia_status", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm")
+            "tx_other", "stunted", "wasted_overweight", "anemia_status", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm", "mean_ref_rr_abnorm")
 
 # CreateTableOne:
 out1 <- CreateTableOne(vars = myVars,
@@ -675,7 +677,7 @@ t1lab <- c("N", "Age Category (%)", "0-1 month", "2-11 months", "12-59 months", 
               member", "Sibling", "Visited due to Illness (%)", "Visited for Immunization (%)", "Visited for Routine Monitoring (%)", "Visited due to Trauma (%)", "Admission to inpatient unit of the
              facility (%)", "Cough (%)", "Difficulty/Rapid breathing (%)", "Fever (%)", "Diarrhea (%)", "Vomiting (%)", "Other (%)", "Received Diagnosis (%)", "Dehydration", "Respiratory", "Digestive", "Malaria", 
               "Fever", "Measles=False", "Ear infection", "Throat infection", "Other", "Received Treatment (%)", "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other", "Stunting (%)", "Severe", "Moderate", "Normal", "Wasting (%)", "Severely Wasted", "Moderately Wasted", "Normal", "Overweight", "Anemia* (%)", "Severe", "Moderate", "Mild", "Normal", "Abnormal SpO2 (reference) (%)", "Abnormal Pulse Rate (reference) (%)",  
-            "Abnormal Temperature (reference) (%)", "Abnormal Profusion Index (reference) (%)")
+            "Abnormal Temperature (reference) (%)", "Abnormal Profusion Index (reference) (%)", "Abnormal Respiratory Rate (reference) (%)")
 
 # Add row labels
 rownames(t1_overall) <- c(t1lab)
@@ -689,7 +691,7 @@ t1 <- kable(t1_overall) %>%
   pack_rows("Diagnosis", 29, 38) %>%
   pack_rows("Treatment received", 39, 44) %>%
   pack_rows("Physical Characteristics", 45, 58) %>%
-  pack_rows("Reference Measurements", 59, 62) %>%
+  pack_rows("Reference Measurements", 59, 63) %>%
   add_footnote("Participants <6mo of age excluded per available WHO thresholds", notation = "symbol")
 ```
 `r t1`
