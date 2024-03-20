@@ -2651,7 +2651,6 @@ confusion_matrix3(df_scan_cat3_l,"ref_tachycardic_59mo_tri","index_tachycardic_5
 
 # Section 6: Percent Agreement {.tabset}
 
-
 ```{r, include=FALSE}
 # use binom.exact function from exactci package to calculate percent agreement and associated 95% CI's for each device/measurement/age category
 # store calculations in object to call in subsequent sections and display in table
@@ -2670,10 +2669,15 @@ pa_radg_fever1 <- binom.exact(x = sum(df_radg_cat1_l$ref_index_agree_fever, na.r
 pa_radg_fever2 <- binom.exact(x = sum(df_radg_cat2_l$ref_index_agree_fever, na.rm=T), n = sum(df_radg_cat2_l$ref_index_pres_fever))
 pa_radg_fever3 <- binom.exact(x = sum(df_radg_cat3_l$ref_index_agree_fever, na.rm=T), n = sum(df_radg_cat3_l$ref_index_pres_fever))
 
-pa_radg_fb1 <- binom.exact(x = sum(df_radg_cat1fb_l$ref_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat1fb_l$ref_index_pres_fb12mo))
+pa_radg_fb1 <- binom.exact(x = sum(df_radg_cat1fb_l$ref_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat1fb_l$ref_index_pres_fb12mo)) # Ref-Annotated RR
 pa_radg_fb2 <- binom.exact(x = sum(df_radg_cat2fb_l$ref_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat2fb_l$ref_index_pres_fb12mo))
 pa_radg_fb3 <- binom.exact(x = sum(df_radg_cat3fb_l$ref_index_agree_fb35mo, na.rm=T), n = sum(df_radg_cat3fb_l$ref_index_pres_fb35mo))
 pa_radg_fb4 <- binom.exact(x = sum(df_radg_cat4fb_l$ref_index_agree_fb59mo, na.rm=T), n = sum(df_radg_cat4fb_l$ref_index_pres_fb59mo))
+
+pa_radg_fbac1 <- binom.exact(x = sum(df_radg_cat1fb_l$refac_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat1fb_l$refac_index_pres_fb12mo)) # Ref-RRac
+pa_radg_fbac2 <- binom.exact(x = sum(df_radg_cat2fb_l$refac_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat2fb_l$refac_index_pres_fb12mo))
+pa_radg_fbac3 <- binom.exact(x = sum(df_radg_cat3fb_l$refac_index_agree_fb35mo, na.rm=T), n = sum(df_radg_cat3fb_l$refac_index_pres_fb35mo))
+pa_radg_fbac4 <- binom.exact(x = sum(df_radg_cat4fb_l$refac_index_agree_fb59mo, na.rm=T), n = sum(df_radg_cat4fb_l$refac_index_pres_fb59mo))
 
 pa_radg_tachy1 <- binom.exact(x = sum(df_radg_cat1_l$ref_index_agree_tachy12mo, na.rm=T), n = sum(df_radg_cat1_l$ref_index_pres_tachy12mo))
 pa_radg_tachy2 <- binom.exact(x = sum(df_radg_cat2_l$ref_index_agree_tachy12mo, na.rm=T), n = sum(df_radg_cat2_l$ref_index_pres_tachy12mo))
@@ -2706,22 +2710,22 @@ pa_radg_fever3_m1 <- binom.exact(x = sum(df_radg_cat3_w$m1_ref_index_agree_fever
 pa_radg_fever3_m2 <- binom.exact(x = sum(df_radg_cat3_w$m2_ref_index_agree_fever, na.rm=T), n = sum(df_radg_cat3_w$m2_ref_index_pres_fever))
 pa_radg_fever3_m3 <- binom.exact(x = sum(df_radg_cat3_w$m3_ref_index_agree_fever, na.rm=T), n = sum(df_radg_cat3_w$m3_ref_index_pres_fever))
 
-### Fast breathing
-# pa_radg_fb1_m1 <- binom.exact(x = sum(df_radg_cat1fb_w$m1_ref_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat1fb_w$m1_ref_index_pres_fb12mo))
-# pa_radg_fb1_m2 <- binom.exact(x = sum(df_radg_cat1fb_w$m2_ref_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat1fb_w$m2_ref_index_pres_fb12mo))
-# pa_radg_fb1_m3 <- binom.exact(x = sum(df_radg_cat1_w$m3_ref_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat1fb_w$m3_ref_index_pres_fb12mo))
-# 
-# pa_radg_fb2_m1 <- binom.exact(x = sum(df_radg_cat2fb_w$m1_ref_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat2fb_w$m1_ref_index_pres_fb12mo))
-# pa_radg_fb2_m2 <- binom.exact(x = sum(df_radg_cat2fb_w$m2_ref_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat2fb_w$m2_ref_index_pres_fb12mo))
-# pa_radg_fb2_m3 <- binom.exact(x = sum(df_radg_cat2fb_w$m3_ref_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat2fb_w$m3_ref_index_pres_fb12mo))
-# 
-# pa_radg_fb3_m1 <- binom.exact(x = sum(df_radg_cat3fb_w$m1_ref_index_agree_fb35mo, na.rm=T), n = sum(df_radg_cat3fb_w$m1_ref_index_pres_fb35mo))
-# pa_radg_fb3_m2 <- binom.exact(x = sum(df_radg_cat3fb_w$m2_ref_index_agree_fb35mo, na.rm=T), n = sum(df_radg_cat3fb_w$m2_ref_index_pres_fb35mo))
-# pa_radg_fb3_m3 <- binom.exact(x = sum(df_radg_cat3fb_w$m3_ref_index_agree_fb35mo, na.rm=T), n = sum(df_radg_cat3fb_w$m3_ref_index_pres_fb35mo))
-# 
-# pa_radg_fb4_m1 <- binom.exact(x = sum(df_radg_cat4fb_w$m1_ref_index_agree_fb59mo, na.rm=T), n = sum(df_radg_cat4fb_w$m1_ref_index_pres_fb59mo))
-# pa_radg_fb4_m2 <- binom.exact(x = sum(df_radg_cat4fb_w$m2_ref_index_agree_fb59mo, na.rm=T), n = sum(df_radg_cat4fb_w$m2_ref_index_pres_fb59mo))
-# pa_radg_fb4_m3 <- binom.exact(x = sum(df_radg_cat4fb_w$m3_ref_index_agree_fb59mo, na.rm=T), n = sum(df_radg_cat4fb_w$m3_ref_index_pres_fb59mo))
+### Fast breathing (RR-ac as ref)
+pa_radg_fbac1_m1 <- binom.exact(x = sum(df_radg_cat1fb_w$m1_refac_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat1fb_w$m1_refac_index_pres_fb12mo))
+pa_radg_fbac1_m2 <- binom.exact(x = sum(df_radg_cat1fb_w$m2_refac_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat1fb_w$m2_refac_index_pres_fb12mo))
+pa_radg_fbac1_m3 <- binom.exact(x = sum(df_radg_cat1fb_w$m3_refac_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat1fb_w$m3_refac_index_pres_fb12mo))
+
+pa_radg_fbac2_m1 <- binom.exact(x = sum(df_radg_cat2fb_w$m1_refac_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat2fb_w$m1_refac_index_pres_fb12mo))
+pa_radg_fbac2_m2 <- binom.exact(x = sum(df_radg_cat2fb_w$m2_refac_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat2fb_w$m2_refac_index_pres_fb12mo))
+pa_radg_fbac2_m3 <- binom.exact(x = sum(df_radg_cat2fb_w$m3_refac_index_agree_fb12mo, na.rm=T), n = sum(df_radg_cat2fb_w$m3_refac_index_pres_fb12mo))
+
+pa_radg_fbac3_m1 <- binom.exact(x = sum(df_radg_cat3fb_w$m1_refac_index_agree_fb35mo, na.rm=T), n = sum(df_radg_cat3fb_w$m1_refac_index_pres_fb35mo))
+pa_radg_fbac3_m2 <- binom.exact(x = sum(df_radg_cat3fb_w$m2_refac_index_agree_fb35mo, na.rm=T), n = sum(df_radg_cat3fb_w$m2_refac_index_pres_fb35mo))
+pa_radg_fbac3_m3 <- binom.exact(x = sum(df_radg_cat3fb_w$m3_refac_index_agree_fb35mo, na.rm=T), n = sum(df_radg_cat3fb_w$m3_refac_index_pres_fb35mo))
+
+pa_radg_fbac4_m1 <- binom.exact(x = sum(df_radg_cat4fb_w$m1_refac_index_agree_fb59mo, na.rm=T), n = sum(df_radg_cat4fb_w$m1_refac_index_pres_fb59mo))
+pa_radg_fbac4_m2 <- binom.exact(x = sum(df_radg_cat4fb_w$m2_refac_index_agree_fb59mo, na.rm=T), n = sum(df_radg_cat4fb_w$m2_refac_index_pres_fb59mo))
+pa_radg_fbac4_m3 <- binom.exact(x = sum(df_radg_cat4fb_w$m3_refac_index_agree_fb59mo, na.rm=T), n = sum(df_radg_cat4fb_w$m3_refac_index_pres_fb59mo))
 
 ### Tachycardia
 pa_radg_tachy1_m1 <- binom.exact(x = sum(df_radg_cat1_w$m1_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_radg_cat1_w$m1_ref_index_pres_tachy12mo))
@@ -2742,10 +2746,15 @@ pa_bio_hypoxia1 <- binom.exact(x = sum(df_bio_cat1_l$ref_index_agree_hypoxic, na
 pa_bio_hypoxia2 <- binom.exact(x = sum(df_bio_cat2_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_bio_cat2_l$ref_index_pres_hypoxic))
 pa_bio_hypoxia3 <- binom.exact(x = sum(df_bio_cat3_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_bio_cat3_l$ref_index_pres_hypoxic))
 
-pa_bio_fb1 <- binom.exact(x = sum(df_bio_cat1fb_l$ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat1fb_l$ref_index_pres_fb12mo))
+pa_bio_fb1 <- binom.exact(x = sum(df_bio_cat1fb_l$ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat1fb_l$ref_index_pres_fb12mo)) # Ref-annotated RR
 pa_bio_fb2 <- binom.exact(x = sum(df_bio_cat2fb_l$ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat2fb_l$ref_index_pres_fb12mo))
 pa_bio_fb3 <- binom.exact(x = sum(df_bio_cat3fb_l$ref_index_agree_fb35mo, na.rm=T), n = sum(df_bio_cat3fb_l$ref_index_pres_fb35mo))
 pa_bio_fb4 <- binom.exact(x = sum(df_bio_cat4fb_l$ref_index_agree_fb59mo, na.rm=T), n = sum(df_bio_cat4fb_l$ref_index_pres_fb59mo))
+
+pa_bio_fbac1 <- binom.exact(x = sum(df_bio_cat1fb_l$refac_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat1fb_l$refac_index_pres_fb12mo)) # Ref-RRac
+pa_bio_fbac2 <- binom.exact(x = sum(df_bio_cat2fb_l$refac_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat2fb_l$refac_index_pres_fb12mo))
+pa_bio_fbac3 <- binom.exact(x = sum(df_bio_cat3fb_l$refac_index_agree_fb35mo, na.rm=T), n = sum(df_bio_cat3fb_l$refac_index_pres_fb35mo))
+pa_bio_fbac4 <- binom.exact(x = sum(df_bio_cat4fb_l$refac_index_agree_fb59mo, na.rm=T), n = sum(df_bio_cat4fb_l$refac_index_pres_fb59mo))
 
 pa_bio_tachy1 <- binom.exact(x = sum(df_bio_cat1_l$ref_index_agree_tachy12mo, na.rm=T), n = sum(df_bio_cat1_l$ref_index_pres_tachy12mo))
 pa_bio_tachy2 <- binom.exact(x = sum(df_bio_cat2_l$ref_index_agree_tachy12mo, na.rm=T), n = sum(df_bio_cat2_l$ref_index_pres_tachy12mo))
@@ -2767,22 +2776,22 @@ pa_bio_hypoxia3_m3 <- binom.exact(x = sum(df_bio_cat3_w$m3_ref_index_agree_hypox
 
 ### Fever -- N/A, no temp measurement
 
-### Fast breathing
-# pa_bio_fb1_m1 <- binom.exact(x = sum(df_bio_cat1fb_w$m1_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat1fb_w$m1_ref_index_pres_fb12mo))
-# pa_bio_fb1_m2 <- binom.exact(x = sum(df_bio_cat1fb_w$m2_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat1fb_w$m2_ref_index_pres_fb12mo))
-# pa_bio_fb1_m3 <- binom.exact(x = sum(df_bio_cat1fb_w$m3_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat1fb_w$m3_ref_index_pres_fb12mo))
-# 
-# pa_bio_fb2_m1 <- binom.exact(x = sum(df_bio_cat2fb_w$m1_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat2fb_w$m1_ref_index_pres_fb12mo))
-# pa_bio_fb2_m2 <- binom.exact(x = sum(df_bio_cat2fb_w$m2_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat2fb_w$m2_ref_index_pres_fb12mo))
-# pa_bio_fb2_m3 <- binom.exact(x = sum(df_bio_cat2fb_w$m3_ref_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat2fb_w$m3_ref_index_pres_fb12mo))
-# 
-# pa_bio_fb3_m1 <- binom.exact(x = sum(df_bio_cat3fb_w$m1_ref_index_agree_fb35mo, na.rm=T), n = sum(df_bio_cat3fb_w$m1_ref_index_pres_fb35mo))
-# pa_bio_fb3_m2 <- binom.exact(x = sum(df_bio_cat3fb_w$m2_ref_index_agree_fb35mo, na.rm=T), n = sum(df_bio_cat3fb_w$m2_ref_index_pres_fb35mo))
-# pa_bio_fb3_m3 <- binom.exact(x = sum(df_bio_cat3fb_w$m3_ref_index_agree_fb35mo, na.rm=T), n = sum(df_bio_cat3fb_w$m3_ref_index_pres_fb35mo))
-# 
-# pa_bio_fb4_m1 <- binom.exact(x = sum(df_bio_cat4fb_w$m1_ref_index_agree_fb59mo, na.rm=T), n = sum(df_bio_cat4fb_w$m1_ref_index_pres_fb59mo))
-# pa_bio_fb4_m2 <- binom.exact(x = sum(df_bio_cat4fb_w$m2_ref_index_agree_fb59mo, na.rm=T), n = sum(df_bio_cat4fb_w$m2_ref_index_pres_fb59mo))
-# pa_bio_fb4_m3 <- binom.exact(x = sum(df_bio_cat4fb_w$m3_ref_index_agree_fb59mo, na.rm=T), n = sum(df_bio_cat4fb_w$m3_ref_index_pres_fb59mo))
+### Fast breathing (ref-RRac)
+pa_bio_fbac1_m1 <- binom.exact(x = sum(df_bio_cat1fb_w$m1_refac_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat1fb_w$m1_refac_index_pres_fb12mo))
+pa_bio_fbac1_m2 <- binom.exact(x = sum(df_bio_cat1fb_w$m2_refac_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat1fb_w$m2_refac_index_pres_fb12mo))
+pa_bio_fbac1_m3 <- binom.exact(x = sum(df_bio_cat1fb_w$m3_refac_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat1fb_w$m3_refac_index_pres_fb12mo))
+
+pa_bio_fbac2_m1 <- binom.exact(x = sum(df_bio_cat2fb_w$m1_refac_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat2fb_w$m1_refac_index_pres_fb12mo))
+pa_bio_fbac2_m2 <- binom.exact(x = sum(df_bio_cat2fb_w$m2_refac_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat2fb_w$m2_refac_index_pres_fb12mo))
+pa_bio_fbac2_m3 <- binom.exact(x = sum(df_bio_cat2fb_w$m3_refac_index_agree_fb12mo, na.rm=T), n = sum(df_bio_cat2fb_w$m3_refac_index_pres_fb12mo))
+
+pa_bio_fbac3_m1 <- binom.exact(x = sum(df_bio_cat3fb_w$m1_refac_index_agree_fb35mo, na.rm=T), n = sum(df_bio_cat3fb_w$m1_refac_index_pres_fb35mo))
+pa_bio_fbac3_m2 <- binom.exact(x = sum(df_bio_cat3fb_w$m2_refac_index_agree_fb35mo, na.rm=T), n = sum(df_bio_cat3fb_w$m2_refac_index_pres_fb35mo))
+pa_bio_fbac3_m3 <- binom.exact(x = sum(df_bio_cat3fb_w$m3_refac_index_agree_fb35mo, na.rm=T), n = sum(df_bio_cat3fb_w$m3_refac_index_pres_fb35mo))
+
+pa_bio_fbac4_m1 <- binom.exact(x = sum(df_bio_cat4fb_w$m1_refac_index_agree_fb59mo, na.rm=T), n = sum(df_bio_cat4fb_w$m1_refac_index_pres_fb59mo))
+pa_bio_fbac4_m2 <- binom.exact(x = sum(df_bio_cat4fb_w$m2_refac_index_agree_fb59mo, na.rm=T), n = sum(df_bio_cat4fb_w$m2_refac_index_pres_fb59mo))
+pa_bio_fbac4_m3 <- binom.exact(x = sum(df_bio_cat4fb_w$m3_refac_index_agree_fb59mo, na.rm=T), n = sum(df_bio_cat4fb_w$m3_refac_index_pres_fb59mo))
 
 ### Tachycardia
 pa_bio_tachy1_m1 <- binom.exact(x = sum(df_bio_cat1_w$m1_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_bio_cat1_w$m1_ref_index_pres_tachy12mo))
@@ -2807,10 +2816,15 @@ pa_neo_fever1 <- binom.exact(x = sum(df_neo_cat1_l$ref_index_agree_fever, na.rm=
 pa_neo_fever2 <- binom.exact(x = sum(df_neo_cat2_l$ref_index_agree_fever, na.rm=T), n = sum(df_neo_cat2_l$ref_index_pres_fever))
 pa_neo_fever3 <- binom.exact(x = sum(df_neo_cat3_l$ref_index_agree_fever, na.rm=T), n = sum(df_neo_cat3_l$ref_index_pres_fever))
 
-pa_neo_fb1 <- binom.exact(x = sum(df_neo_cat1fb_l$ref_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat1fb_l$ref_index_pres_fb12mo))
+pa_neo_fb1 <- binom.exact(x = sum(df_neo_cat1fb_l$ref_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat1fb_l$ref_index_pres_fb12mo)) # Ref-Annotated RR
 pa_neo_fb2 <- binom.exact(x = sum(df_neo_cat2fb_l$ref_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat2fb_l$ref_index_pres_fb12mo))
 pa_neo_fb3 <- binom.exact(x = sum(df_neo_cat3fb_l$ref_index_agree_fb35mo, na.rm=T), n = sum(df_neo_cat3fb_l$ref_index_pres_fb35mo))
 pa_neo_fb4 <- binom.exact(x = sum(df_neo_cat4fb_l$ref_index_agree_fb59mo, na.rm=T), n = sum(df_neo_cat4fb_l$ref_index_pres_fb59mo))
+
+pa_neo_fbac1 <- binom.exact(x = sum(df_neo_cat1fb_l$refac_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat1fb_l$refac_index_pres_fb12mo)) # Ref-RRac
+pa_neo_fbac2 <- binom.exact(x = sum(df_neo_cat2fb_l$refac_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat2fb_l$refac_index_pres_fb12mo))
+pa_neo_fbac3 <- binom.exact(x = sum(df_neo_cat3fb_l$refac_index_agree_fb35mo, na.rm=T), n = sum(df_neo_cat3fb_l$refac_index_pres_fb35mo))
+pa_neo_fbac4 <- binom.exact(x = sum(df_neo_cat4fb_l$refac_index_agree_fb59mo, na.rm=T), n = sum(df_neo_cat4fb_l$refac_index_pres_fb59mo))
 
 pa_neo_tachy1 <- binom.exact(x = sum(df_neo_cat1_l$ref_index_agree_tachy12mo, na.rm=T), n = sum(df_neo_cat1_l$ref_index_pres_tachy12mo))
 pa_neo_tachy2 <- binom.exact(x = sum(df_neo_cat2_l$ref_index_agree_tachy12mo, na.rm=T), n = sum(df_neo_cat2_l$ref_index_pres_tachy12mo))
@@ -2843,23 +2857,22 @@ pa_neo_fever3_m1 <- binom.exact(x = sum(df_neo_cat3_w$m1_ref_index_agree_fever, 
 pa_neo_fever3_m2 <- binom.exact(x = sum(df_neo_cat3_w$m2_ref_index_agree_fever, na.rm=T), n = sum(df_neo_cat3_w$m2_ref_index_pres_fever))
 pa_neo_fever3_m3 <- binom.exact(x = sum(df_neo_cat3_w$m3_ref_index_agree_fever, na.rm=T), n = sum(df_neo_cat3_w$m3_ref_index_pres_fever))
 
-### Fast breathing
-# pa_neo_fb1_m1 <- binom.exact(x = sum(df_neo_cat1fb_w$m1_ref_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat1fb_w$m1_ref_index_pres_fb12mo))
-# pa_neo_fb1_m2 <- binom.exact(x = sum(df_neo_cat1fb_w$m2_ref_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat1fb_w$m2_ref_index_pres_fb12mo))
-# pa_neo_fb1_m3 <- binom.exact(x = sum(df_neo_cat1_w$m3_ref_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat1fb_w$m3_ref_index_pres_fb12mo))
-# 
-# pa_neo_fb2_m1 <- binom.exact(x = sum(df_neo_cat2fb_w$m1_ref_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat2fb_w$m1_ref_index_pres_fb12mo))
-# pa_neo_fb2_m2 <- binom.exact(x = sum(df_neo_cat2fb_w$m2_ref_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat2fb_w$m2_ref_index_pres_fb12mo))
-# pa_neo_fb2_m3 <- binom.exact(x = sum(df_neo_cat2fb_w$m3_ref_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat2fb_w$m3_ref_index_pres_fb12mo))
-# 
-# pa_neo_fb3_m1 <- binom.exact(x = sum(df_neo_cat3fb_w$m1_ref_index_agree_fb35mo, na.rm=T), n = sum(df_neo_cat3fb_w$m1_ref_index_pres_fb35mo))
-# pa_neo_fb3_m2 <- binom.exact(x = sum(df_neo_cat3fb_w$m2_ref_index_agree_fb35mo, na.rm=T), n = sum(df_neo_cat3fb_w$m2_ref_index_pres_fb35mo))
-# pa_neo_fb3_m3 <- binom.exact(x = sum(df_neo_cat3fb_w$m3_ref_index_agree_fb35mo, na.rm=T), n = sum(df_neo_cat3fb_w$m3_ref_index_pres_fb35mo))
-# 
-# pa_neo_fb4_m1 <- binom.exact(x = sum(df_neo_cat4fb_w$m1_ref_index_agree_fb59mo, na.rm=T), n = sum(df_neo_cat4fb_w$m1_ref_index_pres_fb59mo))
-# pa_neo_fb4_m2 <- binom.exact(x = sum(df_neo_cat4fb_w$m2_ref_index_agree_fb59mo, na.rm=T), n = sum(df_neo_cat4fb_w$m2_ref_index_pres_fb59mo))
-# pa_neo_fb4_m3 <- binom.exact(x = sum(df_neo_cat4fb_w$m3_ref_index_agree_fb59mo, na.rm=T), n = sum(df_neo_cat4fb_w$m3_ref_index_pres_fb59mo))
+### Fast breathing (ref-RRac)
+pa_neo_fbac1_m1 <- binom.exact(x = sum(df_neo_cat1fb_w$m1_refac_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat1fb_w$m1_refac_index_pres_fb12mo))
+pa_neo_fbac1_m2 <- binom.exact(x = sum(df_neo_cat1fb_w$m2_refac_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat1fb_w$m2_refac_index_pres_fb12mo))
+pa_neo_fbac1_m3 <- binom.exact(x = sum(df_neo_cat1_w$m3_refac_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat1fb_w$m3_refac_index_pres_fb12mo))
 
+pa_neo_fbac2_m1 <- binom.exact(x = sum(df_neo_cat2fb_w$m1_refac_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat2fb_w$m1_refac_index_pres_fb12mo))
+pa_neo_fbac2_m2 <- binom.exact(x = sum(df_neo_cat2fb_w$m2_refac_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat2fb_w$m2_refac_index_pres_fb12mo))
+pa_neo_fbac2_m3 <- binom.exact(x = sum(df_neo_cat2fb_w$m3_refac_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat2fb_w$m3_refac_index_pres_fb12mo))
+
+pa_neo_fbac3_m1 <- binom.exact(x = sum(df_neo_cat3fb_w$m1_refac_index_agree_fb35mo, na.rm=T), n = sum(df_neo_cat3fb_w$m1_refac_index_pres_fb35mo))
+pa_neo_fbac3_m2 <- binom.exact(x = sum(df_neo_cat3fb_w$m2_refac_index_agree_fb35mo, na.rm=T), n = sum(df_neo_cat3fb_w$m2_refac_index_pres_fb35mo))
+pa_neo_fbac3_m3 <- binom.exact(x = sum(df_neo_cat3fb_w$m3_refac_index_agree_fb35mo, na.rm=T), n = sum(df_neo_cat3fb_w$m3_refac_index_pres_fb35mo))
+
+pa_neo_fbac4_m1 <- binom.exact(x = sum(df_neo_cat4fb_w$m1_refac_index_agree_fb59mo, na.rm=T), n = sum(df_neo_cat4fb_w$m1_refac_index_pres_fb59mo))
+pa_neo_fbac4_m2 <- binom.exact(x = sum(df_neo_cat4fb_w$m2_refac_index_agree_fb59mo, na.rm=T), n = sum(df_neo_cat4fb_w$m2_refac_index_pres_fb59mo))
+pa_neo_fbac4_m3 <- binom.exact(x = sum(df_neo_cat4fb_w$m3_refac_index_agree_fb59mo, na.rm=T), n = sum(df_neo_cat4fb_w$m3_refac_index_pres_fb59mo))
 
 ### Tachycardia
 pa_neo_tachy1_m1 <- binom.exact(x = sum(df_neo_cat1_w$m1_ref_index_agree_tachy12mo, na.rm=T), n = sum(df_neo_cat1_w$m1_ref_index_pres_tachy12mo))
@@ -2874,14 +2887,15 @@ pa_neo_tachy3_m1 <- binom.exact(x = sum(df_neo_cat3_w$m1_ref_index_agree_tachy59
 pa_neo_tachy3_m2 <- binom.exact(x = sum(df_neo_cat3_w$m2_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_neo_cat3_w$m2_ref_index_pres_tachy59mo))
 pa_neo_tachy3_m3 <- binom.exact(x = sum(df_neo_cat3_w$m3_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_neo_cat3_w$m3_ref_index_pres_tachy59mo))
 
-
-
 #===================================== Onyx ====================================
 ## Overall
 pa_onyx_hypoxia3 <- binom.exact(x = sum(df_onyx_cat3_l$ref_index_agree_hypoxic, na.rm=T), n = sum(df_onyx_cat3_l$ref_index_pres_hypoxic))
 
-pa_onyx_fb3 <- binom.exact(x = sum(df_onyx_cat3fb_l$ref_index_agree_fb35mo, na.rm=T), n = sum(df_onyx_cat3fb_l$ref_index_pres_fb35mo))
+pa_onyx_fb3 <- binom.exact(x = sum(df_onyx_cat3fb_l$ref_index_agree_fb35mo, na.rm=T), n = sum(df_onyx_cat3fb_l$ref_index_pres_fb35mo)) # Ref-Annotated RR
 pa_onyx_fb4 <- binom.exact(x = sum(df_onyx_cat4fb_l$ref_index_agree_fb59mo, na.rm=T), n = sum(df_onyx_cat4fb_l$ref_index_pres_fb59mo))
+
+pa_onyx_fbac3 <- binom.exact(x = sum(df_onyx_cat3fb_l$refac_index_agree_fb35mo, na.rm=T), n = sum(df_onyx_cat3fb_l$refac_index_pres_fb35mo)) # Ref-RRac
+pa_onyx_fbac4 <- binom.exact(x = sum(df_onyx_cat4fb_l$refac_index_agree_fb59mo, na.rm=T), n = sum(df_onyx_cat4fb_l$refac_index_pres_fb59mo))
 
 pa_onyx_tachy3 <- binom.exact(x = sum(df_onyx_cat3_l$ref_index_agree_tachy59mo, na.rm=T), n = sum(df_onyx_cat3_l$ref_index_pres_tachy59mo))
 
@@ -2893,14 +2907,14 @@ pa_onyx_hypoxia3_m3 <- binom.exact(x = sum(df_onyx_cat3_w$m3_ref_index_agree_hyp
 
 ### Fever -- N/A, no temp measurement
 
-### Fast breathing
-# pa_onyx_fb3_m1 <- binom.exact(x = sum(df_onyx_cat3fb_w$m1_ref_index_agree_fb35mo, na.rm=T), n = sum(df_onyx_cat3fb_w$m1_ref_index_pres_fb35mo))
-# pa_onyx_fb3_m2 <- binom.exact(x = sum(df_onyx_cat3fb_w$m2_ref_index_agree_fb35mo, na.rm=T), n = sum(df_onyx_cat3fb_w$m2_ref_index_pres_fb35mo))
-# pa_onyx_fb3_m3 <- binom.exact(x = sum(df_onyx_cat3fb_w$m3_ref_index_agree_fb35mo, na.rm=T), n = sum(df_onyx_cat3fb_w$m3_ref_index_pres_fb35mo))
-# 
-# pa_onyx_fb4_m1 <- binom.exact(x = sum(df_onyx_cat4fb_w$m1_ref_index_agree_fb59mo, na.rm=T), n = sum(df_onyx_cat4fb_w$m1_ref_index_pres_fb59mo))
-# pa_onyx_fb4_m2 <- binom.exact(x = sum(df_onyx_cat4fb_w$m2_ref_index_agree_fb59mo, na.rm=T), n = sum(df_onyx_cat4fb_w$m2_ref_index_pres_fb59mo))
-# pa_onyx_fb4_m3 <- binom.exact(x = sum(df_onyx_cat4fb_w$m3_ref_index_agree_fb59mo, na.rm=T), n = sum(df_onyx_cat4fb_w$m3_ref_index_pres_fb59mo))
+### Fast breathing (ref-RRac)
+pa_onyx_fbac3_m1 <- binom.exact(x = sum(df_onyx_cat3fb_w$m1_refac_index_agree_fb35mo, na.rm=T), n = sum(df_onyx_cat3fb_w$m1_refac_index_pres_fb35mo))
+pa_onyx_fbac3_m2 <- binom.exact(x = sum(df_onyx_cat3fb_w$m2_refac_index_agree_fb35mo, na.rm=T), n = sum(df_onyx_cat3fb_w$m2_refac_index_pres_fb35mo))
+pa_onyx_fbac3_m3 <- binom.exact(x = sum(df_onyx_cat3fb_w$m3_refac_index_agree_fb35mo, na.rm=T), n = sum(df_onyx_cat3fb_w$m3_refac_index_pres_fb35mo))
+
+pa_onyx_fbac4_m1 <- binom.exact(x = sum(df_onyx_cat4fb_w$m1_refac_index_agree_fb59mo, na.rm=T), n = sum(df_onyx_cat4fb_w$m1_refac_index_pres_fb59mo))
+pa_onyx_fbac4_m2 <- binom.exact(x = sum(df_onyx_cat4fb_w$m2_refac_index_agree_fb59mo, na.rm=T), n = sum(df_onyx_cat4fb_w$m2_refac_index_pres_fb59mo))
+pa_onyx_fbac4_m3 <- binom.exact(x = sum(df_onyx_cat4fb_w$m3_refac_index_agree_fb59mo, na.rm=T), n = sum(df_onyx_cat4fb_w$m3_refac_index_pres_fb59mo))
 
 ### Tachycardia
 pa_onyx_tachy3_m1 <- binom.exact(x = sum(df_onyx_cat3_w$m1_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_onyx_cat3_w$m1_ref_index_pres_tachy59mo))
@@ -2914,8 +2928,11 @@ pa_scan_hypoxia3 <- binom.exact(x = sum(df_scan_cat3_l$ref_index_agree_hypoxic, 
 
 pa_scan_fever3 <- binom.exact(x = sum(df_scan_cat3_l$ref_index_agree_fever, na.rm=T), n = sum(df_scan_cat3_l$ref_index_pres_fever))
 
-pa_scan_fb3 <- binom.exact(x = sum(df_scan_cat3fb_l$ref_index_agree_fb35mo, na.rm=T), n = sum(df_scan_cat3fb_l$ref_index_pres_fb35mo))
+pa_scan_fb3 <- binom.exact(x = sum(df_scan_cat3fb_l$ref_index_agree_fb35mo, na.rm=T), n = sum(df_scan_cat3fb_l$ref_index_pres_fb35mo)) # Ref-Annotated RR
 pa_scan_fb4 <- binom.exact(x = sum(df_scan_cat4fb_l$ref_index_agree_fb59mo, na.rm=T), n = sum(df_scan_cat4fb_l$ref_index_pres_fb59mo))
+
+pa_scan_fbac3 <- binom.exact(x = sum(df_scan_cat3fb_l$refac_index_agree_fb35mo, na.rm=T), n = sum(df_scan_cat3fb_l$refac_index_pres_fb35mo)) # Ref-RRac
+pa_scan_fbac4 <- binom.exact(x = sum(df_scan_cat4fb_l$refac_index_agree_fb59mo, na.rm=T), n = sum(df_scan_cat4fb_l$refac_index_pres_fb59mo))
 
 pa_scan_tachy3 <- binom.exact(x = sum(df_scan_cat3_l$ref_index_agree_tachy59mo, na.rm=T), n = sum(df_scan_cat3_l$ref_index_pres_tachy59mo))
 
@@ -2930,14 +2947,14 @@ pa_scan_fever3_m1 <- binom.exact(x = sum(df_scan_cat3_w$m1_ref_index_agree_fever
 pa_scan_fever3_m2 <- binom.exact(x = sum(df_scan_cat3_w$m2_ref_index_agree_fever, na.rm=T), n = sum(df_scan_cat3_w$m2_ref_index_pres_fever))
 pa_scan_fever3_m3 <- binom.exact(x = sum(df_scan_cat3_w$m3_ref_index_agree_fever, na.rm=T), n = sum(df_scan_cat3_w$m3_ref_index_pres_fever))
 
-### Fast breathing
-# pa_scan_fb3_m1 <- binom.exact(x = sum(df_scan_cat3fb_w$m1_ref_index_agree_fb35mo, na.rm=T), n = sum(df_scan_cat3fb_w$m1_ref_index_pres_fb35mo))
-# pa_scan_fb3_m2 <- binom.exact(x = sum(df_scan_cat3fb_w$m2_ref_index_agree_fb35mo, na.rm=T), n = sum(df_scan_cat3fb_w$m2_ref_index_pres_fb35mo))
-# pa_scan_fb3_m3 <- binom.exact(x = sum(df_scan_cat3fb_w$m3_ref_index_agree_fb35mo, na.rm=T), n = sum(df_scan_cat3fb_w$m3_ref_index_pres_fb35mo))
-# 
-# pa_scan_fb4_m1 <- binom.exact(x = sum(df_scan_cat4fb_w$m1_ref_index_agree_fb59mo, na.rm=T), n = sum(df_scan_cat4fb_w$m1_ref_index_pres_fb59mo))
-# pa_scan_fb4_m2 <- binom.exact(x = sum(df_scan_cat4fb_w$m2_ref_index_agree_fb59mo, na.rm=T), n = sum(df_scan_cat4fb_w$m2_ref_index_pres_fb59mo))
-# pa_scan_fb4_m3 <- binom.exact(x = sum(df_scan_cat4fb_w$m3_ref_index_agree_fb59mo, na.rm=T), n = sum(df_scan_cat4fb_w$m3_ref_index_pres_fb59mo))
+### Fast breathing (ref-RRac)
+pa_scan_fbac3_m1 <- binom.exact(x = sum(df_scan_cat3fb_w$m1_refac_index_agree_fb35mo, na.rm=T), n = sum(df_scan_cat3fb_w$m1_refac_index_pres_fb35mo))
+pa_scan_fbac3_m2 <- binom.exact(x = sum(df_scan_cat3fb_w$m2_refac_index_agree_fb35mo, na.rm=T), n = sum(df_scan_cat3fb_w$m2_refac_index_pres_fb35mo))
+pa_scan_fbac3_m3 <- binom.exact(x = sum(df_scan_cat3fb_w$m3_refac_index_agree_fb35mo, na.rm=T), n = sum(df_scan_cat3fb_w$m3_refac_index_pres_fb35mo))
+
+pa_scan_fbac4_m1 <- binom.exact(x = sum(df_scan_cat4fb_w$m1_refac_index_agree_fb59mo, na.rm=T), n = sum(df_scan_cat4fb_w$m1_refac_index_pres_fb59mo))
+pa_scan_fbac4_m2 <- binom.exact(x = sum(df_scan_cat4fb_w$m2_refac_index_agree_fb59mo, na.rm=T), n = sum(df_scan_cat4fb_w$m2_refac_index_pres_fb59mo))
+pa_scan_fbac4_m3 <- binom.exact(x = sum(df_scan_cat4fb_w$m3_refac_index_agree_fb59mo, na.rm=T), n = sum(df_scan_cat4fb_w$m3_refac_index_pres_fb59mo))
 
 ### Tachycardia
 pa_scan_tachy3_m1 <- binom.exact(x = sum(df_scan_cat3_w$m1_ref_index_agree_tachy59mo, na.rm=T), n = sum(df_scan_cat3_w$m1_ref_index_pres_tachy59mo))
