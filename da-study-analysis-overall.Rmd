@@ -2825,7 +2825,7 @@ pa_neo_fever3_m3 <- binom.exact(x = sum(df_neo_cat3_w$m3_ref_index_agree_fever, 
 ### Fast breathing (ref-RRac)
 pa_neo_fbac1_m1 <- binom.exact(x = sum(df_neo_cat1fb_w$m1_refac_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat1fb_w$m1_refac_index_pres_fb12mo))
 pa_neo_fbac1_m2 <- binom.exact(x = sum(df_neo_cat1fb_w$m2_refac_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat1fb_w$m2_refac_index_pres_fb12mo))
-pa_neo_fbac1_m3 <- binom.exact(x = sum(df_neo_cat1_w$m3_refac_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat1fb_w$m3_refac_index_pres_fb12mo))
+pa_neo_fbac1_m3 <- binom.exact(x = sum(df_neo_cat1fb_w$m3_refac_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat1fb_w$m3_refac_index_pres_fb12mo))
 
 pa_neo_fbac2_m1 <- binom.exact(x = sum(df_neo_cat2fb_w$m1_refac_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat2fb_w$m1_refac_index_pres_fb12mo))
 pa_neo_fbac2_m2 <- binom.exact(x = sum(df_neo_cat2fb_w$m2_refac_index_agree_fb12mo, na.rm=T), n = sum(df_neo_cat2fb_w$m2_refac_index_pres_fb12mo))
@@ -3079,7 +3079,120 @@ fever_pa <- kable(out_fever, col.names = c("Device","Overall", "M1", "M2", "M3",
 ```
 `r fever_pa`
 
-## Fast Breathing (overall only due to RR annotations)
+## Fast Breathing (reference = acoustic RR)
+```{r}
+# create df with all device/age group/measurements
+out_fbac <- data.frame(col1 = c("", "", "Rad-G", "Biolight", "Neopenda", "Onyx", "Scanbo"),
+                    col2 = c("0-1 month", "Overall", paste(round(pa_radg_fbac1$estimate, 2), " (", round(pa_radg_fbac1$conf.int[1], 2)," - ", round(pa_radg_fbac1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_fbac1$estimate, 2), " (", round(pa_bio_fbac1$conf.int[1], 2)," - ", round(pa_bio_fbac1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fbac1$estimate, 2), " (", round(pa_neo_fbac1$conf.int[1], 2)," - ", round(pa_neo_fbac1$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col3 = c("0-1 month", "M1", paste(round(pa_radg_fbac1_m1$estimate, 2), " (", round(pa_radg_fbac1_m1$conf.int[1], 2)," - ", round(pa_radg_fbac1_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_fbac1_m1$estimate, 2), " (", round(pa_bio_fbac1_m1$conf.int[1], 2)," - ", round(pa_bio_fbac1_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fbac1_m1$estimate, 2), " (", round(pa_neo_fbac1_m1$conf.int[1], 2)," - ", round(pa_neo_fbac1_m1$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col4 = c("0-1 month", "M2", paste(round(pa_radg_fbac1_m2$estimate, 2), " (", round(pa_radg_fbac1_m2$conf.int[1], 2)," - ", round(pa_radg_fbac1_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_fbac1_m2$estimate, 2), " (", round(pa_bio_fbac1_m2$conf.int[1], 2)," - ", round(pa_bio_fbac1_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fbac1_m2$estimate, 2), " (", round(pa_neo_fbac1_m2$conf.int[1], 2)," - ", round(pa_neo_fbac1_m2$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col5 = c("0-1 month", "M3", paste(round(pa_radg_fbac1_m3$estimate, 2), " (", round(pa_radg_fbac1_m3$conf.int[1], 2)," - ", round(pa_radg_fbac1_m3$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_fbac1_m3$estimate, 2), " (", round(pa_bio_fbac1_m3$conf.int[1], 2)," - ", round(pa_bio_fbac1_m3$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fbac1_m3$estimate, 2), " (", round(pa_neo_fbac1_m3$conf.int[1], 2)," - ", round(pa_neo_fbac1_m3$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col6 = c("2-11 months", "Overall", paste(round(pa_radg_fbac2$estimate, 2), " (", round(pa_radg_fbac2$conf.int[1], 2)," - ", round(pa_radg_fbac2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_fbac2$estimate, 2), " (", round(pa_bio_fbac2$conf.int[1], 2)," - ", round(pa_bio_fbac2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fbac2$estimate, 2), " (", round(pa_neo_fbac2$conf.int[1], 2)," - ", round(pa_neo_fbac2$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col7 = c("2-11 months", "M1", paste(round(pa_radg_fbac2_m1$estimate, 2), " (", round(pa_radg_fbac2_m1$conf.int[1], 2)," - ", round(pa_radg_fbac2_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_fbac2_m1$estimate, 2), " (", round(pa_bio_fbac2_m1$conf.int[1], 2)," - ", round(pa_bio_fbac2_m1$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fbac2_m1$estimate, 2), " (", round(pa_neo_fbac2_m1$conf.int[1], 2)," - ", round(pa_neo_fbac2_m1$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col8 = c("2-11 months", "M2", paste(round(pa_radg_fbac2_m2$estimate, 2), " (", round(pa_radg_fbac2_m2$conf.int[1], 2)," - ", round(pa_radg_fbac2_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_fbac2_m2$estimate, 2), " (", round(pa_bio_fbac2_m2$conf.int[1], 2)," - ", round(pa_bio_fbac2_m2$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fbac2_m2$estimate, 2), " (", round(pa_neo_fbac2_m2$conf.int[1], 2)," - ", round(pa_neo_fbac2_m2$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col9 = c("2-11 months", "M3", paste(round(pa_radg_fbac2_m3$estimate, 2), " (", round(pa_radg_fbac2_m3$conf.int[1], 2)," - ", round(pa_radg_fbac2_m3$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_bio_fbac2_m3$estimate, 2), " (", round(pa_bio_fbac2_m3$conf.int[1], 2)," - ", round(pa_bio_fbac2_m3$conf.int[2], 2),")", sep = ""),
+                             paste(round(pa_neo_fbac2_m3$estimate, 2), " (", round(pa_neo_fbac2_m3$conf.int[1], 2)," - ", round(pa_neo_fbac2_m3$conf.int[2], 2),")", sep = ""),
+                             NA,
+                             NA),
+                    
+                    col10 = c("12-35 months", "Overall", paste(round(pa_radg_fbac3$estimate, 2), " (", round(pa_radg_fbac3$conf.int[1], 2)," - ", round(pa_radg_fbac3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_bio_fbac3$estimate, 2), " (", round(pa_bio_fbac3$conf.int[1], 2)," - ", round(pa_bio_fbac3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_fbac3$estimate, 2), " (", round(pa_neo_fbac3$conf.int[1], 2)," - ", round(pa_neo_fbac3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_fbac3$estimate, 2), " (", round(pa_onyx_fbac3$conf.int[1], 2)," - ", round(pa_onyx_fbac3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_fbac3$estimate, 2), " (", round(pa_scan_fbac3$conf.int[1], 2)," - ", round(pa_scan_fbac3$conf.int[2], 2),")", sep = "")),
+                    
+                    col11 = c("12-35 months", "M1", paste(round(pa_radg_fbac3_m1$estimate, 2), " (", round(pa_radg_fbac3_m1$conf.int[1], 2)," - ", round(pa_radg_fbac3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_bio_fbac3_m1$estimate, 2), " (", round(pa_bio_fbac3_m1$conf.int[1], 2)," - ", round(pa_bio_fbac3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_fbac3_m1$estimate, 2), " (", round(pa_neo_fbac3_m1$conf.int[1], 2)," - ", round(pa_neo_fbac3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_fbac3_m1$estimate, 2), " (", round(pa_onyx_fbac3_m1$conf.int[1], 2)," - ", round(pa_onyx_fbac3_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_fbac3_m1$estimate, 2), " (", round(pa_scan_fbac3_m1$conf.int[1], 2)," - ", round(pa_scan_fbac3_m1$conf.int[2], 2),")", sep = "")),
+                    
+                    col12 = c("12-35 months", "M2", paste(round(pa_radg_fbac3_m2$estimate, 2), " (", round(pa_radg_fbac3_m2$conf.int[1], 2)," - ", round(pa_radg_fbac3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_bio_fbac3_m2$estimate, 2), " (", round(pa_bio_fbac3_m2$conf.int[1], 2)," - ", round(pa_bio_fbac3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_fbac3_m2$estimate, 2), " (", round(pa_neo_fbac3_m2$conf.int[1], 2)," - ", round(pa_neo_fbac3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_fbac3_m2$estimate, 2), " (", round(pa_onyx_fbac3_m2$conf.int[1], 2)," - ", round(pa_onyx_fbac3_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_fbac3_m2$estimate, 2), " (", round(pa_scan_fbac3_m2$conf.int[1], 2)," - ", round(pa_scan_fbac3_m2$conf.int[2], 2),")", sep = "")),
+                    
+                    col13 = c("12-35 months", "M3", paste(round(pa_radg_fbac3_m3$estimate, 2), " (", round(pa_radg_fbac3_m3$conf.int[1], 2)," - ", round(pa_radg_fbac3_m3$conf.int[2], 2),")", sep = " "),
+                              paste(round(pa_bio_fbac3_m3$estimate, 2), " (", round(pa_bio_fbac3_m3$conf.int[1], 2)," - ", round(pa_bio_fbac3_m3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_fbac3_m3$estimate, 2), " (", round(pa_neo_fbac3_m3$conf.int[1], 2)," - ", round(pa_neo_fbac3_m3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_fbac3_m3$estimate, 2), " (", round(pa_onyx_fbac3_m3$conf.int[1], 2)," - ", round(pa_onyx_fbac3_m3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_fbac3_m3$estimate, 2), " (", round(pa_scan_fbac3_m3$conf.int[1], 2)," - ", round(pa_scan_fbac3_m3$conf.int[2], 2),")", sep = "")),
+                    
+                    col14 = c("36-59 months", "Overall", paste(round(pa_radg_fbac4$estimate, 2), " (", round(pa_radg_fbac4$conf.int[1], 2)," - ", round(pa_radg_fbac4$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_bio_fbac4$estimate, 2), " (", round(pa_bio_fbac4$conf.int[1], 2)," - ", round(pa_bio_fbac4$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_fbac4$estimate, 2), " (", round(pa_neo_fbac4$conf.int[1], 2)," - ", round(pa_neo_fbac4$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_fbac4$estimate, 2), " (", round(pa_onyx_fbac4$conf.int[1], 2)," - ", round(pa_onyx_fbac4$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_fbac4$estimate, 2), " (", round(pa_scan_fbac4$conf.int[1], 2)," - ", round(pa_scan_fbac4$conf.int[2], 2),")", sep = "")),
+                    
+                    col15 = c("36-59 months", "M1", paste(round(pa_radg_fbac4_m1$estimate, 2), " (", round(pa_radg_fbac4_m1$conf.int[1], 2)," - ", round(pa_radg_fbac4_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_bio_fbac4_m1$estimate, 2), " (", round(pa_bio_fbac4_m1$conf.int[1], 2)," - ", round(pa_bio_fbac4_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_fbac4_m1$estimate, 2), " (", round(pa_neo_fbac4_m1$conf.int[1], 2)," - ", round(pa_neo_fbac4_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_fbac4_m1$estimate, 2), " (", round(pa_onyx_fbac4_m1$conf.int[1], 2)," - ", round(pa_onyx_fbac4_m1$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_fbac4_m1$estimate, 2), " (", round(pa_scan_fbac4_m1$conf.int[1], 2)," - ", round(pa_scan_fbac4_m1$conf.int[2], 2),")", sep = "")),
+                    
+                    col16 = c("36-59 months", "M2", paste(round(pa_radg_fbac4_m2$estimate, 2), " (", round(pa_radg_fbac4_m2$conf.int[1], 2)," - ", round(pa_radg_fbac4_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_bio_fbac4_m2$estimate, 2), " (", round(pa_bio_fbac4_m2$conf.int[1], 2)," - ", round(pa_bio_fbac4_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_fbac4_m2$estimate, 2), " (", round(pa_neo_fbac4_m2$conf.int[1], 2)," - ", round(pa_neo_fbac4_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_fbac4_m2$estimate, 2), " (", round(pa_onyx_fbac4_m2$conf.int[1], 2)," - ", round(pa_onyx_fbac4_m2$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_fbac4_m2$estimate, 2), " (", round(pa_scan_fbac4_m2$conf.int[1], 2)," - ", round(pa_scan_fbac4_m2$conf.int[2], 2),")", sep = "")),
+                    
+                    col17 = c("36-59 months", "M3", paste(round(pa_radg_fbac4_m3$estimate, 2), " (", round(pa_radg_fbac3_m3$conf.int[1], 2)," - ", round(pa_radg_fbac4_m3$conf.int[2], 2),")", sep = " "),
+                              paste(round(pa_bio_fbac4_m3$estimate, 2), " (", round(pa_bio_fbac4_m3$conf.int[1], 2)," - ", round(pa_bio_fbac4_m3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_fbac4_m3$estimate, 2), " (", round(pa_neo_fbac4_m3$conf.int[1], 2)," - ", round(pa_neo_fbac4_m3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_fbac4_m3$estimate, 2), " (", round(pa_onyx_fbac4_m3$conf.int[1], 2)," - ", round(pa_onyx_fbac4_m3$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_fbac4_m3$estimate, 2), " (", round(pa_scan_fbac4_m3$conf.int[1], 2)," - ", round(pa_scan_fbac4_m3$conf.int[2], 2),")", sep = ""))
+                    )
+out_fbac <- out_fbac[out_fbac[1]!="",] # remove first two rows of labels since labels will be added in kable
+rownames(out_fbac) <- NULL # make row names null so numbers don't print in table
+# Create nicely labelled kable object
+fbac_pa <- kable(out_fbac, col.names = c("Device","Overall", "M1", "M2", "M3","Overall", "M1", "M2", "M3","Overall", "M1", "M2", "M3", "Overall", "M1", "M2", "M3")) %>% 
+  kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = T) %>%
+  add_header_above(c("", "0-1 month" = 4, "2-11 months" = 4, "12-35 months" = 4, "36-59 months" = 4)) %>%
+  column_spec(2, italic = T, border_left = T) %>%
+  column_spec(6, italic = T, border_left = T) %>%
+  column_spec(10, italic = T, border_left = T) %>%
+  column_spec(14, italic = T, border_left = T)
+```
+`r fbac_pa`
+
+## Fast Breathing (reference = annotated RR)
 ```{r}
 out_fb <- data.frame(col1 = c("","", "Rad-G", "Biolight", "Neopenda", "Onyx", "Scanbo"),
                     col2 = c("0-1 month", "Overall", paste(round(pa_radg_fb1$estimate, 2), " (", round(pa_radg_fb1$conf.int[1], 2)," - ", round(pa_radg_fb1$conf.int[2], 2),")", sep = ""),
@@ -3088,24 +3201,30 @@ out_fb <- data.frame(col1 = c("","", "Rad-G", "Biolight", "Neopenda", "Onyx", "S
                              NA,
                              NA),
                     
-                    col6 = c("2-11 months", "Overall", paste(round(pa_radg_fb2$estimate, 2), " (", round(pa_radg_fb2$conf.int[1], 2)," - ", round(pa_radg_fb2$conf.int[2], 2),")", sep = ""),
+                    col3 = c("2-11 months", "Overall", paste(round(pa_radg_fb2$estimate, 2), " (", round(pa_radg_fb2$conf.int[1], 2)," - ", round(pa_radg_fb2$conf.int[2], 2),")", sep = ""),
                              paste(round(pa_bio_fb2$estimate, 2), " (", round(pa_bio_fb2$conf.int[1], 2)," - ", round(pa_bio_fb2$conf.int[2], 2),")", sep = ""),
                              paste(round(pa_neo_fb2$estimate, 2), " (", round(pa_neo_fb2$conf.int[1], 2)," - ", round(pa_neo_fb2$conf.int[2], 2),")", sep = ""),
                              NA,
                              NA),
                     
-                    col10 = c("12-59 months", "Overall", paste(round(pa_radg_fb3$estimate, 2), " (", round(pa_radg_fb3$conf.int[1], 2)," - ", round(pa_radg_fb3$conf.int[2], 2),")", sep = ""),
+                    col4 = c("12-35 months", "Overall", paste(round(pa_radg_fb3$estimate, 2), " (", round(pa_radg_fb3$conf.int[1], 2)," - ", round(pa_radg_fb3$conf.int[2], 2),")", sep = ""),
                               paste(round(pa_bio_fb3$estimate, 2), " (", round(pa_bio_fb3$conf.int[1], 2)," - ", round(pa_bio_fb3$conf.int[2], 2),")", sep = ""),
                               paste(round(pa_neo_fb3$estimate, 2), " (", round(pa_neo_fb3$conf.int[1], 2)," - ", round(pa_neo_fb3$conf.int[2], 2),")", sep = ""),
                               paste(round(pa_onyx_fb3$estimate, 2), " (", round(pa_onyx_fb3$conf.int[1], 2)," - ", round(pa_onyx_fb3$conf.int[2], 2),")", sep = ""),
-                              paste(round(pa_scan_fb3$estimate, 2), " (", round(pa_scan_fb3$conf.int[1], 2)," - ", round(pa_scan_fb3$conf.int[2], 2),")", sep = ""))
+                              paste(round(pa_scan_fb3$estimate, 2), " (", round(pa_scan_fb3$conf.int[1], 2)," - ", round(pa_scan_fb3$conf.int[2], 2),")", sep = "")),
+                    
+                    col5 = c("36-59 months", "Overall", paste(round(pa_radg_fb4$estimate, 2), " (", round(pa_radg_fb4$conf.int[1], 2)," - ", round(pa_radg_fb4$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_bio_fb4$estimate, 2), " (", round(pa_bio_fb4$conf.int[1], 2)," - ", round(pa_bio_fb4$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_neo_fb4$estimate, 2), " (", round(pa_neo_fb4$conf.int[1], 2)," - ", round(pa_neo_fb4$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_onyx_fb4$estimate, 2), " (", round(pa_onyx_fb4$conf.int[1], 2)," - ", round(pa_onyx_fb4$conf.int[2], 2),")", sep = ""),
+                              paste(round(pa_scan_fb4$estimate, 2), " (", round(pa_scan_fb4$conf.int[1], 2)," - ", round(pa_scan_fb4$conf.int[2], 2),")", sep = ""))
 )
 out_fb <- out_fb[out_fb[1]!="",] # remove first two rows of labels since labels will be added in kable
 rownames(out_fb) <- NULL # make row names null so numbers don't print in table
 # Create nicely labelled kable object
-fb_pa <- kable(out_fb, col.names = c("Device","Overall", "Overall", "Overall")) %>% 
+fb_pa <- kable(out_fb, col.names = c("Device","Overall", "Overall", "Overall", "Overall")) %>% 
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center", full_width = T) %>%
-  add_header_above(c("", "0-11 month" = 1, "12-35 months" = 1, "36-59 months" = 1))
+  add_header_above(c("", "0-1 month" = 1, "2-11 months" = 1, "12-35 months" = 1, "36-59 months" = 1))
 ```
 `r fb_pa`
 
