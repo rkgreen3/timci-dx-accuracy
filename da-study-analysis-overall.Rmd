@@ -176,10 +176,13 @@ mdf_reshaped$index_fever <- ifelse(mdf_reshaped$index_temp>=37.5, 1, 0)
 mdf_reshaped$ref_fever <- ifelse(mdf_reshaped$ref_temp>=37.5, 1, 0)
 mdf_reshaped$index_fastbreath_12mo <- ifelse(mdf_reshaped$index_rr>49 & mdf_reshaped$age_months<12, 1, 0)
 mdf_reshaped$ref_fastbreath_12mo <- ifelse(mdf_reshaped$ref_rr>49 & mdf_reshaped$age_months<12, 1, 0)
+mdf_reshaped$refac_fastbreath_12mo <- ifelse(mdf_reshaped$ref_rracoustic>49 & mdf_reshaped$age_months<12, 1, 0)
 mdf_reshaped$index_fastbreath_35mo <- ifelse(mdf_reshaped$index_rr>39 & (mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36), 1, 0)
 mdf_reshaped$ref_fastbreath_35mo <- ifelse(mdf_reshaped$ref_rr>39 & (mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36), 1, 0)
+mdf_reshaped$refac_fastbreath_35mo <- ifelse(mdf_reshaped$ref_rracoustic>39 & (mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36), 1, 0)
 mdf_reshaped$index_fastbreath_59mo <- ifelse(mdf_reshaped$index_rr>29 & (mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60), 1, 0)
 mdf_reshaped$ref_fastbreath_59mo <- ifelse(mdf_reshaped$ref_rr>29 & (mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60), 1, 0)
+mdf_reshaped$refac_fastbreath_59mo <- ifelse(mdf_reshaped$ref_rracoustic>29 & (mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60), 1, 0)
 mdf_reshaped$index_tachycardic_12mo <- ifelse(mdf_reshaped$index_pr>179 & mdf_reshaped$age_months<12, 1, 0)
 mdf_reshaped$ref_tachycardic_12mo <- ifelse(mdf_reshaped$ref_pr>179 & mdf_reshaped$age_months<12, 1, 0)
 mdf_reshaped$index_tachycardic_59mo <- ifelse(mdf_reshaped$index_pr>139 & mdf_reshaped$age_months>11, 1, 0)
@@ -203,18 +206,27 @@ mdf_reshaped$index_fastbreath_12mo_tri <- case_when(mdf_reshaped$age_months<12 &
 mdf_reshaped$ref_fastbreath_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$ref_rr>55 ~ 2,
                                             mdf_reshaped$age_months<12 & mdf_reshaped$ref_rr<=55 & mdf_reshaped$ref_rr>=50 ~ 1,
                                             mdf_reshaped$age_months<12 & mdf_reshaped$ref_rr<50 ~ 0)
+mdf_reshaped$refac_fastbreath_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$ref_rracoustic>55 ~ 2,
+                                            mdf_reshaped$age_months<12 & mdf_reshaped$ref_rracoustic<=55 & mdf_reshaped$ref_rracoustic>=50 ~ 1,
+                                            mdf_reshaped$age_months<12 & mdf_reshaped$ref_rracoustic<50 ~ 0)
 mdf_reshaped$index_fastbreath_35mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$index_rr>45 ~ 2,
                                             mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$index_rr<=45 & mdf_reshaped$index_rr>=40 ~ 1,
                                             mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$index_rr<40 ~ 0)
 mdf_reshaped$ref_fastbreath_35mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$ref_rr>45 ~ 2,
                                             mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$ref_rr<=45 & mdf_reshaped$ref_rr>=40 ~ 1,
                                             mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$ref_rr<40 ~ 0)
+mdf_reshaped$refac_fastbreath_35mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$ref_rracoustic>45 ~ 2,
+                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$ref_rracoustic<=45 & mdf_reshaped$ref_rracoustic>=40 ~ 1,
+                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$ref_rracoustic<40 ~ 0)
 mdf_reshaped$index_fastbreath_59mo_tri <- case_when(mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$index_rr>35 ~ 2,
                                             mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$index_rr<=35 & mdf_reshaped$index_rr>=30 ~ 1,
                                             mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$index_rr<30 ~ 0)
 mdf_reshaped$ref_fastbreath_59mo_tri <- case_when(mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$ref_rr>35 ~ 2,
                                             mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$ref_rr<=35 & mdf_reshaped$ref_rr>=30 ~ 1,
                                             mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$ref_rr<30 ~ 0)
+mdf_reshaped$refac_fastbreath_59mo_tri <- case_when(mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$ref_rracoustic>35 ~ 2,
+                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$ref_rracoustic<=35 & mdf_reshaped$ref_rracoustic>=30 ~ 1,
+                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$ref_rracoustic<30 ~ 0)
 mdf_reshaped$index_tachycardic_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$index_pr>190 ~ 2,
                                             mdf_reshaped$age_months<12 & mdf_reshaped$index_pr<=190 & mdf_reshaped$index_pr>=180 ~ 1,
                                             mdf_reshaped$age_months<12 & mdf_reshaped$index_pr<180 ~ 0)
@@ -244,6 +256,12 @@ mdf_reshaped$ref_index_pres_fb35mo <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_
 mdf_reshaped$ref_index_agree_fb35mo <- ifelse(mdf_reshaped$ref_fastbreath_35mo==mdf_reshaped$index_fastbreath_35mo, 1, 0)
 mdf_reshaped$ref_index_pres_fb59mo <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_59mo) & !is.na(mdf_reshaped$index_fastbreath_59mo), 1, 0)
 mdf_reshaped$ref_index_agree_fb59mo <- ifelse(mdf_reshaped$ref_fastbreath_59mo==mdf_reshaped$index_fastbreath_59mo, 1, 0)
+mdf_reshaped$refac_index_pres_fb12mo <- ifelse(!is.na(mdf_reshaped$refac_fastbreath_12mo) & !is.na(mdf_reshaped$index_fastbreath_12mo), 1, 0)
+mdf_reshaped$refac_index_agree_fb12mo <- ifelse(mdf_reshaped$refac_fastbreath_12mo==mdf_reshaped$index_fastbreath_12mo, 1, 0)
+mdf_reshaped$refac_index_pres_fb35mo <- ifelse(!is.na(mdf_reshaped$refac_fastbreath_35mo) & !is.na(mdf_reshaped$index_fastbreath_35mo), 1, 0)
+mdf_reshaped$refac_index_agree_fb35mo <- ifelse(mdf_reshaped$refac_fastbreath_35mo==mdf_reshaped$index_fastbreath_35mo, 1, 0)
+mdf_reshaped$refac_index_pres_fb59mo <- ifelse(!is.na(mdf_reshaped$refac_fastbreath_59mo) & !is.na(mdf_reshaped$index_fastbreath_59mo), 1, 0)
+mdf_reshaped$refac_index_agree_fb59mo <- ifelse(mdf_reshaped$refac_fastbreath_59mo==mdf_reshaped$index_fastbreath_59mo, 1, 0)
 mdf_reshaped$ref_index_pres_tachy12mo <- ifelse(!is.na(mdf_reshaped$ref_tachycardic_12mo) & !is.na(mdf_reshaped$index_tachycardic_12mo), 1, 0)
 mdf_reshaped$ref_index_agree_tachy12mo <- ifelse(mdf_reshaped$ref_tachycardic_12mo==mdf_reshaped$index_tachycardic_12mo, 1, 0)
 mdf_reshaped$ref_index_pres_tachy59mo <- ifelse(!is.na(mdf_reshaped$ref_tachycardic_59mo) & !is.na(mdf_reshaped$index_tachycardic_59mo), 1, 0)
@@ -259,6 +277,12 @@ mdf_reshaped$ref_index_pres_fb35mo_tri <- ifelse(!is.na(mdf_reshaped$ref_fastbre
 mdf_reshaped$ref_index_agree_fb35mo_tri <- ifelse(mdf_reshaped$ref_fastbreath_35mo_tri==mdf_reshaped$index_fastbreath_35mo_tri, 1, 0)
 mdf_reshaped$ref_index_pres_fb59mo_tri <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_59mo_tri) & !is.na(mdf_reshaped$index_fastbreath_59mo_tri), 1, 0)
 mdf_reshaped$ref_index_agree_fb59mo_tri <- ifelse(mdf_reshaped$ref_fastbreath_59mo_tri==mdf_reshaped$index_fastbreath_59mo_tri, 1, 0)
+mdf_reshaped$refac_index_pres_fb12mo_tri <- ifelse(!is.na(mdf_reshaped$refac_fastbreath_12mo_tri) & !is.na(mdf_reshaped$index_fastbreath_12mo_tri), 1, 0)
+mdf_reshaped$refac_index_agree_fb12mo_tri <- ifelse(mdf_reshaped$refac_fastbreath_12mo_tri==mdf_reshaped$index_fastbreath_12mo_tri, 1, 0)
+mdf_reshaped$refac_index_pres_fb35mo_tri <- ifelse(!is.na(mdf_reshaped$refac_fastbreath_35mo_tri) & !is.na(mdf_reshaped$index_fastbreath_35mo_tri), 1, 0)
+mdf_reshaped$refac_index_agree_fb35mo_tri <- ifelse(mdf_reshaped$refac_fastbreath_35mo_tri==mdf_reshaped$index_fastbreath_35mo_tri, 1, 0)
+mdf_reshaped$refac_index_pres_fb59mo_tri <- ifelse(!is.na(mdf_reshaped$refac_fastbreath_59mo_tri) & !is.na(mdf_reshaped$index_fastbreath_59mo_tri), 1, 0)
+mdf_reshaped$refac_index_agree_fb59mo_tri <- ifelse(mdf_reshaped$refac_fastbreath_59mo_tri==mdf_reshaped$index_fastbreath_59mo_tri, 1, 0)
 mdf_reshaped$ref_index_pres_tachy12mo_tri <- ifelse(!is.na(mdf_reshaped$ref_tachycardic_12mo_tri) & !is.na(mdf_reshaped$index_tachycardic_12mo_tri), 1, 0)
 mdf_reshaped$ref_index_agree_tachy12mo_tri <- ifelse(mdf_reshaped$ref_tachycardic_12mo_tri==mdf_reshaped$index_tachycardic_12mo_tri, 1, 0)
 mdf_reshaped$ref_index_pres_tachy59mo_tri <- ifelse(!is.na(mdf_reshaped$ref_tachycardic_59mo_tri) & !is.na(mdf_reshaped$index_tachycardic_59mo_tri), 1, 0)
@@ -270,6 +294,7 @@ mdf_reshaped$mae_temp <- mdf_reshaped$ref_temp - mdf_reshaped$index_temp
 mdf_reshaped$mae_pr <- mdf_reshaped$ref_pr - mdf_reshaped$index_pr
 mdf_reshaped$mae_pi <- mdf_reshaped$ref_pi - mdf_reshaped$index_pi
 mdf_reshaped$mae_rr <- mdf_reshaped$ref_rr - mdf_reshaped$index_rr
+mdf_reshaped$mae_rrac <- mdf_reshaped$ref_rracoustic - mdf_reshaped$index_rr
 ```
 
 ```{r device_dfs, warning=FALSE}
