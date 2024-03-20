@@ -347,10 +347,13 @@ df_og$m1_index_fever <- ifelse(df_og$m1_index_temp>=37.5, 1, 0)
 df_og$m1_ref_fever <- ifelse(df_og$m1_therm_skin_temp>=37.5, 1, 0)
 df_og$m1_index_fastbreath_12mo <- ifelse(df_og$m1_index_rr>49 & df_og$age_months<12, 1, 0)
 df_og$m1_ref_fastbreath_12mo <- ifelse(df_og$m1_ref_rr>49 & df_og$age_months<12, 1, 0)
+df_og$m1_refac_fastbreath_12mo <- ifelse(df_og$m1_ref_rracoustic>49 & df_og$age_months<12, 1, 0)
 df_og$m1_index_fastbreath_35mo <- ifelse(df_og$m1_index_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
 df_og$m1_ref_fastbreath_35mo <- ifelse(df_og$m1_ref_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
+df_og$m1_refac_fastbreath_35mo <- ifelse(df_og$m1_ref_rracoustic>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
 df_og$m1_index_fastbreath_59mo <- ifelse(df_og$m1_index_rr>29 & (df_og$age_months>35 & df_og$age_months<60), 1, 0)
 df_og$m1_ref_fastbreath_59mo <- ifelse(df_og$m1_ref_rr>29 & (df_og$age_months>35 & df_og$age_months<60), 1, 0)
+df_og$m1_refac_fastbreath_59mo <- ifelse(df_og$m1_ref_rracoustic>29 & (df_og$age_months>35 & df_og$age_months<60), 1, 0)
 df_og$m1_index_tachycardic_12mo <- ifelse(df_og$m1_index_pr>179 & df_og$age_months<12, 1, 0)
 df_og$m1_ref_tachycardic_12mo <- ifelse(df_og$m1_ref_pr>179 & df_og$age_months<12, 1, 0)
 df_og$m1_index_tachycardic_59mo <- ifelse(df_og$m1_index_pr>139 & df_og$age_months>11, 1, 0)
@@ -362,10 +365,13 @@ df_og$m2_index_fever <- ifelse(df_og$m2_index_temp>=37.5, 1, 0)
 df_og$m2_ref_fever <- ifelse(df_og$m2_therm_skin_temp>=37.5, 1, 0)
 df_og$m2_index_fastbreath_12mo <- ifelse(df_og$m2_index_rr>49 & df_og$age_months<12, 1, 0)
 df_og$m2_ref_fastbreath_12mo <- ifelse(df_og$m2_ref_rr>49 & df_og$age_months<12, 1, 0)
+df_og$m2_refac_fastbreath_12mo <- ifelse(df_og$m2_ref_rracoustic>49 & df_og$age_months<12, 1, 0)
 df_og$m2_index_fastbreath_35mo <- ifelse(df_og$m2_index_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
 df_og$m2_ref_fastbreath_35mo <- ifelse(df_og$m2_ref_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
+df_og$m2_refac_fastbreath_35mo <- ifelse(df_og$m2_ref_rracoustic>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
 df_og$m2_index_fastbreath_59mo <- ifelse(df_og$m2_index_rr>29 & (df_og$age_months>35 & df_og$age_months<60), 1, 0)
 df_og$m2_ref_fastbreath_59mo <- ifelse(df_og$m2_ref_rr>29 & (df_og$age_months>35 & df_og$age_months<60), 1, 0)
+df_og$m2_refac_fastbreath_59mo <- ifelse(df_og$m2_ref_rracoustic>29 & (df_og$age_months>35 & df_og$age_months<60), 1, 0)
 df_og$m2_index_tachycardic_12mo <- ifelse(df_og$m2_index_pr>179 & df_og$age_months<12, 1, 0)
 df_og$m2_ref_tachycardic_12mo <- ifelse(df_og$m2_ref_pr>179 & df_og$age_months<12, 1, 0)
 df_og$m2_index_tachycardic_59mo <- ifelse(df_og$m2_index_pr>139 & df_og$age_months>11, 1, 0)
@@ -377,10 +383,13 @@ df_og$m3_index_fever <- ifelse(df_og$m3_index_temp>=37.5, 1, 0)
 df_og$m3_ref_fever <- ifelse(df_og$m3_therm_skin_temp>=37.5, 1, 0)
 df_og$m3_index_fastbreath_12mo <- ifelse(df_og$m3_index_rr>49 & df_og$age_months<12, 1, 0)
 df_og$m3_ref_fastbreath_12mo <- ifelse(df_og$m3_ref_rr>49 & df_og$age_months<12, 1, 0)
+df_og$m3_refac_fastbreath_12mo <- ifelse(df_og$m3_ref_rracoustic>49 & df_og$age_months<12, 1, 0)
 df_og$m3_index_fastbreath_35mo <- ifelse(df_og$m3_index_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
 df_og$m3_ref_fastbreath_35mo <- ifelse(df_og$m3_ref_rr>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
+df_og$m3_refac_fastbreath_35mo <- ifelse(df_og$m3_ref_rracoustic>39 & (df_og$age_months>11 & df_og$age_months<36), 1, 0)
 df_og$m3_index_fastbreath_59mo <- ifelse(df_og$m3_index_rr>29 & (df_og$age_months>35 & df_og$age_months<60), 1, 0)
 df_og$m3_ref_fastbreath_59mo <- ifelse(df_og$m3_ref_rr>29 & (df_og$age_months>35 & df_og$age_months<60), 1, 0)
+df_og$m3_refac_fastbreath_59mo <- ifelse(df_og$m3_ref_rracoustic>29 & (df_og$age_months>35 & df_og$age_months<60), 1, 0)
 df_og$m3_index_tachycardic_12mo <- ifelse(df_og$m3_index_pr>179 & df_og$age_months<12, 1, 0)
 df_og$m3_ref_tachycardic_12mo <- ifelse(df_og$m3_ref_pr>179 & df_og$age_months<12, 1, 0)
 df_og$m3_index_tachycardic_59mo <- ifelse(df_og$m3_index_pr>139 & df_og$age_months>11, 1, 0)
@@ -405,18 +414,27 @@ df_og$m1_index_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m1_i
 df_og$m1_ref_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m1_ref_rr>55 ~ 2,
                                             df_og$age_months<12 & df_og$m1_ref_rr<=55 & df_og$m1_ref_rr>=50 ~ 1,
                                             df_og$age_months<12 & df_og$m1_ref_rr<50 ~ 0)
+df_og$m1_refac_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m1_ref_rracoustic>55 ~ 2,
+                                            df_og$age_months<12 & df_og$m1_ref_rracoustic<=55 & df_og$m1_ref_rracoustic>=50 ~ 1,
+                                            df_og$age_months<12 & df_og$m1_ref_rracoustic<50 ~ 0)
 df_og$m1_index_fastbreath_35mo_tri <- case_when(df_og$age_months>11 & df_og$age_months<36 & df_og$m1_index_rr>45 ~ 2,
                                             df_og$age_months>11 & df_og$age_months<36 & df_og$m1_index_rr<=45 & df_og$m1_index_rr>=40 ~ 1,
                                             df_og$age_months>11 & df_og$age_months<36 & df_og$m1_index_rr<40 ~ 0)
 df_og$m1_ref_fastbreath_35mo_tri <- case_when(df_og$age_months>11 & df_og$age_months<36 & df_og$m1_ref_rr>45 ~ 2,
                                             df_og$age_months>11 & df_og$age_months<36 & df_og$m1_ref_rr<=45 & df_og$m1_ref_rr>=40 ~ 1,
                                             df_og$age_months>11 & df_og$age_months<36 & df_og$m1_ref_rr<40 ~ 0)
+df_og$m1_refac_fastbreath_35mo_tri <- case_when(df_og$age_months>11 & df_og$age_months<36 & df_og$m1_ref_rracoustic>45 ~ 2,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m1_ref_rracoustic<=45 & df_og$m1_ref_rracoustic>=40 ~ 1,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m1_ref_rracoustic<40 ~ 0)
 df_og$m1_index_fastbreath_59mo_tri <- case_when(df_og$age_months>35 & df_og$age_months<60 & df_og$m1_index_rr>35 ~ 2,
                                             df_og$age_months>35 & df_og$age_months<60 & df_og$m1_index_rr<=35 & df_og$m1_index_rr>=30 ~ 1,
                                             df_og$age_months>35 & df_og$age_months<60 & df_og$m1_index_rr<30 ~ 0)
 df_og$m1_ref_fastbreath_59mo_tri <- case_when(df_og$age_months>35 & df_og$age_months<60 & df_og$m1_ref_rr>35 ~ 2,
                                             df_og$age_months>35 & df_og$age_months<60 & df_og$m1_ref_rr<=35 & df_og$m1_ref_rr>=30 ~ 1,
                                             df_og$age_months>35 & df_og$age_months<60 & df_og$m1_ref_rr<30 ~ 0)
+df_og$m1_refac_fastbreath_59mo_tri <- case_when(df_og$age_months>35 & df_og$age_months<60 & df_og$m1_ref_rracoustic>35 ~ 2,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m1_ref_rracoustic<=35 & df_og$m1_ref_rracoustic>=30 ~ 1,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m1_ref_rracoustic<30 ~ 0)
 df_og$m1_index_tachycardic_12mo_tri <- case_when(df_og$age_months<12 & df_og$m1_index_pr>190 ~ 2,
                                             df_og$age_months<12 & df_og$m1_index_pr<=190 & df_og$m1_index_pr>=180 ~ 1,
                                             df_og$age_months<12 & df_og$m1_index_pr<180 ~ 0)
@@ -448,18 +466,27 @@ df_og$m2_index_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m2_i
 df_og$m2_ref_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m2_ref_rr>55 ~ 2,
                                             df_og$age_months<12 & df_og$m2_ref_rr<=55 & df_og$m2_ref_rr>=50 ~ 1,
                                             df_og$age_months<12 & df_og$m2_ref_rr<50 ~ 0)
+df_og$m2_refac_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m2_ref_rracoustic>55 ~ 2,
+                                            df_og$age_months<12 & df_og$m2_ref_rracoustic<=55 & df_og$m2_ref_rracoustic>=50 ~ 1,
+                                            df_og$age_months<12 & df_og$m2_ref_rracoustic<50 ~ 0)
 df_og$m2_index_fastbreath_35mo_tri <- case_when(df_og$age_months>11 & df_og$age_months<36 & df_og$m2_index_rr>45 ~ 2,
                                             df_og$age_months>11 & df_og$age_months<36 & df_og$m2_index_rr<=45 & df_og$m2_index_rr>=40 ~ 1,
                                             df_og$age_months>11 & df_og$age_months<36 & df_og$m2_index_rr<40 ~ 0)
 df_og$m2_ref_fastbreath_35mo_tri <- case_when(df_og$age_months>11 & df_og$age_months<36 & df_og$m2_ref_rr>45 ~ 2,
                                             df_og$age_months>11 & df_og$age_months<36 & df_og$m2_ref_rr<=45 & df_og$m2_ref_rr>=40 ~ 1,
                                             df_og$age_months>11 & df_og$age_months<36 & df_og$m2_ref_rr<40 ~ 0)
+df_og$m2_refac_fastbreath_35mo_tri <- case_when(df_og$age_months>11 & df_og$age_months<36 & df_og$m2_ref_rracoustic>45 ~ 2,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m2_ref_rracoustic<=45 & df_og$m2_ref_rracoustic>=40 ~ 1,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m2_ref_rracoustic<40 ~ 0)
 df_og$m2_index_fastbreath_59mo_tri <- case_when(df_og$age_months>35 & df_og$age_months<60 & df_og$m2_index_rr>35 ~ 2,
                                             df_og$age_months>35 & df_og$age_months<60 & df_og$m2_index_rr<=35 & df_og$m2_index_rr>=30 ~ 1,
                                             df_og$age_months>35 & df_og$age_months<60 & df_og$m2_index_rr<30 ~ 0)
 df_og$m2_ref_fastbreath_59mo_tri <- case_when(df_og$age_months>35 & df_og$age_months<60 & df_og$m2_ref_rr>35 ~ 2,
                                             df_og$age_months>35 & df_og$age_months<60 & df_og$m2_ref_rr<=35 & df_og$m2_ref_rr>=30 ~ 1,
                                             df_og$age_months>35 & df_og$age_months<60 & df_og$m2_ref_rr<30 ~ 0)
+df_og$m2_refac_fastbreath_59mo_tri <- case_when(df_og$age_months>35 & df_og$age_months<60 & df_og$m2_ref_rracoustic>35 ~ 2,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m2_ref_rracoustic<=35 & df_og$m2_ref_rracoustic>=30 ~ 1,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m2_ref_rracoustic<30 ~ 0)
 df_og$m2_index_tachycardic_12mo_tri <- case_when(df_og$age_months<12 & df_og$m2_index_pr>190 ~ 2,
                                             df_og$age_months<12 & df_og$m2_index_pr<=190 & df_og$m2_index_pr>=180 ~ 1,
                                             df_og$age_months<12 & df_og$m2_index_pr<180 ~ 0)
@@ -491,18 +518,27 @@ df_og$m3_index_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m3_i
 df_og$m3_ref_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m3_ref_rr>55 ~ 2,
                                             df_og$age_months<12 & df_og$m3_ref_rr<=55 & df_og$m3_ref_rr>=50 ~ 1,
                                             df_og$age_months<12 & df_og$m3_ref_rr<50 ~ 0)
+df_og$m3_refac_fastbreath_12mo_tri <- case_when(df_og$age_months<12 & df_og$m3_ref_rracoustic>55 ~ 2,
+                                            df_og$age_months<12 & df_og$m3_ref_rracoustic<=55 & df_og$m3_ref_rracoustic>=50 ~ 1,
+                                            df_og$age_months<12 & df_og$m3_ref_rracoustic<50 ~ 0)
 df_og$m3_index_fastbreath_35mo_tri <- case_when(df_og$age_months>11 & df_og$age_months<36 & df_og$m3_index_rr>45 ~ 2,
                                             df_og$age_months>11 & df_og$age_months<36 & df_og$m3_index_rr<=45 & df_og$m3_index_rr>=40 ~ 1,
                                             df_og$age_months>11 & df_og$age_months<36 & df_og$m3_index_rr<40 ~ 0)
 df_og$m3_ref_fastbreath_35mo_tri <- case_when(df_og$age_months>11 & df_og$age_months<36 & df_og$m3_ref_rr>45 ~ 2,
                                             df_og$age_months>11 & df_og$age_months<36 & df_og$m3_ref_rr<=45 & df_og$m3_ref_rr>=40 ~ 1,
                                             df_og$age_months>11 & df_og$age_months<36 & df_og$m3_ref_rr<40 ~ 0)
+df_og$m3_refac_fastbreath_35mo_tri <- case_when(df_og$age_months>11 & df_og$age_months<36 & df_og$m3_ref_rracoustic>45 ~ 2,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m3_ref_rracoustic<=45 & df_og$m3_ref_rracoustic>=40 ~ 1,
+                                            df_og$age_months>11 & df_og$age_months<36 & df_og$m3_ref_rracoustic<40 ~ 0)
 df_og$m3_index_fastbreath_59mo_tri <- case_when(df_og$age_months>35 & df_og$age_months<60 & df_og$m3_index_rr>35 ~ 2,
                                             df_og$age_months>35 & df_og$age_months<60 & df_og$m3_index_rr<=35 & df_og$m3_index_rr>=30 ~ 1,
                                             df_og$age_months>35 & df_og$age_months<60 & df_og$m3_index_rr<30 ~ 0)
 df_og$m3_ref_fastbreath_59mo_tri <- case_when(df_og$age_months>35 & df_og$age_months<60 & df_og$m3_ref_rr>35 ~ 2,
                                             df_og$age_months>35 & df_og$age_months<60 & df_og$m3_ref_rr<=35 & df_og$m3_ref_rr>=30 ~ 1,
                                             df_og$age_months>35 & df_og$age_months<60 & df_og$m3_ref_rr<30 ~ 0)
+df_og$m3_refac_fastbreath_59mo_tri <- case_when(df_og$age_months>35 & df_og$age_months<60 & df_og$m3_ref_rracoustic>35 ~ 2,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m3_ref_rracoustic<=35 & df_og$m3_ref_rracoustic>=30 ~ 1,
+                                            df_og$age_months>35 & df_og$age_months<60 & df_og$m3_ref_rracoustic<30 ~ 0)
 df_og$m3_index_tachycardic_12mo_tri <- case_when(df_og$age_months<12 & df_og$m3_index_pr>190 ~ 2,
                                             df_og$age_months<12 & df_og$m3_index_pr<=190 & df_og$m3_index_pr>=180 ~ 1,
                                             df_og$age_months<12 & df_og$m3_index_pr<180 ~ 0)
@@ -532,6 +568,12 @@ df_og$m1_ref_index_pres_fb35mo <- ifelse(!is.na(df_og$m1_ref_fastbreath_35mo) & 
 df_og$m1_ref_index_agree_fb35mo <- ifelse(df_og$m1_ref_fastbreath_35mo==df_og$m1_index_fastbreath_35mo, 1, 0)
 df_og$m1_ref_index_pres_fb59mo <- ifelse(!is.na(df_og$m1_ref_fastbreath_59mo) & !is.na(df_og$m1_index_fastbreath_59mo), 1, 0)
 df_og$m1_ref_index_agree_fb59mo <- ifelse(df_og$m1_ref_fastbreath_59mo==df_og$m1_index_fastbreath_59mo, 1, 0)
+df_og$m1_refac_index_pres_fb12mo <- ifelse(!is.na(df_og$m1_refac_fastbreath_12mo) & !is.na(df_og$m1_index_fastbreath_12mo), 1, 0)
+df_og$m1_refac_index_agree_fb12mo <- ifelse(df_og$m1_refac_fastbreath_12mo==df_og$m1_index_fastbreath_12mo, 1, 0)
+df_og$m1_refac_index_pres_fb35mo <- ifelse(!is.na(df_og$m1_refac_fastbreath_35mo) & !is.na(df_og$m1_index_fastbreath_35mo), 1, 0)
+df_og$m1_refac_index_agree_fb35mo <- ifelse(df_og$m1_refac_fastbreath_35mo==df_og$m1_index_fastbreath_35mo, 1, 0)
+df_og$m1_refac_index_pres_fb59mo <- ifelse(!is.na(df_og$m1_refac_fastbreath_59mo) & !is.na(df_og$m1_index_fastbreath_59mo), 1, 0)
+df_og$m1_refac_index_agree_fb59mo <- ifelse(df_og$m1_refac_fastbreath_59mo==df_og$m1_index_fastbreath_59mo, 1, 0)
 df_og$m1_ref_index_pres_tachy12mo <- ifelse(!is.na(df_og$m1_ref_tachycardic_12mo) & !is.na(df_og$m1_index_tachycardic_12mo), 1, 0)
 df_og$m1_ref_index_agree_tachy12mo <- ifelse(df_og$m1_ref_tachycardic_12mo==df_og$m1_index_tachycardic_12mo, 1, 0)
 df_og$m1_ref_index_pres_tachy59mo <- ifelse(!is.na(df_og$m1_ref_tachycardic_59mo) & !is.na(df_og$m1_index_tachycardic_59mo), 1, 0)
@@ -547,6 +589,12 @@ df_og$m2_ref_index_pres_fb35mo <- ifelse(!is.na(df_og$m2_ref_fastbreath_35mo) & 
 df_og$m2_ref_index_agree_fb35mo <- ifelse(df_og$m2_ref_fastbreath_35mo==df_og$m2_index_fastbreath_35mo, 1, 0)
 df_og$m2_ref_index_pres_fb59mo <- ifelse(!is.na(df_og$m2_ref_fastbreath_59mo) & !is.na(df_og$m2_index_fastbreath_59mo), 1, 0)
 df_og$m2_ref_index_agree_fb59mo <- ifelse(df_og$m2_ref_fastbreath_59mo==df_og$m2_index_fastbreath_59mo, 1, 0)
+df_og$m2_refac_index_pres_fb12mo <- ifelse(!is.na(df_og$m2_refac_fastbreath_12mo) & !is.na(df_og$m2_index_fastbreath_12mo), 1, 0)
+df_og$m2_refac_index_agree_fb12mo <- ifelse(df_og$m2_refac_fastbreath_12mo==df_og$m2_index_fastbreath_12mo, 1, 0)
+df_og$m2_refac_index_pres_fb35mo <- ifelse(!is.na(df_og$m2_refac_fastbreath_35mo) & !is.na(df_og$m2_index_fastbreath_35mo), 1, 0)
+df_og$m2_refac_index_agree_fb35mo <- ifelse(df_og$m2_refac_fastbreath_35mo==df_og$m2_index_fastbreath_35mo, 1, 0)
+df_og$m2_refac_index_pres_fb59mo <- ifelse(!is.na(df_og$m2_refac_fastbreath_59mo) & !is.na(df_og$m2_index_fastbreath_59mo), 1, 0)
+df_og$m2_refac_index_agree_fb59mo <- ifelse(df_og$m2_refac_fastbreath_59mo==df_og$m2_index_fastbreath_59mo, 1, 0)
 df_og$m2_ref_index_pres_tachy12mo <- ifelse(!is.na(df_og$m2_ref_tachycardic_12mo) & !is.na(df_og$m2_index_tachycardic_12mo), 1, 0)
 df_og$m2_ref_index_agree_tachy12mo <- ifelse(df_og$m2_ref_tachycardic_12mo==df_og$m2_index_tachycardic_12mo, 1, 0)
 df_og$m2_ref_index_pres_tachy59mo <- ifelse(!is.na(df_og$m2_ref_tachycardic_59mo) & !is.na(df_og$m2_index_tachycardic_59mo), 1, 0)
@@ -562,6 +610,12 @@ df_og$m3_ref_index_pres_fb35mo <- ifelse(!is.na(df_og$m3_ref_fastbreath_35mo) & 
 df_og$m3_ref_index_agree_fb35mo <- ifelse(df_og$m3_ref_fastbreath_35mo==df_og$m3_index_fastbreath_35mo, 1, 0)
 df_og$m3_ref_index_pres_fb59mo <- ifelse(!is.na(df_og$m3_ref_fastbreath_59mo) & !is.na(df_og$m3_index_fastbreath_59mo), 1, 0)
 df_og$m3_ref_index_agree_fb59mo <- ifelse(df_og$m3_ref_fastbreath_59mo==df_og$m3_index_fastbreath_59mo, 1, 0)
+df_og$m3_refac_index_pres_fb12mo <- ifelse(!is.na(df_og$m3_refac_fastbreath_12mo) & !is.na(df_og$m3_index_fastbreath_12mo), 1, 0)
+df_og$m3_refac_index_agree_fb12mo <- ifelse(df_og$m3_refac_fastbreath_12mo==df_og$m3_index_fastbreath_12mo, 1, 0)
+df_og$m3_refac_index_pres_fb35mo <- ifelse(!is.na(df_og$m3_refac_fastbreath_35mo) & !is.na(df_og$m3_index_fastbreath_35mo), 1, 0)
+df_og$m3_refac_index_agree_fb35mo <- ifelse(df_og$m3_refac_fastbreath_35mo==df_og$m3_index_fastbreath_35mo, 1, 0)
+df_og$m3_refac_index_pres_fb59mo <- ifelse(!is.na(df_og$m3_refac_fastbreath_59mo) & !is.na(df_og$m3_index_fastbreath_59mo), 1, 0)
+df_og$m3_refac_index_agree_fb59mo <- ifelse(df_og$m3_refac_fastbreath_59mo==df_og$m3_index_fastbreath_59mo, 1, 0)
 df_og$m3_ref_index_pres_tachy12mo <- ifelse(!is.na(df_og$m3_ref_tachycardic_12mo) & !is.na(df_og$m3_index_tachycardic_12mo), 1, 0)
 df_og$m3_ref_index_agree_tachy12mo <- ifelse(df_og$m3_ref_tachycardic_12mo==df_og$m3_index_tachycardic_12mo, 1, 0)
 df_og$m3_ref_index_pres_tachy59mo <- ifelse(!is.na(df_og$m3_ref_tachycardic_59mo) & !is.na(df_og$m3_index_tachycardic_59mo), 1, 0)
@@ -578,6 +632,12 @@ df_og$m1_ref_index_pres_fb35mo_tri <- ifelse(!is.na(df_og$m1_ref_fastbreath_35mo
 df_og$m1_ref_index_agree_fb35mo_tri <- ifelse(df_og$m1_ref_fastbreath_35mo_tri==df_og$m1_index_fastbreath_35mo_tri, 1, 0)
 df_og$m1_ref_index_pres_fb59mo_tri <- ifelse(!is.na(df_og$m1_ref_fastbreath_59mo_tri) & !is.na(df_og$m1_index_fastbreath_59mo_tri), 1, 0)
 df_og$m1_ref_index_agree_fb59mo_tri <- ifelse(df_og$m1_ref_fastbreath_59mo_tri==df_og$m1_index_fastbreath_59mo_tri, 1, 0)
+df_og$m1_refac_index_pres_fb12mo_tri <- ifelse(!is.na(df_og$m1_refac_fastbreath_12mo_tri) & !is.na(df_og$m1_index_fastbreath_12mo_tri), 1, 0)
+df_og$m1_refac_index_agree_fb12mo_tri <- ifelse(df_og$m1_refac_fastbreath_12mo_tri==df_og$m1_index_fastbreath_12mo_tri, 1, 0)
+df_og$m1_refac_index_pres_fb35mo_tri <- ifelse(!is.na(df_og$m1_refac_fastbreath_35mo_tri) & !is.na(df_og$m1_index_fastbreath_35mo_tri), 1, 0)
+df_og$m1_refac_index_agree_fb35mo_tri <- ifelse(df_og$m1_refac_fastbreath_35mo_tri==df_og$m1_index_fastbreath_35mo_tri, 1, 0)
+df_og$m1_refac_index_pres_fb59mo_tri <- ifelse(!is.na(df_og$m1_refac_fastbreath_59mo_tri) & !is.na(df_og$m1_index_fastbreath_59mo_tri), 1, 0)
+df_og$m1_refac_index_agree_fb59mo_tri <- ifelse(df_og$m1_refac_fastbreath_59mo_tri==df_og$m1_index_fastbreath_59mo_tri, 1, 0)
 df_og$m1_ref_index_pres_tachy12mo_tri <- ifelse(!is.na(df_og$m1_ref_tachycardic_12mo_tri) & !is.na(df_og$m1_index_tachycardic_12mo_tri), 1, 0)
 df_og$m1_ref_index_agree_tachy12mo_tri <- ifelse(df_og$m1_ref_tachycardic_12mo_tri==df_og$m1_index_tachycardic_12mo_tri, 1, 0)
 df_og$m1_ref_index_pres_tachy59mo_tri <- ifelse(!is.na(df_og$m1_ref_tachycardic_59mo_tri) & !is.na(df_og$m1_index_tachycardic_59mo_tri), 1, 0)
@@ -593,6 +653,12 @@ df_og$m2_ref_index_pres_fb35mo_tri <- ifelse(!is.na(df_og$m2_ref_fastbreath_35mo
 df_og$m2_ref_index_agree_fb35mo_tri <- ifelse(df_og$m2_ref_fastbreath_35mo_tri==df_og$m2_index_fastbreath_35mo_tri, 1, 0)
 df_og$m2_ref_index_pres_fb59mo_tri <- ifelse(!is.na(df_og$m2_ref_fastbreath_59mo_tri) & !is.na(df_og$m2_index_fastbreath_59mo_tri), 1, 0)
 df_og$m2_ref_index_agree_fb59mo_tri <- ifelse(df_og$m2_ref_fastbreath_59mo_tri==df_og$m2_index_fastbreath_59mo_tri, 1, 0)
+df_og$m2_refac_index_pres_fb12mo_tri <- ifelse(!is.na(df_og$m2_refac_fastbreath_12mo_tri) & !is.na(df_og$m2_index_fastbreath_12mo_tri), 1, 0)
+df_og$m2_refac_index_agree_fb12mo_tri <- ifelse(df_og$m2_refac_fastbreath_12mo_tri==df_og$m2_index_fastbreath_12mo_tri, 1, 0)
+df_og$m2_refac_index_pres_fb35mo_tri <- ifelse(!is.na(df_og$m2_refac_fastbreath_35mo_tri) & !is.na(df_og$m2_index_fastbreath_35mo_tri), 1, 0)
+df_og$m2_refac_index_agree_fb35mo_tri <- ifelse(df_og$m2_refac_fastbreath_35mo_tri==df_og$m2_index_fastbreath_35mo_tri, 1, 0)
+df_og$m2_refac_index_pres_fb59mo_tri <- ifelse(!is.na(df_og$m2_refac_fastbreath_59mo_tri) & !is.na(df_og$m2_index_fastbreath_59mo_tri), 1, 0)
+df_og$m2_refac_index_agree_fb59mo_tri <- ifelse(df_og$m2_refac_fastbreath_59mo_tri==df_og$m2_index_fastbreath_59mo_tri, 1, 0)
 df_og$m2_ref_index_pres_tachy12mo_tri <- ifelse(!is.na(df_og$m2_ref_tachycardic_12mo_tri) & !is.na(df_og$m2_index_tachycardic_12mo_tri), 1, 0)
 df_og$m2_ref_index_agree_tachy12mo_tri <- ifelse(df_og$m2_ref_tachycardic_12mo_tri==df_og$m2_index_tachycardic_12mo_tri, 1, 0)
 df_og$m2_ref_index_pres_tachy59mo_tri <- ifelse(!is.na(df_og$m2_ref_tachycardic_59mo_tri) & !is.na(df_og$m2_index_tachycardic_59mo_tri), 1, 0)
@@ -608,6 +674,12 @@ df_og$m3_ref_index_pres_fb35mo_tri <- ifelse(!is.na(df_og$m3_ref_fastbreath_35mo
 df_og$m3_ref_index_agree_fb35mo_tri <- ifelse(df_og$m3_ref_fastbreath_35mo_tri==df_og$m3_index_fastbreath_35mo_tri, 1, 0)
 df_og$m3_ref_index_pres_fb59mo_tri <- ifelse(!is.na(df_og$m3_ref_fastbreath_59mo_tri) & !is.na(df_og$m3_index_fastbreath_59mo_tri), 1, 0)
 df_og$m3_ref_index_agree_fb59mo_tri <- ifelse(df_og$m3_ref_fastbreath_59mo_tri==df_og$m3_index_fastbreath_59mo_tri, 1, 0)
+df_og$m3_refac_index_pres_fb12mo_tri <- ifelse(!is.na(df_og$m3_refac_fastbreath_12mo_tri) & !is.na(df_og$m3_index_fastbreath_12mo_tri), 1, 0)
+df_og$m3_refac_index_agree_fb12mo_tri <- ifelse(df_og$m3_refac_fastbreath_12mo_tri==df_og$m3_index_fastbreath_12mo_tri, 1, 0)
+df_og$m3_refac_index_pres_fb35mo_tri <- ifelse(!is.na(df_og$m3_refac_fastbreath_35mo_tri) & !is.na(df_og$m3_index_fastbreath_35mo_tri), 1, 0)
+df_og$m3_refac_index_agree_fb35mo_tri <- ifelse(df_og$m3_refac_fastbreath_35mo_tri==df_og$m3_index_fastbreath_35mo_tri, 1, 0)
+df_og$m3_refac_index_pres_fb59mo_tri <- ifelse(!is.na(df_og$m3_refac_fastbreath_59mo_tri) & !is.na(df_og$m3_index_fastbreath_59mo_tri), 1, 0)
+df_og$m3_refac_index_agree_fb59mo_tri <- ifelse(df_og$m3_refac_fastbreath_59mo_tri==df_og$m3_index_fastbreath_59mo_tri, 1, 0)
 df_og$m3_ref_index_pres_tachy12mo_tri <- ifelse(!is.na(df_og$m3_ref_tachycardic_12mo_tri) & !is.na(df_og$m3_index_tachycardic_12mo_tri), 1, 0)
 df_og$m3_ref_index_agree_tachy12mo_tri <- ifelse(df_og$m3_ref_tachycardic_12mo_tri==df_og$m3_index_tachycardic_12mo_tri, 1, 0)
 df_og$m3_ref_index_pres_tachy59mo_tri <- ifelse(!is.na(df_og$m3_ref_tachycardic_59mo_tri) & !is.na(df_og$m3_index_tachycardic_59mo_tri), 1, 0)
