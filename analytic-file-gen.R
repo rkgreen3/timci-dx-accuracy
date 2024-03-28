@@ -155,7 +155,27 @@ idf <- left_join(idf, idf_tx, by = "ppt_id")
 # Remove legacy variables from original df to merge back in with idf
 df <- df %>% select(-c(ill_sxs_cough, ill_sxs_rapidbreathing, ill_sxs_fever, ill_sxs_diarrhea, ill_sxs_vomit, ill_sxs_other, visit_reason_ill_sxs_oth, dx_dehydration, dx_respiratory, dx_digestive, dx_malaria,dx_fever, dx_measles, dx_earinfection, dx_throatinfection, dx_other, reported_dx_oth, tx_antibiotic, tx_antimalarial, tx_dehydration, tx_bronchodilator, tx_other, reported_tx_oth))
 df <- left_join(df, idf, by = "ppt_id")
-
+## Recode NAs as 0
+df$ill_sxs_flulike <- ifelse(is.na(df$ill_sxs_flulike), 0, df$ill_sxs_flulike)
+df$ill_sxs_dermatologic <- ifelse(is.na(df$ill_sxs_dermatologic), 0, df$ill_sxs_dermatologic)
+df$ill_sxs_abdpain <- ifelse(is.na(df$ill_sxs_abdpain), 0, df$ill_sxs_abdpain)
+df$ill_sxs_eyedischarge <- ifelse(is.na(df$ill_sxs_eyedischarge), 0, df$ill_sxs_eyedischarge)
+df$ill_sxs_poorfeeding <- ifelse(is.na(df$ill_sxs_poorfeeding), 0, df$ill_sxs_poorfeeding)
+df$ill_sxs_other <- ifelse(is.na(df$ill_sxs_other), 0, df$ill_sxs_other)
+df$dx_dermatologic <- ifelse(is.na(df$dx_dermatologic), 0, df$dx_dermatologic)
+df$dx_eyeinfection <- ifelse(is.na(df$dx_eyeinfection), 0, df$dx_eyeinfection)
+df$dx_allergy <- ifelse(is.na(df$dx_allergy), 0, df$dx_allergy)
+df$dx_oralcandid <- ifelse(is.na(df$dx_oralcandid), 0, df$dx_oralcandid)
+df$dx_other <- ifelse(is.na(df$dx_other), 0, df$dx_other)
+df$tx_antipyretic <- ifelse(is.na(df$tx_antipyretic), 0, df$tx_antipyretic)
+df$tx_antihistamine <- ifelse(is.na(df$tx_antihistamine), 0, df$tx_antihistamine)
+df$tx_decongestant <- ifelse(is.na(df$tx_decongestant), 0, df$tx_decongestant)
+df$tx_antitussive <- ifelse(is.na(df$tx_antitussive), 0, df$tx_antitussive)
+df$tx_vitamin <- ifelse(is.na(df$tx_vitamin), 0, df$tx_vitamin)
+df$tx_drops <- ifelse(is.na(df$tx_drops), 0, df$tx_drops)
+df$tx_steroid <- ifelse(is.na(df$tx_steroid), 0, df$tx_steroid)
+df$tx_other <- ifelse(is.na(df$tx_other), 0, df$tx_other)
+  
 # Create variable for each of above to indicate more than one option was selected
 df$visit_rsn_sum <- df$visit_rsn_illness + df$visit_rsn_immunize + df$visit_rsn_routine + df$visit_rsn_trauma + df$visit_rsn_admit
 df$visit_rsn_multiple <- ifelse(df$visit_rsn_sum>1, 1, 0)
@@ -265,8 +285,6 @@ age_df$age_cat <- ifelse(age_df$ppt_id %in% c("16669-80", "16669-406", "16669-38
 age_df <- age_df %>% select(-c(age_in_months, age_category, country, discrepant_cat)) #prepare to join back to main df
 df <- df %>% select(-c(age_months, age_cat))
 df <- left_join(df, age_df, by="ppt_id")
-
-
 
 # Convert crazy high temps from F to C
 df$m1_index_temp_f <- ifelse(df$m1_index_temp>40, df$m1_index_temp, NA)

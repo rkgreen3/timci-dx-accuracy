@@ -32,7 +32,7 @@ library(reshape2)
 library(ggplot2)
 
 # Read in (cleaned) data 
-filename <- "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2024-03-08.csv"
+filename <- "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2024-03-28.csv"
 df_og <- read.csv(filename)
 df_og <- df_og %>% select(-c("X", "m1_index_temp_f", "m2_index_temp_f", "m3_index_temp_f"))
 
@@ -752,22 +752,16 @@ Note: Abnormal reference measure proportions presented in this table are based o
 
 factorVars <- c("age_cat", "sex","cg_relationship", 
                 "visit_rsn_illness", "visit_rsn_immunize", "visit_rsn_routine",
-                "ill_sxs_cough", "ill_sxs_rapidbreathing", "ill_sxs_fever",
-                "ill_sxs_diarrhea", "ill_sxs_vomit", "ill_sxs_other",
-                "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
-                "dx_fever", "dx_earinfection", "dx_throatinfection", "dx_other",
-                "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
-                "tx_other", "stunted", "wasted_overweight", "anemia_status", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm", "mean_ref_rr_abnorm")
+                "ill_sxs_cough", "ill_sxs_rapidbreathing", "ill_sxs_fever", "ill_sxs_diarrhea", "ill_sxs_vomit", "ill_sxs_flulike", "ill_sxs_dermatologic", "ill_sxs_abdpain", "ill_sxs_eyedischarge", "ill_sxs_poorfeeding", "ill_sxs_other",
+                "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria", "dx_fever", "dx_earinfection", "dx_throatinfection", "dx_dermatologic", "dx_eyeinfection", "dx_allergy", "dx_oralcandid", "dx_other",
+                "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator", "tx_antipyretic", "tx_antihistamine", "tx_decongestant", "tx_antitussive", "tx_vitamin", "tx_drops", "tx_steroid", "tx_other",   "stunted", "wasted_overweight", "anemia_status", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm", "mean_ref_rr_abnorm")
 
 # Specify all the variables to include in table 1 (both continuous and categorical)
 myVars <- c("age_cat", "sex","cg_relationship", 
             "visit_rsn_illness", "visit_rsn_immunize", "visit_rsn_routine",
-            "ill_sxs_cough", "ill_sxs_rapidbreathing", "ill_sxs_fever",
-            "ill_sxs_diarrhea", "ill_sxs_vomit", "ill_sxs_other",
-            "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
-            "dx_fever", "dx_earinfection", "dx_throatinfection", "dx_other",
-            "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
-            "tx_other", "stunted", "wasted_overweight", "anemia_status", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm", "mean_ref_rr_abnorm")
+            "ill_sxs_cough", "ill_sxs_rapidbreathing", "ill_sxs_fever", "ill_sxs_diarrhea", "ill_sxs_vomit", "ill_sxs_flulike", "ill_sxs_dermatologic", "ill_sxs_abdpain", "ill_sxs_eyedischarge", "ill_sxs_poorfeeding", "ill_sxs_other",
+                "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria", "dx_fever","dx_earinfection", "dx_throatinfection", "dx_dermatologic", "dx_eyeinfection", "dx_allergy", "dx_oralcandid", "dx_other",
+                "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator", "tx_antipyretic", "tx_antihistamine", "tx_decongestant", "tx_antitussive", "tx_vitamin", "tx_drops", "tx_steroid", "tx_other",   "stunted", "wasted_overweight", "anemia_status", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm", "mean_ref_rr_abnorm")
 
 # CreateTableOne:
 out1 <- CreateTableOne(vars = myVars,
@@ -784,14 +778,13 @@ t1_overall <- print(out1,
 # Create row labels
 t1lab <- c("N", "Age Category (%)", "0-1 month", "2-11 months", "12-59 months", 
            "Sex = Male/Female (%)",
-          "Relationship of caregiver to child (%)", "Community member", "Father only", "Grandfather only", "Grandmother only", "Mother and father", "Mother and grandmother", "Mother only", "Other", "Other family 
-              member", "Sibling", 
-          "Visited due to Illness (%)", "Visited for Immunization (%)", "Visited for Routine Monitoring (%)", 
-          "Cough (%)", "Difficulty/Rapid breathing (%)", "Fever (%)", "Diarrhea (%)", "Vomiting (%)", "Other (%)", 
+          "Relationship of caregiver to child (%)", "Community member", "Father only", "Grandfather only", "Grandmother only", "Mother and father", "Mother and grandmother", "Mother only", "Other", "Other family member", "Sibling", 
+          "Visited due to Illness", "Visited for Immunization", "Visited for Routine Monitoring", 
+          "Cough", "Difficulty/Rapid breathing", "Fever", "Diarrhea", "Vomiting", "Flu-like symptoms", "Dermatologic signs", "Abdominal pain/Constipation", "Eye discharge", "Poor feeding","Other", 
           "Received Diagnosis (%)", "No", "Yes", "NA",
-          "Dehydration", "Respiratory", "Digestive", "Malaria", "Fever", "Ear infection", "Throat infection", "Other", 
+          "Dehydration", "Respiratory", "Digestive", "Malaria", "Fever", "Ear infection", "Throat infection", "Dermatological", "Eye infection", "Allergic reaction", "Oral candidiasis", "Other", 
           "Received Treatment (%)", "No", "Yes", "NA",
-          "Antibiotic", "Antimalarial", "Dehydration", "Bronchodilator", "Other", 
+          "Antibiotic","Antimalarial","Dehydration","Bronchodilator","Antipyretic/Analgesic","Antihistamine","Nasal decongestant","Antitussive","Vitamin","Ear/Eye/Nose drops","Steriods", "Other", 
           "Stunting (%)", "Severe", "Moderate", "Normal", "NA",
           "Wasting (%)", "Severely Wasted", "Moderately Wasted", "Normal", "Overweight", "NA",
           "Anemia* (%)", "Severe", "Moderate", "Mild", "Normal", "NA",
@@ -805,14 +798,14 @@ rownames(t1_overall) <- c(t1lab)
 
 t1 <- kable(t1_overall) %>%
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
-  add_indent(c(3:5, 8:17, 28:30, 40:42, 49:52, 54:58, 60:64, 68:70, 73:75)) %>%
+  add_indent(c(3:5, 8:17, 33:35, 49:51, 65:68, 70:74, 76:80, 84:86, 89:91)) %>%
   pack_rows("Demographic Characteristics", 2, 17) %>%
-  pack_rows("Reason for visit to clinic", 18, 20) %>%
-  pack_rows("Symptoms Present", 21, 26) %>%
-  pack_rows("Diagnosis", 27, 38) %>%
-  pack_rows("Treatment received", 39, 47) %>%
-  pack_rows("Physical Characteristics", 48, 64) %>%
-  pack_rows("Reference Measurements", 65, 75) %>%
+  pack_rows("Reason for visit to clinic (%)", 18, 20) %>%
+  pack_rows("Symptoms Present (%)", 21, 31) %>%
+  pack_rows("Diagnosis (%)", 32, 47) %>%
+  pack_rows("Treatment received (%)", 48, 63) %>%
+  pack_rows("Physical Characteristics", 64, 80) %>%
+  pack_rows("Reference Measurements", 81, 91) %>%
   add_footnote("Participants <6mo of age excluded per available WHO thresholds", notation = "symbol")
 ```
 `r t1`
