@@ -762,22 +762,17 @@ Note: Reference measure summaries presented in this table (for measurements obta
 
 factorVars <- c("age_cat", "sex","cg_relationship", 
                 "visit_rsn_illness", "visit_rsn_immunize", "visit_rsn_routine", "visit_rsn_trauma", "visit_rsn_admit",
-                "ill_sxs_cough", "ill_sxs_rapidbreathing", "ill_sxs_fever",
-                "ill_sxs_diarrhea", "ill_sxs_vomit", "ill_sxs_other",
-                "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
-                "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_other",
-                "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
-                "tx_other", "stunted", "wasted_overweight", "anemia_status", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm", "mean_ref_rr_abnorm")
+                "ill_sxs_cough", "ill_sxs_rapidbreathing", "ill_sxs_fever", "ill_sxs_diarrhea", "ill_sxs_vomit", "ill_sxs_flulike", "ill_sxs_dermatologic", "ill_sxs_abdpain", "ill_sxs_eyedischarge", "ill_sxs_poorfeeding", "ill_sxs_other",
+                "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria", "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_dermatologic", "dx_eyeinfection", "dx_allergy", "dx_oralcandid", "dx_other",
+                "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator", "tx_antipyretic", "tx_antihistamine", "tx_decongestant", "tx_antitussive", "tx_vitamin", "tx_drops", "tx_steriod", "tx_other", 
+                "stunted", "wasted_overweight", "anemia_status", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm", "mean_ref_rr_abnorm")
 
 # Specify all the variables to include in table 1 (both continuous and categorical)
 myVars <- c("age_cat", "sex","cg_relationship", 
             "visit_rsn_illness", "visit_rsn_immunize", "visit_rsn_routine", "visit_rsn_trauma", "visit_rsn_admit",
-            "ill_sxs_cough", "ill_sxs_rapidbreathing", "ill_sxs_fever",
-            "ill_sxs_diarrhea", "ill_sxs_vomit", "ill_sxs_other",
-            "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria",
-            "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_other",
-            "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator",
-            "tx_other", "stunted", "wasted_overweight", "anemia_status", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm", "mean_ref_rr_abnorm")
+            "ill_sxs_cough", "ill_sxs_rapidbreathing", "ill_sxs_fever", "ill_sxs_diarrhea", "ill_sxs_vomit", "ill_sxs_flulike", "ill_sxs_dermatologic", "ill_sxs_abdpain", "ill_sxs_eyedischarge", "ill_sxs_poorfeeding", "ill_sxs_other",
+                "received_dx", "dx_dehydration", "dx_respiratory", "dx_digestive", "dx_malaria", "dx_fever", "dx_measles", "dx_earinfection", "dx_throatinfection", "dx_dermatologic", "dx_eyeinfection", "dx_allergy", "dx_oralcandid", "dx_other",
+                "received_tx", "tx_antibiotic", "tx_antimalarial", "tx_dehydration", "tx_bronchodilator", "tx_antipyretic", "tx_antihistamine", "tx_decongestant", "tx_antitussive", "tx_vitamin", "tx_drops", "tx_steriod", "tx_other",  "stunted", "wasted_overweight", "anemia_status", "mean_ref_o2_abnorm", "mean_ref_pr_abnorm", "mean_ref_temp_abnorm", "mean_ref_pi_abnorm", "mean_ref_rr_abnorm")
 
 # CreateTableOne:
 out1 <- CreateTableOne(vars = myVars,
