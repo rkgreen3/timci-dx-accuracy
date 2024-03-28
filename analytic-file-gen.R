@@ -1,10 +1,11 @@
-# Version date: 2024-03-08
+# Version date: 2024-03-28
 
 # Load packages
 library(plyr)
 library(dplyr)
 library(lubridate)
 library(zscorer)
+library(readxl)
 
 # Read in REDCap data for Kenya, Tanzania, and India (saved in Box)
 df_og <- read.csv("C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_2024-02-23.csv") #update file path to local machine
@@ -64,6 +65,96 @@ colnames(df)[colnames(df) == "reported_tx___3"] = "tx_dehydration"
 colnames(df)[colnames(df) == "reported_tx___4"] = "tx_bronchodilator"
 colnames(df)[colnames(df) == "reported_tx___5"] = "tx_other"
 colnames(df)[colnames(df) == "recieved_txt"] = "received_tx"
+
+# Merge in re-coded "other" data for sxs, dx, and tx
+## Symptoms
+### Prepare recoded df
+df_othersxs <- read_excel("C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/Table One Other Categories.xlsx", sheet = 1)
+df_othersxs <- subset(df_othersxs, !is.na(df_othersxs$`"Other" Symptom recorded`))
+colnames(df_othersxs) <- c("ppt_id", "visit_reason_ill_sxs_oth", "ill_sxs_flulike", "ill_sxs_dermatologic", "ill_sxs_abdpain", "ill_sxs_eyedischarge", "ill_sxs_poorfeeding", "ill_sxs_other", "ill_sxs_rapidbreathing2")
+df_othersxs <- df_othersxs %>% select(-c(visit_reason_ill_sxs_oth))
+### Create symptom-only df from main df
+idf_sxs <- df %>% select(ppt_id, ill_sxs_cough, ill_sxs_rapidbreathing, ill_sxs_fever, ill_sxs_diarrhea, ill_sxs_vomit, ill_sxs_other, visit_reason_ill_sxs_oth)
+idf_sxs$drop1 <- ifelse(idf_sxs$ill_sxs_other==0 | idf_sxs$ppt_id %in% c("13410-62", "13410-368", "15684-335"), 1, 0) #flag anyone not in the recoded df, split into 2 df's to merge and rbind later
+idf_sxs1 <- subset(idf_sxs, drop1==0) # use this one for merging
+idf_sxs1 <- idf_sxs1 %>% select(-c(ill_sxs_other, drop1))
+idf_sxs2 <- subset(idf_sxs, drop1==1) # use this one to rbind the merged df
+idf_sxs1 <- left_join(idf_sxs1, df_othersxs, by = "ppt_id")
+idf_sxs1$ill_sxs_rapidbreathing <- case_when(idf_sxs1$ill_sxs_rapidbreathing2==1 ~ 1,
+                                        is.na(idf_sxs1$ill_sxs_rapidbreathing2) ~ idf_sxs1$ill_sxs_rapidbreathing)
+idf_sxs1 <- idf_sxs1 %>% select(-c(ill_sxs_rapidbreathing2))
+### Prepare df's for rbind
+idf_sxs1 <- idf_sxs1 %>% select(c(ppt_id, ill_sxs_cough, ill_sxs_rapidbreathing, ill_sxs_fever, ill_sxs_diarrhea, ill_sxs_vomit, ill_sxs_flulike, ill_sxs_dermatologic, ill_sxs_abdpain, ill_sxs_eyedischarge, ill_sxs_poorfeeding, ill_sxs_other, visit_reason_ill_sxs_oth))
+idf_sxs2$ill_sxs_flulike <- NA
+idf_sxs2$ill_sxs_dermatologic <- NA
+idf_sxs2$ill_sxs_abdpain <- NA
+idf_sxs2$ill_sxs_eyedischarge <- NA
+idf_sxs2$ill_sxs_poorfeeding <- NA
+idf_sxs2 <- idf_sxs2 %>% select(c(ppt_id, ill_sxs_cough, ill_sxs_rapidbreathing, ill_sxs_fever, ill_sxs_diarrhea, ill_sxs_vomit, ill_sxs_flulike, ill_sxs_dermatologic, ill_sxs_abdpain, ill_sxs_eyedischarge, ill_sxs_poorfeeding, ill_sxs_other, visit_reason_ill_sxs_oth))
+idf_sxs <- rbind(idf_sxs1, idf_sxs2)
+
+## Diagnosis
+df_otherdx <- read_excel("C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/Table One Other Categories.xlsx", sheet = 2)
+df_otherdx <- subset(df_otherdx, !is.na(df_otherdx$`"Other" Diagnosis recorded`))
+colnames(df_otherdx) <- c("ppt_id", "reported_dx_oth", "dx_dermatologic", "dx_eyeinfection", "dx_allergy", "dx_oralcandid", "dx_digestive2", "dx_respiratory2", "dx_other")
+df_otherdx <- df_otherdx %>% select(-c(reported_dx_oth))
+### Create dx-only df from main df
+idf_dx <- df %>% select(ppt_id, dx_dehydration, dx_respiratory, dx_digestive, dx_malaria, dx_fever, dx_measles, dx_earinfection, dx_throatinfection, dx_other, reported_dx_oth)
+idf_dx$drop1 <- ifelse(idf_dx$dx_other==0 | idf_dx$ppt_id %in% c("13410-124", "13410-406"), 1, 0) #flag anyone not in the recoded df, split into 2 df's to merge and rbind later
+idf_dx1 <- subset(idf_dx, drop1==0) # use this one for merging
+idf_dx1 <- idf_dx1 %>% select(-c(dx_other, drop1))
+idf_dx2 <- subset(idf_dx, drop1==1) # use this one to rbind the merged df
+idf_dx1 <- left_join(idf_dx1, df_otherdx, by = "ppt_id")
+idf_dx1$dx_respiratory <- case_when(idf_dx1$dx_respiratory2==1 ~ 1,
+                                    is.na(idf_dx1$dx_respiratory2) ~ idf_dx1$dx_respiratory)
+idf_dx1$dx_digestive <- case_when(idf_dx1$dx_digestive2==1 ~ 1,
+                                    is.na(idf_dx1$dx_digestive2) ~ idf_dx1$dx_digestive)
+idf_dx1 <- idf_dx1 %>% select(-c(dx_respiratory2, dx_digestive2))
+### Prepare df's for rbind
+idf_dx1 <- idf_dx1 %>% select(c(ppt_id, dx_dehydration, dx_respiratory, dx_digestive, dx_malaria, dx_fever, dx_measles, dx_earinfection, dx_throatinfection, dx_dermatologic, dx_eyeinfection, dx_allergy, dx_oralcandid, dx_other, reported_dx_oth))
+idf_dx2$dx_dermatologic <- NA
+idf_dx2$dx_eyeinfection <- NA
+idf_dx2$dx_allergy <- NA
+idf_dx2$dx_oralcandid <- NA
+idf_dx2 <- idf_dx2 %>% select(c(ppt_id, dx_dehydration, dx_respiratory, dx_digestive, dx_malaria, dx_fever, dx_measles, dx_earinfection, dx_throatinfection, dx_dermatologic, dx_eyeinfection, dx_allergy, dx_oralcandid, dx_other, reported_dx_oth))
+idf_dx <- rbind(idf_dx1, idf_dx2)
+
+## Treatment
+df_othertx <- read_excel("C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/Table One Other Categories.xlsx", sheet = 3)
+df_othertx <- subset(df_othertx, !is.na(df_othertx$`"Other" Treatment recorded`))
+colnames(df_othertx) <- c("ppt_id", "reported_tx_oth", "tx_antipyretic", "tx_antihistamine", "tx_decongestant", "tx_antitussive", "tx_vitamin", "tx_drops", "tx_steroid", "tx_other","tx_dehydration2","tx_antibiotic2")
+df_othertx <- df_othertx %>% select(-c(reported_tx_oth))
+### Create dx-only df from main df
+idf_tx <- df %>% select(ppt_id, tx_antibiotic, tx_antimalarial, tx_dehydration, tx_bronchodilator, tx_other, reported_tx_oth)
+idf_tx$drop1 <- ifelse(idf_tx$tx_other==0 | idf_tx$ppt_id %in% c("13410-258", "16669-128"), 1, 0) #flag anyone not in the recoded df, split into 2 df's to merge and rbind later
+idf_tx1 <- subset(idf_tx, drop1==0) # use this one for merging
+idf_tx1 <- idf_tx1 %>% select(-c(tx_other, drop1))
+idf_tx2 <- subset(idf_tx, drop1==1) # use this one to rbind the merged df
+idf_tx1 <- left_join(idf_tx1, df_othertx, by = "ppt_id")
+idf_tx1$tx_dehydration <- case_when(idf_tx1$tx_dehydration2==1 ~ 1,
+                                    is.na(idf_tx1$tx_dehydration2) ~ idf_tx1$tx_dehydration)
+idf_tx1$tx_antibiotic <- case_when(idf_tx1$tx_antibiotic2==1 ~ 1,
+                                  is.na(idf_tx1$tx_antibiotic2) ~ idf_tx1$tx_antibiotic)
+idf_tx1 <- idf_tx1 %>% select(-c(tx_dehydration2, tx_antibiotic2))
+### Prepare df's for rbind
+idf_tx1 <- idf_tx1 %>% select(c(ppt_id, tx_antibiotic, tx_antimalarial, tx_dehydration, tx_bronchodilator, tx_antipyretic, tx_antihistamine, tx_decongestant, tx_antitussive, tx_vitamin, tx_drops, tx_steroid, tx_other, reported_tx_oth))
+idf_tx2$tx_antipyretic <- NA
+idf_tx2$tx_antihistamine <- NA
+idf_tx2$tx_decongestant <- NA
+idf_tx2$tx_antitussive <- NA
+idf_tx2$tx_vitamin <- NA
+idf_tx2$tx_drops <- NA
+idf_tx2$tx_steroid <- NA
+idf_tx2 <- idf_tx2 %>% select(c(ppt_id, tx_antibiotic, tx_antimalarial, tx_dehydration, tx_bronchodilator, tx_antipyretic, tx_antihistamine, tx_decongestant, tx_antitussive, tx_vitamin, tx_drops, tx_steroid, tx_other, reported_tx_oth))
+idf_tx <- rbind(idf_tx1, idf_tx2)
+
+# Join all idf's together
+idf <- left_join(idf_sxs, idf_dx, by = "ppt_id")
+idf <- left_join(idf, idf_tx, by = "ppt_id")
+
+# Remove legacy variables from original df to merge back in with idf
+df <- df %>% select(-c(ill_sxs_cough, ill_sxs_rapidbreathing, ill_sxs_fever, ill_sxs_diarrhea, ill_sxs_vomit, ill_sxs_other, visit_reason_ill_sxs_oth, dx_dehydration, dx_respiratory, dx_digestive, dx_malaria,dx_fever, dx_measles, dx_earinfection, dx_throatinfection, dx_other, reported_dx_oth, tx_antibiotic, tx_antimalarial, tx_dehydration, tx_bronchodilator, tx_other, reported_tx_oth))
+df <- left_join(df, idf, by = "ppt_id")
 
 # Create variable for each of above to indicate more than one option was selected
 df$visit_rsn_sum <- df$visit_rsn_illness + df$visit_rsn_immunize + df$visit_rsn_routine + df$visit_rsn_trauma + df$visit_rsn_admit
@@ -230,4 +321,4 @@ df$m3_ref_rr_confident <- case_when(df$m3_annotation_confident_r1==0 & df$m3_ann
 df <- df %>% select(-c(bdate, age_cat2, month_diff, m1_30s_pic, m1_90s_pic, m2_30s_pic, m2_90s_pic, m3_30s_pic, m3_90s_pic, m1_index_spo2, m1_ref_sp02, m2_index_spo2, m2_ref_sp02, m3_index_spo2, m3_ref_sp02, cg_interview_yn, cg_sex, cg_edu_mother, cg_edu_mother_oth, cg_overall_comfort, cg_like_most, cg_like_least, cg_prov_challenges_yn, cg_prov_challenges, cg_overall_satisfied, cg_confident_use, cg_confident_performance, cg_adequate_assess_yn,  cg_adequate_assess_rsn, cg_advantage, cg_concerns, cg_compare_assess, cg_compare_assess_rsn, cg_useful, cg_useful_rsn, cg_rec_device, cg_rec_device_rsn, cg_rec_facility, cg_rec_facility_rsn,  cg_major_considerations, cg_provider_use_yn, cg_provider_use, cg_overall_impression, cg_advantages, cg_disadvantages, cg_understand_purpose, cg_discomfort, cg_discomfort_des, cg_recommend,  cg_change_desire, cg_oth_comments, caregiver_interview_complete))
 
 # Write file as .csv to shared Box folder
-write.csv(df, "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2024-03-08.csv")
+write.csv(df, "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2024-03-28.csv")
