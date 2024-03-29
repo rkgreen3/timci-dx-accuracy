@@ -32,7 +32,8 @@ library(reshape2)
 library(ggplot2)
 
 # Read in (cleaned) data 
-filename <- "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2024-03-28.csv"
+#filename <- "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2024-03-28.csv" #primary analysis
+filename <- "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_outliers_excluded_2024-03-29.csv" #sensitivity analysis
 df_og <- read.csv(filename)
 df_og <- df_og %>% select(-c("X", "m1_index_temp_f", "m2_index_temp_f", "m3_index_temp_f"))
 
@@ -788,24 +789,42 @@ t1lab <- c("N", "Age Category (%)", "0-1 month", "2-11 months", "12-59 months",
           "Stunting (%)", "Severe", "Moderate", "Normal", "NA",
           "Wasting (%)", "Severely Wasted", "Moderately Wasted", "Normal", "Overweight", "NA",
           "Anemia* (%)", "Severe", "Moderate", "Mild", "Normal", "NA",
-          "Abnormal SpO2 (reference) (%)", "Abnormal Pulse Rate (reference) (%)",  
+          "Abnormal SpO2 (reference) (%)", 
+            "No", "Yes", "NA", #for sensitivity analysis only
+          "Abnormal Pulse Rate (reference) (%)", 
+            "No", "Yes", "NA", #for sensitivity analysis only
           "Abnormal Temperature (reference) (%)", "No", "Yes", "NA",
           "Abnormal Profusion Index (reference) (%)", 
+            "No", "Yes", "NA", #for sensitivity analysis only
           "Abnormal Respiratory Rate (reference) (%)", "No", "Yes", "NA")
 
 # Add row labels
 rownames(t1_overall) <- c(t1lab)
 
+# For regular analysis:
+# t1 <- kable(t1_overall) %>%
+#   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
+#   add_indent(c(3:5, 8:17, 33:35, 49:51, 65:68, 70:74, 76:80, 84:86, 89:91)) %>%
+#   pack_rows("Demographic Characteristics", 2, 17) %>%
+#   pack_rows("Reason for visit to clinic (%)", 18, 20) %>%
+#   pack_rows("Symptoms Present (%)", 21, 31) %>%
+#   pack_rows("Diagnosis (%)", 32, 47) %>%
+#   pack_rows("Treatment received (%)", 48, 63) %>%
+#   pack_rows("Physical Characteristics", 64, 80) %>%
+#   pack_rows("Reference Measurements", 81, 91) %>%
+#   add_footnote("Participants <6mo of age excluded per available WHO thresholds", notation = "symbol")
+
+# For sensitivity analysis:
 t1 <- kable(t1_overall) %>%
   kable_styling(bootstrap_options=c("striped","hover","condensed"), position = "center") %>%
-  add_indent(c(3:5, 8:17, 33:35, 49:51, 65:68, 70:74, 76:80, 84:86, 89:91)) %>%
+  add_indent(c(3:5, 8:17, 33:35, 49:51, 65:68, 70:74, 76:80, 82:84, 86:88, 91:92, 94:96, 98:100)) %>%
   pack_rows("Demographic Characteristics", 2, 17) %>%
   pack_rows("Reason for visit to clinic (%)", 18, 20) %>%
   pack_rows("Symptoms Present (%)", 21, 31) %>%
   pack_rows("Diagnosis (%)", 32, 47) %>%
   pack_rows("Treatment received (%)", 48, 63) %>%
   pack_rows("Physical Characteristics", 64, 80) %>%
-  pack_rows("Reference Measurements", 81, 91) %>%
+  pack_rows("Reference Measurements", 81, 100) %>%
   add_footnote("Participants <6mo of age excluded per available WHO thresholds", notation = "symbol")
 ```
 `r t1`
