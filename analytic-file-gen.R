@@ -346,8 +346,6 @@ dfs <- df
 ## M1
 dfs$m1_index_temp <- ifelse(dfs$m1_index_temp<(mean(dfs$m1_index_temp, na.rm=T)-(2*sd(dfs$m1_index_temp, na.rm = TRUE))), NA, dfs$m1_index_temp)
 dfs$m1_index_temp <- ifelse(dfs$m1_index_temp>(mean(dfs$m1_index_temp, na.rm=T)+(2*sd(dfs$m1_index_temp, na.rm = TRUE))), NA, dfs$m1_index_temp)
-dfs$m1_index_spo2 <- ifelse(dfs$m1_index_spo2<(mean(dfs$m1_index_spo2, na.rm=T)-(2*sd(dfs$m1_index_spo2, na.rm = TRUE))), NA, dfs$m1_index_spo2)
-dfs$m1_index_spo2 <- ifelse(dfs$m1_index_spo2>(mean(dfs$m1_index_spo2, na.rm=T)+(2*sd(dfs$m1_index_spo2, na.rm = TRUE))), NA, dfs$m1_index_spo2)
 dfs$m1_index_o2 <- ifelse(dfs$m1_index_o2<(mean(dfs$m1_index_o2, na.rm=T)-(2*sd(dfs$m1_index_o2, na.rm = TRUE))), NA, dfs$m1_index_o2)
 dfs$m1_index_o2 <- ifelse(dfs$m1_index_o2>(mean(dfs$m1_index_o2, na.rm=T)+(2*sd(dfs$m1_index_o2, na.rm = TRUE))), NA, dfs$m1_index_o2)
 dfs$m1_index_pi <- ifelse(dfs$m1_index_pi<(mean(dfs$m1_index_pi, na.rm=T)-(2*sd(dfs$m1_index_pi, na.rm = TRUE))), NA, dfs$m1_index_pi)
@@ -357,8 +355,6 @@ dfs$m1_index_pr <- ifelse(dfs$m1_index_pr>(mean(dfs$m1_index_pr, na.rm=T)+(2*sd(
 dfs$m1_index_rr <- ifelse(dfs$m1_index_rr<(mean(dfs$m1_index_rr, na.rm=T)-(2*sd(dfs$m1_index_rr, na.rm = TRUE))), NA, dfs$m1_index_rr)
 dfs$m1_index_rr <- ifelse(dfs$m1_index_rr>(mean(dfs$m1_index_rr, na.rm=T)+(2*sd(dfs$m1_index_rr, na.rm = TRUE))), NA, dfs$m1_index_rr)
 
-dfs$m1_ref_sp02 <- ifelse(dfs$m1_ref_sp02<(mean(dfs$m1_ref_sp02, na.rm=T)-(2*sd(dfs$m1_ref_sp02, na.rm = TRUE))), NA, dfs$m1_ref_sp02)
-dfs$m1_ref_sp02 <- ifelse(dfs$m1_ref_sp02>(mean(dfs$m1_ref_sp02, na.rm=T)+(2*sd(dfs$m1_ref_sp02, na.rm = TRUE))), NA, dfs$m1_ref_sp02)
 dfs$m1_therm_skin_temp <- ifelse(dfs$m1_therm_skin_temp<(mean(dfs$m1_therm_skin_temp, na.rm=T)-(2*sd(dfs$m1_therm_skin_temp, na.rm = TRUE))), NA, dfs$m1_therm_skin_temp)
 dfs$m1_therm_skin_temp <- ifelse(dfs$m1_therm_skin_temp>(mean(dfs$m1_therm_skin_temp, na.rm=T)+(2*sd(dfs$m1_therm_skin_temp, na.rm = TRUE))), NA, dfs$m1_therm_skin_temp)
 dfs$m1_ref_o2 <- ifelse(dfs$m1_ref_o2<(mean(dfs$m1_ref_o2, na.rm=T)-(2*sd(dfs$m1_ref_o2, na.rm = TRUE))), NA, dfs$m1_ref_o2)
@@ -375,8 +371,6 @@ dfs$m1_ref_thb <- ifelse(dfs$m1_ref_thb>(mean(dfs$m1_ref_thb, na.rm=T)+(2*sd(dfs
 ## M2
 dfs$m2_index_temp <- ifelse(dfs$m2_index_temp<(mean(dfs$m2_index_temp, na.rm=T)-(2*sd(dfs$m2_index_temp, na.rm = TRUE))), NA, dfs$m2_index_temp)
 dfs$m2_index_temp <- ifelse(dfs$m2_index_temp>(mean(dfs$m2_index_temp, na.rm=T)+(2*sd(dfs$m2_index_temp, na.rm = TRUE))), NA, dfs$m2_index_temp)
-dfs$m2_index_spo2 <- ifelse(dfs$m2_index_spo2<(mean(dfs$m2_index_spo2, na.rm=T)-(2*sd(dfs$m2_index_spo2, na.rm = TRUE))), NA, dfs$m2_index_spo2)
-dfs$m2_index_spo2 <- ifelse(dfs$m2_index_spo2>(mean(dfs$m2_index_spo2, na.rm=T)+(2*sd(dfs$m2_index_spo2, na.rm = TRUE))), NA, dfs$m2_index_spo2)
 dfs$m2_index_o2 <- ifelse(dfs$m2_index_o2<(mean(dfs$m2_index_o2, na.rm=T)-(2*sd(dfs$m2_index_o2, na.rm = TRUE))), NA, dfs$m2_index_o2)
 dfs$m2_index_o2 <- ifelse(dfs$m2_index_o2>(mean(dfs$m2_index_o2, na.rm=T)+(2*sd(dfs$m2_index_o2, na.rm = TRUE))), NA, dfs$m2_index_o2)
 dfs$m2_index_pi <- ifelse(dfs$m2_index_pi<(mean(dfs$m2_index_pi, na.rm=T)-(2*sd(dfs$m2_index_pi, na.rm = TRUE))), NA, dfs$m2_index_pi)
@@ -386,8 +380,6 @@ dfs$m2_index_pr <- ifelse(dfs$m2_index_pr>(mean(dfs$m2_index_pr, na.rm=T)+(2*sd(
 dfs$m2_index_rr <- ifelse(dfs$m2_index_rr<(mean(dfs$m2_index_rr, na.rm=T)-(2*sd(dfs$m2_index_rr, na.rm = TRUE))), NA, dfs$m2_index_rr)
 dfs$m2_index_rr <- ifelse(dfs$m2_index_rr>(mean(dfs$m2_index_rr, na.rm=T)+(2*sd(dfs$m2_index_rr, na.rm = TRUE))), NA, dfs$m2_index_rr)
 
-dfs$m2_ref_sp02 <- ifelse(dfs$m2_ref_sp02<(mean(dfs$m2_ref_sp02, na.rm=T)-(2*sd(dfs$m2_ref_sp02, na.rm = TRUE))), NA, dfs$m2_ref_sp02)
-dfs$m2_ref_sp02 <- ifelse(dfs$m2_ref_sp02>(mean(dfs$m2_ref_sp02, na.rm=T)+(2*sd(dfs$m2_ref_sp02, na.rm = TRUE))), NA, dfs$m2_ref_sp02)
 dfs$m2_therm_skin_temp <- ifelse(dfs$m2_therm_skin_temp<(mean(dfs$m2_therm_skin_temp, na.rm=T)-(2*sd(dfs$m2_therm_skin_temp, na.rm = TRUE))), NA, dfs$m2_therm_skin_temp)
 dfs$m2_therm_skin_temp <- ifelse(dfs$m2_therm_skin_temp>(mean(dfs$m2_therm_skin_temp, na.rm=T)+(2*sd(dfs$m2_therm_skin_temp, na.rm = TRUE))), NA, dfs$m2_therm_skin_temp)
 dfs$m2_ref_o2 <- ifelse(dfs$m2_ref_o2<(mean(dfs$m2_ref_o2, na.rm=T)-(2*sd(dfs$m2_ref_o2, na.rm = TRUE))), NA, dfs$m2_ref_o2)
@@ -404,8 +396,6 @@ dfs$m2_ref_thb <- ifelse(dfs$m2_ref_thb>(mean(dfs$m2_ref_thb, na.rm=T)+(2*sd(dfs
 ## M3
 dfs$m3_index_temp <- ifelse(dfs$m3_index_temp<(mean(dfs$m3_index_temp, na.rm=T)-(2*sd(dfs$m3_index_temp, na.rm = TRUE))), NA, dfs$m3_index_temp)
 dfs$m3_index_temp <- ifelse(dfs$m3_index_temp>(mean(dfs$m3_index_temp, na.rm=T)+(2*sd(dfs$m3_index_temp, na.rm = TRUE))), NA, dfs$m3_index_temp)
-dfs$m3_index_spo2 <- ifelse(dfs$m3_index_spo2<(mean(dfs$m3_index_spo2, na.rm=T)-(2*sd(dfs$m3_index_spo2, na.rm = TRUE))), NA, dfs$m3_index_spo2)
-dfs$m3_index_spo2 <- ifelse(dfs$m3_index_spo2>(mean(dfs$m3_index_spo2, na.rm=T)+(2*sd(dfs$m3_index_spo2, na.rm = TRUE))), NA, dfs$m3_index_spo2)
 dfs$m3_index_o2 <- ifelse(dfs$m3_index_o2<(mean(dfs$m3_index_o2, na.rm=T)-(2*sd(dfs$m3_index_o2, na.rm = TRUE))), NA, dfs$m3_index_o2)
 dfs$m3_index_o2 <- ifelse(dfs$m3_index_o2>(mean(dfs$m3_index_o2, na.rm=T)+(2*sd(dfs$m3_index_o2, na.rm = TRUE))), NA, dfs$m3_index_o2)
 dfs$m3_index_pi <- ifelse(dfs$m3_index_pi<(mean(dfs$m3_index_pi, na.rm=T)-(2*sd(dfs$m3_index_pi, na.rm = TRUE))), NA, dfs$m3_index_pi)
@@ -415,8 +405,6 @@ dfs$m3_index_pr <- ifelse(dfs$m3_index_pr>(mean(dfs$m3_index_pr, na.rm=T)+(2*sd(
 dfs$m3_index_rr <- ifelse(dfs$m3_index_rr<(mean(dfs$m3_index_rr, na.rm=T)-(2*sd(dfs$m3_index_rr, na.rm = TRUE))), NA, dfs$m3_index_rr)
 dfs$m3_index_rr <- ifelse(dfs$m3_index_rr>(mean(dfs$m3_index_rr, na.rm=T)+(2*sd(dfs$m3_index_rr, na.rm = TRUE))), NA, dfs$m3_index_rr)
 
-dfs$m3_ref_sp02 <- ifelse(dfs$m3_ref_sp02<(mean(dfs$m3_ref_sp02, na.rm=T)-(2*sd(dfs$m3_ref_sp02, na.rm = TRUE))), NA, dfs$m3_ref_sp02)
-dfs$m3_ref_sp02 <- ifelse(dfs$m3_ref_sp02>(mean(dfs$m3_ref_sp02, na.rm=T)+(2*sd(dfs$m3_ref_sp02, na.rm = TRUE))), NA, dfs$m3_ref_sp02)
 dfs$m3_therm_skin_temp <- ifelse(dfs$m3_therm_skin_temp<(mean(dfs$m3_therm_skin_temp, na.rm=T)-(2*sd(dfs$m3_therm_skin_temp, na.rm = TRUE))), NA, dfs$m3_therm_skin_temp)
 dfs$m3_therm_skin_temp <- ifelse(dfs$m3_therm_skin_temp>(mean(dfs$m3_therm_skin_temp, na.rm=T)+(2*sd(dfs$m3_therm_skin_temp, na.rm = TRUE))), NA, dfs$m3_therm_skin_temp)
 dfs$m3_ref_o2 <- ifelse(dfs$m3_ref_o2<(mean(dfs$m3_ref_o2, na.rm=T)-(2*sd(dfs$m3_ref_o2, na.rm = TRUE))), NA, dfs$m3_ref_o2)
