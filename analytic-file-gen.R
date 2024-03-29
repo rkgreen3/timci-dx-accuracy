@@ -1,4 +1,4 @@
-# Version date: 2024-03-28
+# Version date: 2024-03-29
 
 # Load packages
 library(plyr)
@@ -338,5 +338,98 @@ df$m3_ref_rr_confident <- case_when(df$m3_annotation_confident_r1==0 & df$m3_ann
 # Remove unnecessary variables 
 df <- df %>% select(-c(bdate, age_cat2, month_diff, m1_30s_pic, m1_90s_pic, m2_30s_pic, m2_90s_pic, m3_30s_pic, m3_90s_pic, m1_index_spo2, m1_ref_sp02, m2_index_spo2, m2_ref_sp02, m3_index_spo2, m3_ref_sp02, cg_interview_yn, cg_sex, cg_edu_mother, cg_edu_mother_oth, cg_overall_comfort, cg_like_most, cg_like_least, cg_prov_challenges_yn, cg_prov_challenges, cg_overall_satisfied, cg_confident_use, cg_confident_performance, cg_adequate_assess_yn,  cg_adequate_assess_rsn, cg_advantage, cg_concerns, cg_compare_assess, cg_compare_assess_rsn, cg_useful, cg_useful_rsn, cg_rec_device, cg_rec_device_rsn, cg_rec_facility, cg_rec_facility_rsn,  cg_major_considerations, cg_provider_use_yn, cg_provider_use, cg_overall_impression, cg_advantages, cg_disadvantages, cg_understand_purpose, cg_discomfort, cg_discomfort_des, cg_recommend,  cg_change_desire, cg_oth_comments, caregiver_interview_complete))
 
-# Write file as .csv to shared Box folder
+# Write file as .csv to shared Box folder -- ANALYTIC FILE
 write.csv(df, "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2024-03-28.csv")
+
+# Re-code outliers (+/-2SD) to NA for sensitivity analysis
+dfs <- df
+## M1
+dfs$m1_index_temp <- ifelse(dfs$m1_index_temp<(mean(dfs$m1_index_temp, na.rm=T)-(2*sd(dfs$m1_index_temp, na.rm = TRUE))), NA, dfs$m1_index_temp)
+dfs$m1_index_temp <- ifelse(dfs$m1_index_temp>(mean(dfs$m1_index_temp, na.rm=T)+(2*sd(dfs$m1_index_temp, na.rm = TRUE))), NA, dfs$m1_index_temp)
+dfs$m1_index_spo2 <- ifelse(dfs$m1_index_spo2<(mean(dfs$m1_index_spo2, na.rm=T)-(2*sd(dfs$m1_index_spo2, na.rm = TRUE))), NA, dfs$m1_index_spo2)
+dfs$m1_index_spo2 <- ifelse(dfs$m1_index_spo2>(mean(dfs$m1_index_spo2, na.rm=T)+(2*sd(dfs$m1_index_spo2, na.rm = TRUE))), NA, dfs$m1_index_spo2)
+dfs$m1_index_o2 <- ifelse(dfs$m1_index_o2<(mean(dfs$m1_index_o2, na.rm=T)-(2*sd(dfs$m1_index_o2, na.rm = TRUE))), NA, dfs$m1_index_o2)
+dfs$m1_index_o2 <- ifelse(dfs$m1_index_o2>(mean(dfs$m1_index_o2, na.rm=T)+(2*sd(dfs$m1_index_o2, na.rm = TRUE))), NA, dfs$m1_index_o2)
+dfs$m1_index_pi <- ifelse(dfs$m1_index_pi<(mean(dfs$m1_index_pi, na.rm=T)-(2*sd(dfs$m1_index_pi, na.rm = TRUE))), NA, dfs$m1_index_pi)
+dfs$m1_index_pi <- ifelse(dfs$m1_index_pi>(mean(dfs$m1_index_pi, na.rm=T)+(2*sd(dfs$m1_index_pi, na.rm = TRUE))), NA, dfs$m1_index_pi)
+dfs$m1_index_pr <- ifelse(dfs$m1_index_pr<(mean(dfs$m1_index_pr, na.rm=T)-(2*sd(dfs$m1_index_pr, na.rm = TRUE))), NA, dfs$m1_index_pr)
+dfs$m1_index_pr <- ifelse(dfs$m1_index_pr>(mean(dfs$m1_index_pr, na.rm=T)+(2*sd(dfs$m1_index_pr, na.rm = TRUE))), NA, dfs$m1_index_pr)
+dfs$m1_index_rr <- ifelse(dfs$m1_index_rr<(mean(dfs$m1_index_rr, na.rm=T)-(2*sd(dfs$m1_index_rr, na.rm = TRUE))), NA, dfs$m1_index_rr)
+dfs$m1_index_rr <- ifelse(dfs$m1_index_rr>(mean(dfs$m1_index_rr, na.rm=T)+(2*sd(dfs$m1_index_rr, na.rm = TRUE))), NA, dfs$m1_index_rr)
+
+dfs$m1_ref_sp02 <- ifelse(dfs$m1_ref_sp02<(mean(dfs$m1_ref_sp02, na.rm=T)-(2*sd(dfs$m1_ref_sp02, na.rm = TRUE))), NA, dfs$m1_ref_sp02)
+dfs$m1_ref_sp02 <- ifelse(dfs$m1_ref_sp02>(mean(dfs$m1_ref_sp02, na.rm=T)+(2*sd(dfs$m1_ref_sp02, na.rm = TRUE))), NA, dfs$m1_ref_sp02)
+dfs$m1_therm_skin_temp <- ifelse(dfs$m1_therm_skin_temp<(mean(dfs$m1_therm_skin_temp, na.rm=T)-(2*sd(dfs$m1_therm_skin_temp, na.rm = TRUE))), NA, dfs$m1_therm_skin_temp)
+dfs$m1_therm_skin_temp <- ifelse(dfs$m1_therm_skin_temp>(mean(dfs$m1_therm_skin_temp, na.rm=T)+(2*sd(dfs$m1_therm_skin_temp, na.rm = TRUE))), NA, dfs$m1_therm_skin_temp)
+dfs$m1_ref_o2 <- ifelse(dfs$m1_ref_o2<(mean(dfs$m1_ref_o2, na.rm=T)-(2*sd(dfs$m1_ref_o2, na.rm = TRUE))), NA, dfs$m1_ref_o2)
+dfs$m1_ref_o2 <- ifelse(dfs$m1_ref_o2>(mean(dfs$m1_ref_o2, na.rm=T)+(2*sd(dfs$m1_ref_o2, na.rm = TRUE))), NA, dfs$m1_ref_o2)
+dfs$m1_ref_pi <- ifelse(dfs$m1_ref_pi<(mean(dfs$m1_ref_pi, na.rm=T)-(2*sd(dfs$m1_ref_pi, na.rm = TRUE))), NA, dfs$m1_ref_pi)
+dfs$m1_ref_pi <- ifelse(dfs$m1_ref_pi>(mean(dfs$m1_ref_pi, na.rm=T)+(2*sd(dfs$m1_ref_pi, na.rm = TRUE))), NA, dfs$m1_ref_pi)
+dfs$m1_ref_pr <- ifelse(dfs$m1_ref_pr<(mean(dfs$m1_ref_pr, na.rm=T)-(2*sd(dfs$m1_ref_pr, na.rm = TRUE))), NA, dfs$m1_ref_pr)
+dfs$m1_ref_pr <- ifelse(dfs$m1_ref_pr>(mean(dfs$m1_ref_pr, na.rm=T)+(2*sd(dfs$m1_ref_pr, na.rm = TRUE))), NA, dfs$m1_ref_pr)
+dfs$m1_ref_rracoustic <- ifelse(dfs$m1_ref_rracoustic<(mean(dfs$m1_ref_rracoustic, na.rm=T)-(2*sd(dfs$m1_ref_rracoustic, na.rm = TRUE))), NA, dfs$m1_ref_rracoustic)
+dfs$m1_ref_rracoustic <- ifelse(dfs$m1_ref_rracoustic>(mean(dfs$m1_ref_rracoustic, na.rm=T)+(2*sd(dfs$m1_ref_rracoustic, na.rm = TRUE))), NA, dfs$m1_ref_rracoustic)
+dfs$m1_ref_thb <- ifelse(dfs$m1_ref_thb<(mean(dfs$m1_ref_thb, na.rm=T)-(2*sd(dfs$m1_ref_thb, na.rm = TRUE))), NA, dfs$m1_ref_thb)
+dfs$m1_ref_thb <- ifelse(dfs$m1_ref_thb>(mean(dfs$m1_ref_thb, na.rm=T)+(2*sd(dfs$m1_ref_thb, na.rm = TRUE))), NA, dfs$m1_ref_thb)
+
+## M2
+dfs$m2_index_temp <- ifelse(dfs$m2_index_temp<(mean(dfs$m2_index_temp, na.rm=T)-(2*sd(dfs$m2_index_temp, na.rm = TRUE))), NA, dfs$m2_index_temp)
+dfs$m2_index_temp <- ifelse(dfs$m2_index_temp>(mean(dfs$m2_index_temp, na.rm=T)+(2*sd(dfs$m2_index_temp, na.rm = TRUE))), NA, dfs$m2_index_temp)
+dfs$m2_index_spo2 <- ifelse(dfs$m2_index_spo2<(mean(dfs$m2_index_spo2, na.rm=T)-(2*sd(dfs$m2_index_spo2, na.rm = TRUE))), NA, dfs$m2_index_spo2)
+dfs$m2_index_spo2 <- ifelse(dfs$m2_index_spo2>(mean(dfs$m2_index_spo2, na.rm=T)+(2*sd(dfs$m2_index_spo2, na.rm = TRUE))), NA, dfs$m2_index_spo2)
+dfs$m2_index_o2 <- ifelse(dfs$m2_index_o2<(mean(dfs$m2_index_o2, na.rm=T)-(2*sd(dfs$m2_index_o2, na.rm = TRUE))), NA, dfs$m2_index_o2)
+dfs$m2_index_o2 <- ifelse(dfs$m2_index_o2>(mean(dfs$m2_index_o2, na.rm=T)+(2*sd(dfs$m2_index_o2, na.rm = TRUE))), NA, dfs$m2_index_o2)
+dfs$m2_index_pi <- ifelse(dfs$m2_index_pi<(mean(dfs$m2_index_pi, na.rm=T)-(2*sd(dfs$m2_index_pi, na.rm = TRUE))), NA, dfs$m2_index_pi)
+dfs$m2_index_pi <- ifelse(dfs$m2_index_pi>(mean(dfs$m2_index_pi, na.rm=T)+(2*sd(dfs$m2_index_pi, na.rm = TRUE))), NA, dfs$m2_index_pi)
+dfs$m2_index_pr <- ifelse(dfs$m2_index_pr<(mean(dfs$m2_index_pr, na.rm=T)-(2*sd(dfs$m2_index_pr, na.rm = TRUE))), NA, dfs$m2_index_pr)
+dfs$m2_index_pr <- ifelse(dfs$m2_index_pr>(mean(dfs$m2_index_pr, na.rm=T)+(2*sd(dfs$m2_index_pr, na.rm = TRUE))), NA, dfs$m2_index_pr)
+dfs$m2_index_rr <- ifelse(dfs$m2_index_rr<(mean(dfs$m2_index_rr, na.rm=T)-(2*sd(dfs$m2_index_rr, na.rm = TRUE))), NA, dfs$m2_index_rr)
+dfs$m2_index_rr <- ifelse(dfs$m2_index_rr>(mean(dfs$m2_index_rr, na.rm=T)+(2*sd(dfs$m2_index_rr, na.rm = TRUE))), NA, dfs$m2_index_rr)
+
+dfs$m2_ref_sp02 <- ifelse(dfs$m2_ref_sp02<(mean(dfs$m2_ref_sp02, na.rm=T)-(2*sd(dfs$m2_ref_sp02, na.rm = TRUE))), NA, dfs$m2_ref_sp02)
+dfs$m2_ref_sp02 <- ifelse(dfs$m2_ref_sp02>(mean(dfs$m2_ref_sp02, na.rm=T)+(2*sd(dfs$m2_ref_sp02, na.rm = TRUE))), NA, dfs$m2_ref_sp02)
+dfs$m2_therm_skin_temp <- ifelse(dfs$m2_therm_skin_temp<(mean(dfs$m2_therm_skin_temp, na.rm=T)-(2*sd(dfs$m2_therm_skin_temp, na.rm = TRUE))), NA, dfs$m2_therm_skin_temp)
+dfs$m2_therm_skin_temp <- ifelse(dfs$m2_therm_skin_temp>(mean(dfs$m2_therm_skin_temp, na.rm=T)+(2*sd(dfs$m2_therm_skin_temp, na.rm = TRUE))), NA, dfs$m2_therm_skin_temp)
+dfs$m2_ref_o2 <- ifelse(dfs$m2_ref_o2<(mean(dfs$m2_ref_o2, na.rm=T)-(2*sd(dfs$m2_ref_o2, na.rm = TRUE))), NA, dfs$m2_ref_o2)
+dfs$m2_ref_o2 <- ifelse(dfs$m2_ref_o2>(mean(dfs$m2_ref_o2, na.rm=T)+(2*sd(dfs$m2_ref_o2, na.rm = TRUE))), NA, dfs$m2_ref_o2)
+dfs$m2_ref_pi <- ifelse(dfs$m2_ref_pi<(mean(dfs$m2_ref_pi, na.rm=T)-(2*sd(dfs$m2_ref_pi, na.rm = TRUE))), NA, dfs$m2_ref_pi)
+dfs$m2_ref_pi <- ifelse(dfs$m2_ref_pi>(mean(dfs$m2_ref_pi, na.rm=T)+(2*sd(dfs$m2_ref_pi, na.rm = TRUE))), NA, dfs$m2_ref_pi)
+dfs$m2_ref_pr <- ifelse(dfs$m2_ref_pr<(mean(dfs$m2_ref_pr, na.rm=T)-(2*sd(dfs$m2_ref_pr, na.rm = TRUE))), NA, dfs$m2_ref_pr)
+dfs$m2_ref_pr <- ifelse(dfs$m2_ref_pr>(mean(dfs$m2_ref_pr, na.rm=T)+(2*sd(dfs$m2_ref_pr, na.rm = TRUE))), NA, dfs$m2_ref_pr)
+dfs$m2_ref_rracoustic <- ifelse(dfs$m2_ref_rracoustic<(mean(dfs$m2_ref_rracoustic, na.rm=T)-(2*sd(dfs$m2_ref_rracoustic, na.rm = TRUE))), NA, dfs$m2_ref_rracoustic)
+dfs$m2_ref_rracoustic <- ifelse(dfs$m2_ref_rracoustic>(mean(dfs$m2_ref_rracoustic, na.rm=T)+(2*sd(dfs$m2_ref_rracoustic, na.rm = TRUE))), NA, dfs$m2_ref_rracoustic)
+dfs$m2_ref_thb <- ifelse(dfs$m2_ref_thb<(mean(dfs$m2_ref_thb, na.rm=T)-(2*sd(dfs$m2_ref_thb, na.rm = TRUE))), NA, dfs$m2_ref_thb)
+dfs$m2_ref_thb <- ifelse(dfs$m2_ref_thb>(mean(dfs$m2_ref_thb, na.rm=T)+(2*sd(dfs$m2_ref_thb, na.rm = TRUE))), NA, dfs$m2_ref_thb)
+
+## M3
+dfs$m3_index_temp <- ifelse(dfs$m3_index_temp<(mean(dfs$m3_index_temp, na.rm=T)-(2*sd(dfs$m3_index_temp, na.rm = TRUE))), NA, dfs$m3_index_temp)
+dfs$m3_index_temp <- ifelse(dfs$m3_index_temp>(mean(dfs$m3_index_temp, na.rm=T)+(2*sd(dfs$m3_index_temp, na.rm = TRUE))), NA, dfs$m3_index_temp)
+dfs$m3_index_spo2 <- ifelse(dfs$m3_index_spo2<(mean(dfs$m3_index_spo2, na.rm=T)-(2*sd(dfs$m3_index_spo2, na.rm = TRUE))), NA, dfs$m3_index_spo2)
+dfs$m3_index_spo2 <- ifelse(dfs$m3_index_spo2>(mean(dfs$m3_index_spo2, na.rm=T)+(2*sd(dfs$m3_index_spo2, na.rm = TRUE))), NA, dfs$m3_index_spo2)
+dfs$m3_index_o2 <- ifelse(dfs$m3_index_o2<(mean(dfs$m3_index_o2, na.rm=T)-(2*sd(dfs$m3_index_o2, na.rm = TRUE))), NA, dfs$m3_index_o2)
+dfs$m3_index_o2 <- ifelse(dfs$m3_index_o2>(mean(dfs$m3_index_o2, na.rm=T)+(2*sd(dfs$m3_index_o2, na.rm = TRUE))), NA, dfs$m3_index_o2)
+dfs$m3_index_pi <- ifelse(dfs$m3_index_pi<(mean(dfs$m3_index_pi, na.rm=T)-(2*sd(dfs$m3_index_pi, na.rm = TRUE))), NA, dfs$m3_index_pi)
+dfs$m3_index_pi <- ifelse(dfs$m3_index_pi>(mean(dfs$m3_index_pi, na.rm=T)+(2*sd(dfs$m3_index_pi, na.rm = TRUE))), NA, dfs$m3_index_pi)
+dfs$m3_index_pr <- ifelse(dfs$m3_index_pr<(mean(dfs$m3_index_pr, na.rm=T)-(2*sd(dfs$m3_index_pr, na.rm = TRUE))), NA, dfs$m3_index_pr)
+dfs$m3_index_pr <- ifelse(dfs$m3_index_pr>(mean(dfs$m3_index_pr, na.rm=T)+(2*sd(dfs$m3_index_pr, na.rm = TRUE))), NA, dfs$m3_index_pr)
+dfs$m3_index_rr <- ifelse(dfs$m3_index_rr<(mean(dfs$m3_index_rr, na.rm=T)-(2*sd(dfs$m3_index_rr, na.rm = TRUE))), NA, dfs$m3_index_rr)
+dfs$m3_index_rr <- ifelse(dfs$m3_index_rr>(mean(dfs$m3_index_rr, na.rm=T)+(2*sd(dfs$m3_index_rr, na.rm = TRUE))), NA, dfs$m3_index_rr)
+
+dfs$m3_ref_sp02 <- ifelse(dfs$m3_ref_sp02<(mean(dfs$m3_ref_sp02, na.rm=T)-(2*sd(dfs$m3_ref_sp02, na.rm = TRUE))), NA, dfs$m3_ref_sp02)
+dfs$m3_ref_sp02 <- ifelse(dfs$m3_ref_sp02>(mean(dfs$m3_ref_sp02, na.rm=T)+(2*sd(dfs$m3_ref_sp02, na.rm = TRUE))), NA, dfs$m3_ref_sp02)
+dfs$m3_therm_skin_temp <- ifelse(dfs$m3_therm_skin_temp<(mean(dfs$m3_therm_skin_temp, na.rm=T)-(2*sd(dfs$m3_therm_skin_temp, na.rm = TRUE))), NA, dfs$m3_therm_skin_temp)
+dfs$m3_therm_skin_temp <- ifelse(dfs$m3_therm_skin_temp>(mean(dfs$m3_therm_skin_temp, na.rm=T)+(2*sd(dfs$m3_therm_skin_temp, na.rm = TRUE))), NA, dfs$m3_therm_skin_temp)
+dfs$m3_ref_o2 <- ifelse(dfs$m3_ref_o2<(mean(dfs$m3_ref_o2, na.rm=T)-(2*sd(dfs$m3_ref_o2, na.rm = TRUE))), NA, dfs$m3_ref_o2)
+dfs$m3_ref_o2 <- ifelse(dfs$m3_ref_o2>(mean(dfs$m3_ref_o2, na.rm=T)+(2*sd(dfs$m3_ref_o2, na.rm = TRUE))), NA, dfs$m3_ref_o2)
+dfs$m3_ref_pi <- ifelse(dfs$m3_ref_pi<(mean(dfs$m3_ref_pi, na.rm=T)-(2*sd(dfs$m3_ref_pi, na.rm = TRUE))), NA, dfs$m3_ref_pi)
+dfs$m3_ref_pi <- ifelse(dfs$m3_ref_pi>(mean(dfs$m3_ref_pi, na.rm=T)+(2*sd(dfs$m3_ref_pi, na.rm = TRUE))), NA, dfs$m3_ref_pi)
+dfs$m3_ref_pr <- ifelse(dfs$m3_ref_pr<(mean(dfs$m3_ref_pr, na.rm=T)-(2*sd(dfs$m3_ref_pr, na.rm = TRUE))), NA, dfs$m3_ref_pr)
+dfs$m3_ref_pr <- ifelse(dfs$m3_ref_pr>(mean(dfs$m3_ref_pr, na.rm=T)+(2*sd(dfs$m3_ref_pr, na.rm = TRUE))), NA, dfs$m3_ref_pr)
+dfs$m3_ref_rracoustic <- ifelse(dfs$m3_ref_rracoustic<(mean(dfs$m3_ref_rracoustic, na.rm=T)-(2*sd(dfs$m3_ref_rracoustic, na.rm = TRUE))), NA, dfs$m3_ref_rracoustic)
+dfs$m3_ref_rracoustic <- ifelse(dfs$m3_ref_rracoustic>(mean(dfs$m3_ref_rracoustic, na.rm=T)+(2*sd(dfs$m3_ref_rracoustic, na.rm = TRUE))), NA, dfs$m3_ref_rracoustic)
+dfs$m3_ref_thb <- ifelse(dfs$m3_ref_thb<(mean(dfs$m3_ref_thb, na.rm=T)-(2*sd(dfs$m3_ref_thb, na.rm = TRUE))), NA, dfs$m3_ref_thb)
+dfs$m3_ref_thb <- ifelse(dfs$m3_ref_thb>(mean(dfs$m3_ref_thb, na.rm=T)+(2*sd(dfs$m3_ref_thb, na.rm = TRUE))), NA, dfs$m3_ref_thb)
+
+# Write file as .csv to shared Box folder -- SENSITIVITY FILE
+write.csv(dfs, "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_outliers_excluded_2024-03-29.csv")
+
