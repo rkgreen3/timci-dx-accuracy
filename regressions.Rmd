@@ -1,0 +1,473 @@
+---
+title: "Effect of skin tone on device performance"
+author: "Rebecca Green"
+date: "`r Sys.Date()`"
+output: 
+  word_document:
+    reference_docx: template_formatted.docx
+---
+
+```{r setup, include=FALSE}
+rm(list = ls())
+
+# Rmd setup (since we echo all code)
+knitr::opts_chunk$set(echo = FALSE)
+
+# install these packages if not already on your computer
+library(plyr)
+library(dplyr)
+library(reshape2)
+library(ggplot2)
+library(stargazer)
+library(lme4)
+
+# Read in (cleaned) data 
+filename <- "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2024-03-28.csv" #primary analysis
+df_og <- read.csv(filename)
+df_og <- df_og %>% select(-c("X", "m1_index_temp_f", "m2_index_temp_f", "m3_index_temp_f"))
+
+# Exclude colorimeter readings out of range (only saw in b)
+df_og$colorimeter_b <- ifelse(df_og$colorimeter_b>127, NA, df_og$colorimeter_b)
+# Calculate ITA from colorimeter measures
+df_og$ita <- (atan(df_og$colorimeter_l-50)/df_og$colorimeter_b)*(180/pi)
+
+# Step 1: Reshape to create long df
+## use regular expressions to identify measurement-related columns and trim to only variables needed
+df_reshaped <- df_og %>% select(ppt_id, index_device_name, age_months, monk, ita, colnames(df_og[grepl("m[[:digit:]]_index_+", names(df_og))]), colnames(df_og[grepl("therm", names(df_og))]), colnames(df_og[grepl("m[[:digit:]]_ref_+", names(df_og))]), colnames(df_og[grepl("m[[:digit:]]_calm", names(df_og))]))
+df_reshaped <- df_reshaped %>% select(-c(colnames(df_og[grepl("error", names(df_og))]), colnames(df_og[grepl("attempt", names(df_og))]), colnames(df_og[grepl("thb", names(df_og))])))
+df_reshaped <- df_reshaped %>% select(-c(colnames(df_reshaped[grepl("confident", names(df_reshaped))])))
+mdf_reshaped <- melt(df_reshaped, id.vars = c("ppt_id", "index_device_name", "age_months", "monk", "ita")) ## Melt df into long format, maintaining ID vars
+mdf_reshaped$grp <- toupper(substr(mdf_reshaped$variable, start = 1, stop = 2)) # Extract measurement number into grouping variable
+mdf_reshaped$mes <- substr(mdf_reshaped$variable, start = 4, stop = nchar(as.character(mdf_reshaped$variable))) # Extract index/ref and measurement type into variable
+mdf_reshaped <- mdf_reshaped %>% select(-c(variable))
+mdf_reshaped$mes <- ifelse(mdf_reshaped$mes=="therm_skin_temp", "ref_temp", mdf_reshaped$mes)
+## Subset into index measurements only, further subset into each measurement type so value can be renamed accordingly
+mdf_reshaped_i <- subset(mdf_reshaped, grepl("index", mdf_reshaped$mes))
+mdf_reshaped_i_temp <- subset(mdf_reshaped_i, grepl("temp", mdf_reshaped_i$mes)) # Temp
+names(mdf_reshaped_i_temp)[6] <- paste(mdf_reshaped_i_temp$mes)
+mdf_reshaped_i_temp <- mdf_reshaped_i_temp %>% select(-c(mes))
+mdf_reshaped_i_o2 <- subset(mdf_reshaped_i, grepl("_o2", mdf_reshaped_i$mes)) # O2
+names(mdf_reshaped_i_o2)[6] <- paste(mdf_reshaped_i_o2$mes)
+mdf_reshaped_i_o2 <- mdf_reshaped_i_o2 %>% select(-c(mes))
+mdf_reshaped_i_pr <- subset(mdf_reshaped_i, grepl("pr", mdf_reshaped_i$mes)) # PR
+names(mdf_reshaped_i_pr)[6] <- paste(mdf_reshaped_i_pr$mes)
+mdf_reshaped_i_pr <- mdf_reshaped_i_pr %>% select(-c(mes))
+mdf_reshaped_i_pi <- subset(mdf_reshaped_i, grepl("pi", mdf_reshaped_i$mes)) # PI
+names(mdf_reshaped_i_pi)[6] <- paste(mdf_reshaped_i_pi$mes)
+mdf_reshaped_i_pi <- mdf_reshaped_i_pi %>% select(-c(mes))
+mdf_reshaped_i_rr <- subset(mdf_reshaped_i, grepl("rr", mdf_reshaped_i$mes)) # RR
+names(mdf_reshaped_i_rr)[6] <- paste(mdf_reshaped_i_rr$mes)
+mdf_reshaped_i_rr <- mdf_reshaped_i_rr %>% select(-c(mes))
+## Join back to one df for recreation of full df
+mdf_reshaped_i <- left_join(mdf_reshaped_i_temp, mdf_reshaped_i_o2, by = c("ppt_id", "index_device_name", "age_months", "monk", "ita", "grp"))
+mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_pr, by = c("ppt_id", "index_device_name", "age_months", "monk", "ita", "grp"))
+mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_pi, by = c("ppt_id", "index_device_name", "age_months", "monk", "ita", "grp"))
+mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_rr, by = c("ppt_id", "index_device_name", "age_months", "monk", "ita", "grp"))
+## Do all of the above for reference measurements
+mdf_reshaped_r <- subset(mdf_reshaped, grepl("ref", mdf_reshaped$mes))
+mdf_reshaped_r_temp <- subset(mdf_reshaped_r, grepl("temp", mdf_reshaped_r$mes)) # Temp
+names(mdf_reshaped_r_temp)[6] <- paste(mdf_reshaped_r_temp$mes)
+mdf_reshaped_r_temp <- mdf_reshaped_r_temp %>% select(-c(mes))
+mdf_reshaped_r_o2 <- subset(mdf_reshaped_r, grepl("_o2", mdf_reshaped_r$mes)) # O2
+names(mdf_reshaped_r_o2)[6] <- paste(mdf_reshaped_r_o2$mes)
+mdf_reshaped_r_o2 <- mdf_reshaped_r_o2 %>% select(-c(mes))
+mdf_reshaped_r_pr <- subset(mdf_reshaped_r, grepl("pr", mdf_reshaped_r$mes)) # PR
+names(mdf_reshaped_r_pr)[6] <- paste(mdf_reshaped_r_pr$mes)
+mdf_reshaped_r_pr <- mdf_reshaped_r_pr %>% select(-c(mes))
+mdf_reshaped_r_pi <- subset(mdf_reshaped_r, grepl("pi", mdf_reshaped_r$mes)) # PI
+names(mdf_reshaped_r_pi)[6] <- paste(mdf_reshaped_r_pi$mes)
+mdf_reshaped_r_pi <- mdf_reshaped_r_pi %>% select(-c(mes))
+mdf_reshaped_r_rr <- subset(mdf_reshaped_r, grepl("rr", mdf_reshaped_r$mes)) # RR-all
+mdf_reshaped_r_rrac <- subset(mdf_reshaped_r_rr, grepl("rracoustic", mdf_reshaped_r_rr$mes)) # RR-acoustic
+names(mdf_reshaped_r_rrac)[6] <- paste(mdf_reshaped_r_rrac$mes)
+mdf_reshaped_r_rr <- subset(mdf_reshaped_r_rr, !grepl("rracoustic", mdf_reshaped_r_rr$mes)) # RR
+names(mdf_reshaped_r_rr)[6] <- paste(mdf_reshaped_r_rr$mes)
+mdf_reshaped_r_rr <- mdf_reshaped_r_rr %>% select(-c(mes))
+mdf_reshaped_r_rrac <- mdf_reshaped_r_rrac %>% select(-c(mes))
+## Join back to one df for recreation of full df
+mdf_reshaped_r <- left_join(mdf_reshaped_r_temp, mdf_reshaped_r_o2, by = c("ppt_id", "index_device_name", "age_months", "monk", "ita", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_pr, by = c("ppt_id", "index_device_name", "age_months", "monk", "ita", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_pi, by = c("ppt_id", "index_device_name", "age_months", "monk", "ita", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_rr, by = c("ppt_id", "index_device_name", "age_months", "monk", "ita", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_rrac, by = c("ppt_id", "index_device_name", "age_months", "monk", "ita", "grp"))
+# Add calmness
+mdf_reshaped_c <- subset(mdf_reshaped, grepl("calm", mdf_reshaped$mes)) # Calmness
+names(mdf_reshaped_c)[6] <- paste(mdf_reshaped_c$mes)
+mdf_reshaped_c <- mdf_reshaped_c %>% select(-c(mes))
+
+# Join index and ref df's back to one melted df
+mdf_reshaped <- left_join(mdf_reshaped_i, mdf_reshaped_r, by = c("ppt_id", "index_device_name", "age_months", "monk", "ita", "grp")) #long format df w/index & ref measurements for all devices & measurement types
+mdf_reshaped <- left_join(mdf_reshaped, mdf_reshaped_c, by = c("ppt_id", "index_device_name", "age_months", "monk", "ita", "grp"))
+
+# Center calmness to improve interpretability (mean = 3.596)
+mdf_reshaped$calm2 <- mdf_reshaped$calm - 3.596
+
+# Add indicator variables here for clinical thresholds (long format) -- Note: From the SAP, these are defined for the user in Section 5, if changed here be sure to change there and below
+mdf_reshaped$index_hypoxic <- ifelse(mdf_reshaped$index_o2<90, 1, 0)
+mdf_reshaped$ref_hypoxic <- ifelse(mdf_reshaped$ref_o2<90, 1, 0)
+mdf_reshaped$index_fever <- ifelse(mdf_reshaped$index_temp>=37.5, 1, 0)
+mdf_reshaped$ref_fever <- ifelse(mdf_reshaped$ref_temp>=37.5, 1, 0)
+mdf_reshaped$index_fastbreath_12mo <- ifelse(mdf_reshaped$index_rr>49 & mdf_reshaped$age_months<12, 1, 0)
+mdf_reshaped$ref_fastbreath_12mo <- ifelse(mdf_reshaped$ref_rr>49 & mdf_reshaped$age_months<12, 1, 0)
+mdf_reshaped$refac_fastbreath_12mo <- ifelse(mdf_reshaped$ref_rracoustic>49 & mdf_reshaped$age_months<12, 1, 0)
+mdf_reshaped$index_fastbreath_35mo <- ifelse(mdf_reshaped$index_rr>39 & (mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36), 1, 0)
+mdf_reshaped$ref_fastbreath_35mo <- ifelse(mdf_reshaped$ref_rr>39 & (mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36), 1, 0)
+mdf_reshaped$refac_fastbreath_35mo <- ifelse(mdf_reshaped$ref_rracoustic>39 & (mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36), 1, 0)
+mdf_reshaped$index_fastbreath_59mo <- ifelse(mdf_reshaped$index_rr>29 & (mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60), 1, 0)
+mdf_reshaped$ref_fastbreath_59mo <- ifelse(mdf_reshaped$ref_rr>29 & (mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60), 1, 0)
+mdf_reshaped$refac_fastbreath_59mo <- ifelse(mdf_reshaped$ref_rracoustic>29 & (mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60), 1, 0)
+mdf_reshaped$index_tachycardic_12mo <- ifelse(mdf_reshaped$index_pr>179 & mdf_reshaped$age_months<12, 1, 0)
+mdf_reshaped$ref_tachycardic_12mo <- ifelse(mdf_reshaped$ref_pr>179 & mdf_reshaped$age_months<12, 1, 0)
+mdf_reshaped$index_tachycardic_59mo <- ifelse(mdf_reshaped$index_pr>139 & mdf_reshaped$age_months>11, 1, 0)
+mdf_reshaped$ref_tachycardic_59mo <- ifelse(mdf_reshaped$ref_pr>139 & mdf_reshaped$age_months>11, 1, 0)
+## Add 3-level indicator variables for clinical thresholds (long format) -- Note: From the SAP, these are defined for the user in Section 5, if changed here be sure to change there and below
+mdf_reshaped$index_hypoxic_tri <- case_when(mdf_reshaped$index_o2<88 ~ 2,
+                                            mdf_reshaped$index_o2<90 & mdf_reshaped$index_o2>=88 ~ 1,
+                                            mdf_reshaped$index_o2>=90 ~ 0)
+mdf_reshaped$ref_hypoxic_tri <- case_when(mdf_reshaped$ref_o2<88 ~ 2,
+                                            mdf_reshaped$ref_o2<90 & mdf_reshaped$ref_o2>=88 ~ 1,
+                                            mdf_reshaped$ref_o2>=90 ~ 0)
+mdf_reshaped$index_fever_tri <- case_when(mdf_reshaped$index_temp>=38.5 ~ 2,
+                                            mdf_reshaped$index_temp<38.5 & mdf_reshaped$index_temp>=37.5 ~ 1,
+                                            mdf_reshaped$index_temp<37.5 ~ 0)
+mdf_reshaped$ref_fever_tri <- case_when(mdf_reshaped$ref_temp>=38.5 ~ 2,
+                                            mdf_reshaped$ref_temp<38.5 & mdf_reshaped$ref_temp>=37.5 ~ 1,
+                                            mdf_reshaped$ref_temp<37.5 ~ 0)
+mdf_reshaped$index_fastbreath_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$index_rr>55 ~ 2,
+                                            mdf_reshaped$age_months<12 & mdf_reshaped$index_rr<=55 & mdf_reshaped$index_rr>=50 ~ 1,
+                                            mdf_reshaped$age_months<12 & mdf_reshaped$index_rr<50 ~ 0)
+mdf_reshaped$ref_fastbreath_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$ref_rr>55 ~ 2,
+                                            mdf_reshaped$age_months<12 & mdf_reshaped$ref_rr<=55 & mdf_reshaped$ref_rr>=50 ~ 1,
+                                            mdf_reshaped$age_months<12 & mdf_reshaped$ref_rr<50 ~ 0)
+mdf_reshaped$refac_fastbreath_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$ref_rracoustic>55 ~ 2,
+                                            mdf_reshaped$age_months<12 & mdf_reshaped$ref_rracoustic<=55 & mdf_reshaped$ref_rracoustic>=50 ~ 1,
+                                            mdf_reshaped$age_months<12 & mdf_reshaped$ref_rracoustic<50 ~ 0)
+mdf_reshaped$index_fastbreath_35mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$index_rr>45 ~ 2,
+                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$index_rr<=45 & mdf_reshaped$index_rr>=40 ~ 1,
+                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$index_rr<40 ~ 0)
+mdf_reshaped$ref_fastbreath_35mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$ref_rr>45 ~ 2,
+                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$ref_rr<=45 & mdf_reshaped$ref_rr>=40 ~ 1,
+                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$ref_rr<40 ~ 0)
+mdf_reshaped$refac_fastbreath_35mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$ref_rracoustic>45 ~ 2,
+                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$ref_rracoustic<=45 & mdf_reshaped$ref_rracoustic>=40 ~ 1,
+                                            mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 & mdf_reshaped$ref_rracoustic<40 ~ 0)
+mdf_reshaped$index_fastbreath_59mo_tri <- case_when(mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$index_rr>35 ~ 2,
+                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$index_rr<=35 & mdf_reshaped$index_rr>=30 ~ 1,
+                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$index_rr<30 ~ 0)
+mdf_reshaped$ref_fastbreath_59mo_tri <- case_when(mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$ref_rr>35 ~ 2,
+                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$ref_rr<=35 & mdf_reshaped$ref_rr>=30 ~ 1,
+                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$ref_rr<30 ~ 0)
+mdf_reshaped$refac_fastbreath_59mo_tri <- case_when(mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$ref_rracoustic>35 ~ 2,
+                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$ref_rracoustic<=35 & mdf_reshaped$ref_rracoustic>=30 ~ 1,
+                                            mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60 & mdf_reshaped$ref_rracoustic<30 ~ 0)
+mdf_reshaped$index_tachycardic_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$index_pr>190 ~ 2,
+                                            mdf_reshaped$age_months<12 & mdf_reshaped$index_pr<=190 & mdf_reshaped$index_pr>=180 ~ 1,
+                                            mdf_reshaped$age_months<12 & mdf_reshaped$index_pr<180 ~ 0)
+mdf_reshaped$ref_tachycardic_12mo_tri <- case_when(mdf_reshaped$age_months<12 & mdf_reshaped$ref_pr>190 ~ 2,
+                                            mdf_reshaped$age_months<12 & mdf_reshaped$ref_pr<=190 & mdf_reshaped$ref_pr>=180 ~ 1,
+                                            mdf_reshaped$age_months<12 & mdf_reshaped$ref_pr<180 ~ 0)
+mdf_reshaped$index_tachycardic_59mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$index_pr>150 ~ 2,
+                                            mdf_reshaped$age_months>11 & mdf_reshaped$index_pr<=150 & mdf_reshaped$index_pr>=140 ~ 1,
+                                            mdf_reshaped$age_months>11 & mdf_reshaped$index_pr<140 ~ 0)
+mdf_reshaped$ref_tachycardic_59mo_tri <- case_when(mdf_reshaped$age_months>11 & mdf_reshaped$ref_pr>150 ~ 2,
+                                            mdf_reshaped$age_months>11 & mdf_reshaped$ref_pr<=150 & mdf_reshaped$ref_pr>=140 ~ 1,
+                                            mdf_reshaped$age_months>11 & mdf_reshaped$ref_pr<140 ~ 0)
+# Add clinical age category for fast breathing, ensuring groupings fall within study age categories as well
+mdf_reshaped$age_cat_fastbreathe <- case_when(mdf_reshaped$age_months<2 ~ "0-1 month",
+                                              mdf_reshaped$age_months>1 & mdf_reshaped$age_months<12 ~ "2-11 months",
+                                              mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 ~ "12-35 months",
+                                              mdf_reshaped$age_months>35 ~ "36-59 months")
+mdf_reshaped$grp <- as.factor(mdf_reshaped$grp)
+# Add indicator variables for number of trials and number of successes for each clinical outcome to use in percent agreement section
+mdf_reshaped$ref_index_pres_hypoxic <- ifelse(!is.na(mdf_reshaped$ref_hypoxic) & !is.na(mdf_reshaped$index_hypoxic), 1, 0)
+mdf_reshaped$ref_index_agree_hypoxic <- ifelse(mdf_reshaped$ref_hypoxic==mdf_reshaped$index_hypoxic, 1, 0)
+mdf_reshaped$ref_index_pres_fever <- ifelse(!is.na(mdf_reshaped$ref_fever) & !is.na(mdf_reshaped$index_fever), 1, 0)
+mdf_reshaped$ref_index_agree_fever <- ifelse(mdf_reshaped$ref_fever==mdf_reshaped$index_fever, 1, 0)
+mdf_reshaped$ref_index_pres_fb12mo <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_12mo) & !is.na(mdf_reshaped$index_fastbreath_12mo), 1, 0)
+mdf_reshaped$ref_index_agree_fb12mo <- ifelse(mdf_reshaped$ref_fastbreath_12mo==mdf_reshaped$index_fastbreath_12mo, 1, 0)
+mdf_reshaped$ref_index_pres_fb35mo <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_35mo) & !is.na(mdf_reshaped$index_fastbreath_35mo), 1, 0)
+mdf_reshaped$ref_index_agree_fb35mo <- ifelse(mdf_reshaped$ref_fastbreath_35mo==mdf_reshaped$index_fastbreath_35mo, 1, 0)
+mdf_reshaped$ref_index_pres_fb59mo <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_59mo) & !is.na(mdf_reshaped$index_fastbreath_59mo), 1, 0)
+mdf_reshaped$ref_index_agree_fb59mo <- ifelse(mdf_reshaped$ref_fastbreath_59mo==mdf_reshaped$index_fastbreath_59mo, 1, 0)
+mdf_reshaped$refac_index_pres_fb12mo <- ifelse(!is.na(mdf_reshaped$refac_fastbreath_12mo) & !is.na(mdf_reshaped$index_fastbreath_12mo), 1, 0)
+mdf_reshaped$refac_index_agree_fb12mo <- ifelse(mdf_reshaped$refac_fastbreath_12mo==mdf_reshaped$index_fastbreath_12mo, 1, 0)
+mdf_reshaped$refac_index_pres_fb35mo <- ifelse(!is.na(mdf_reshaped$refac_fastbreath_35mo) & !is.na(mdf_reshaped$index_fastbreath_35mo), 1, 0)
+mdf_reshaped$refac_index_agree_fb35mo <- ifelse(mdf_reshaped$refac_fastbreath_35mo==mdf_reshaped$index_fastbreath_35mo, 1, 0)
+mdf_reshaped$refac_index_pres_fb59mo <- ifelse(!is.na(mdf_reshaped$refac_fastbreath_59mo) & !is.na(mdf_reshaped$index_fastbreath_59mo), 1, 0)
+mdf_reshaped$refac_index_agree_fb59mo <- ifelse(mdf_reshaped$refac_fastbreath_59mo==mdf_reshaped$index_fastbreath_59mo, 1, 0)
+mdf_reshaped$ref_index_pres_tachy12mo <- ifelse(!is.na(mdf_reshaped$ref_tachycardic_12mo) & !is.na(mdf_reshaped$index_tachycardic_12mo), 1, 0)
+mdf_reshaped$ref_index_agree_tachy12mo <- ifelse(mdf_reshaped$ref_tachycardic_12mo==mdf_reshaped$index_tachycardic_12mo, 1, 0)
+mdf_reshaped$ref_index_pres_tachy59mo <- ifelse(!is.na(mdf_reshaped$ref_tachycardic_59mo) & !is.na(mdf_reshaped$index_tachycardic_59mo), 1, 0)
+mdf_reshaped$ref_index_agree_tachy59mo <- ifelse(mdf_reshaped$ref_tachycardic_59mo==mdf_reshaped$index_tachycardic_59mo, 1, 0)
+mdf_reshaped$ref_refac_pres_fb12mo <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_12mo) & !is.na(mdf_reshaped$refac_fastbreath_12mo), 1, 0) # Annotated RR vs. RRac
+mdf_reshaped$ref_refac_agree_fb12mo <- ifelse(mdf_reshaped$ref_fastbreath_12mo==mdf_reshaped$refac_fastbreath_12mo, 1, 0)
+mdf_reshaped$ref_refac_pres_fb35mo <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_35mo) & !is.na(mdf_reshaped$refac_fastbreath_35mo), 1, 0)
+mdf_reshaped$ref_refac_agree_fb35mo <- ifelse(mdf_reshaped$ref_fastbreath_35mo==mdf_reshaped$refac_fastbreath_35mo, 1, 0)
+mdf_reshaped$ref_refac_pres_fb59mo <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_59mo) & !is.na(mdf_reshaped$refac_fastbreath_59mo), 1, 0)
+mdf_reshaped$ref_refac_agree_fb59mo <- ifelse(mdf_reshaped$ref_fastbreath_59mo==mdf_reshaped$refac_fastbreath_59mo, 1, 0)
+# Do the same for trinary variables
+mdf_reshaped$ref_index_pres_hypoxic_tri <- ifelse(!is.na(mdf_reshaped$ref_hypoxic_tri) & !is.na(mdf_reshaped$index_hypoxic_tri), 1, 0)
+mdf_reshaped$ref_index_agree_hypoxic_tri <- ifelse(mdf_reshaped$ref_hypoxic_tri==mdf_reshaped$index_hypoxic_tri, 1, 0)
+mdf_reshaped$ref_index_pres_fever_tri <- ifelse(!is.na(mdf_reshaped$ref_fever_tri) & !is.na(mdf_reshaped$index_fever_tri), 1, 0)
+mdf_reshaped$ref_index_agree_fever_tri <- ifelse(mdf_reshaped$ref_fever_tri==mdf_reshaped$index_fever_tri, 1, 0)
+mdf_reshaped$ref_index_pres_fb12mo_tri <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_12mo_tri) & !is.na(mdf_reshaped$index_fastbreath_12mo_tri), 1, 0)
+mdf_reshaped$ref_index_agree_fb12mo_tri <- ifelse(mdf_reshaped$ref_fastbreath_12mo_tri==mdf_reshaped$index_fastbreath_12mo_tri, 1, 0)
+mdf_reshaped$ref_index_pres_fb35mo_tri <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_35mo_tri) & !is.na(mdf_reshaped$index_fastbreath_35mo_tri), 1, 0)
+mdf_reshaped$ref_index_agree_fb35mo_tri <- ifelse(mdf_reshaped$ref_fastbreath_35mo_tri==mdf_reshaped$index_fastbreath_35mo_tri, 1, 0)
+mdf_reshaped$ref_index_pres_fb59mo_tri <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_59mo_tri) & !is.na(mdf_reshaped$index_fastbreath_59mo_tri), 1, 0)
+mdf_reshaped$ref_index_agree_fb59mo_tri <- ifelse(mdf_reshaped$ref_fastbreath_59mo_tri==mdf_reshaped$index_fastbreath_59mo_tri, 1, 0)
+mdf_reshaped$refac_index_pres_fb12mo_tri <- ifelse(!is.na(mdf_reshaped$refac_fastbreath_12mo_tri) & !is.na(mdf_reshaped$index_fastbreath_12mo_tri), 1, 0)
+mdf_reshaped$refac_index_agree_fb12mo_tri <- ifelse(mdf_reshaped$refac_fastbreath_12mo_tri==mdf_reshaped$index_fastbreath_12mo_tri, 1, 0)
+mdf_reshaped$refac_index_pres_fb35mo_tri <- ifelse(!is.na(mdf_reshaped$refac_fastbreath_35mo_tri) & !is.na(mdf_reshaped$index_fastbreath_35mo_tri), 1, 0)
+mdf_reshaped$refac_index_agree_fb35mo_tri <- ifelse(mdf_reshaped$refac_fastbreath_35mo_tri==mdf_reshaped$index_fastbreath_35mo_tri, 1, 0)
+mdf_reshaped$refac_index_pres_fb59mo_tri <- ifelse(!is.na(mdf_reshaped$refac_fastbreath_59mo_tri) & !is.na(mdf_reshaped$index_fastbreath_59mo_tri), 1, 0)
+mdf_reshaped$refac_index_agree_fb59mo_tri <- ifelse(mdf_reshaped$refac_fastbreath_59mo_tri==mdf_reshaped$index_fastbreath_59mo_tri, 1, 0)
+mdf_reshaped$ref_index_pres_tachy12mo_tri <- ifelse(!is.na(mdf_reshaped$ref_tachycardic_12mo_tri) & !is.na(mdf_reshaped$index_tachycardic_12mo_tri), 1, 0)
+mdf_reshaped$ref_index_agree_tachy12mo_tri <- ifelse(mdf_reshaped$ref_tachycardic_12mo_tri==mdf_reshaped$index_tachycardic_12mo_tri, 1, 0)
+mdf_reshaped$ref_index_pres_tachy59mo_tri <- ifelse(!is.na(mdf_reshaped$ref_tachycardic_59mo_tri) & !is.na(mdf_reshaped$index_tachycardic_59mo_tri), 1, 0)
+mdf_reshaped$ref_index_agree_tachy59mo_tri <- ifelse(mdf_reshaped$ref_tachycardic_59mo_tri==mdf_reshaped$index_tachycardic_59mo_tri, 1, 0)
+mdf_reshaped$ref_refac_pres_fb12mo_tri <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_12mo_tri) & !is.na(mdf_reshaped$refac_fastbreath_12mo_tri), 1, 0) # Annotated RR vs. RRac
+mdf_reshaped$ref_refac_agree_fb12mo_tri <- ifelse(mdf_reshaped$ref_fastbreath_12mo_tri==mdf_reshaped$refac_fastbreath_12mo_tri, 1, 0)
+mdf_reshaped$ref_refac_pres_fb35mo_tri <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_35mo_tri) & !is.na(mdf_reshaped$refac_fastbreath_35mo_tri), 1, 0)
+mdf_reshaped$ref_refac_agree_fb35mo_tri <- ifelse(mdf_reshaped$ref_fastbreath_35mo_tri==mdf_reshaped$refac_fastbreath_35mo_tri, 1, 0)
+mdf_reshaped$ref_refac_pres_fb59mo_tri <- ifelse(!is.na(mdf_reshaped$ref_fastbreath_59mo_tri) & !is.na(mdf_reshaped$refac_fastbreath_59mo_tri), 1, 0)
+mdf_reshaped$ref_refac_agree_fb59mo_tri <- ifelse(mdf_reshaped$ref_fastbreath_59mo_tri==mdf_reshaped$refac_fastbreath_59mo_tri, 1, 0)
+
+# Step 2: Create device df's
+## Long format (M1-M3 are levels of one variable)
+df_radg_l <- subset(mdf_reshaped, index_device_name=="Rad-G Temp (Masimo)")
+df_bio_l <- subset(mdf_reshaped, index_device_name=="m800 (Biolight)")
+df_neo_l <- subset(mdf_reshaped, index_device_name=="NeoGuard (Neopenda)")
+df_onyx_l <- subset(mdf_reshaped, index_device_name=="Onyx PO+RR (Nonin)")
+df_scan_l <- subset(mdf_reshaped, index_device_name=="Scanbo v8 (Scanbo)")
+```
+
+This is a companion document to the TIMCI Diagnostic Accuracy Study Data Analysis at the global level. This document has been prepared to assess the effect of skin tone on index device measurement. A linear mixed effects regression is constructed in the form of 'index device result ~ skin tone + age in months + calmness' to control for repeated measures across all devices and clinical measurements. Calmness is centered around the mean with negative coefficients reflecting more agitation and positive coefficients reflecting more calmness. Monk skin tone is also compared against the calculated individual typography angle (based on colorimeter readings) in contingency table formatting and evaluated using Fisher's exact test with an intrinsic Monte Carlo simulation to calculate p-values due to low cell counts.
+
+```{r lmer_setup, echo=FALSE, include=FALSE}
+# Define parameters applicable to all sections
+## Covariates and predictors
+covariates <- "+age_months+calm2+"
+predictor1 <- "monk"
+predictor2 <- "ita"
+
+## Labels for regression outputs
+labels1 <- c("Monk skin tone", "Age in months", "Calmness")
+labels2 <- c("ITA", "Age in Months", "Calmness")
+```
+
+# Using Monk Skin Tone
+## Measurement of SpO2
+```{r}
+# Define title, outcome, and model
+title <- "Effect of Monk Skin Tone on SpO2 Measurement across Index Devices"
+outcome <- "index_o2"
+fml <- paste(outcome, "~", predictor1, covariates, "(1|ppt_id)", sep = "")
+
+# Build models using different device df's
+mo2_radg <- lmer(fml, data = df_radg_l)
+mo2_neo <- lmer(fml, data = df_neo_l)
+mo2_scan <- lmer(fml, data = df_scan_l)
+mo2_bio <- lmer(fml, data = df_bio_l)
+mo2_onyx <- lmer(fml, data = df_onyx_l)
+
+# Format output
+stargazer(mo2_radg,mo2_neo, mo2_scan,mo2_bio, mo2_onyx,
+                type = "text",
+                ci = TRUE,
+                title = title,
+                covariate.labels = labels1,
+                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx"),
+                dep.var.labels = "SpO2")
+```
+
+## Measurement of Temperature
+```{r}
+# Define title, outcome, and model
+title <- "Effect of Monk Skin Tone on Temperature Measurement across Index Devices"
+outcome <- "index_temp"
+fml <- paste(outcome, "~", predictor1, covariates, "(1|ppt_id)", sep = "")
+
+# Build models using different device df's
+mtemp_radg <- lmer(fml, data = df_radg_l)
+mtemp_neo <- lmer(fml, data = df_neo_l)
+mtemp_scan <- lmer(fml, data = df_scan_l)
+
+# Format output
+stargazer(mtemp_radg,mtemp_neo, mtemp_scan,
+                type = "text",
+                title = title,
+                covariate.labels = labels1,
+                column.labels = c("Rad-G", "Neopenda", "Scanbo"),
+                dep.var.labels = "Temperature")
+```
+
+## Measurement of Pulse Rate
+```{r}
+# Define title, outcome, and model
+title <- "Effect of Monk Skin Tone on Pulse Rate Measurement across Index Devices"
+outcome <- "index_pr"
+fml <- paste(outcome, "~", predictor1, covariates, "(1|ppt_id)", sep = "")
+
+# Build models using different device df's
+mpr_radg <- lmer(fml, data = df_radg_l)
+mpr_neo <- lmer(fml, data = df_neo_l)
+mpr_scan <- lmer(fml, data = df_scan_l)
+mpr_bio <- lmer(fml, data = df_bio_l)
+mpr_onyx <- lmer(fml, data = df_onyx_l)
+
+# Format output
+stargazer(mpr_radg,mpr_neo, mpr_scan,mpr_bio, mpr_onyx,
+                type = "text",
+                title = title,
+                covariate.labels = labels1,
+                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx"),
+                dep.var.labels = "Pulse Rate")
+```
+
+## Measurement of Respiratory Rate
+```{r}
+# Define title, outcome, and model
+title <- "Effect of Monk Skin Tone on Respiratory Rate Measurement across Index Devices"
+outcome <- "index_rr"
+fml <- paste(outcome, "~", predictor1, covariates, "(1|ppt_id)", sep = "")
+
+# Build models using different device df's
+mrr_radg <- lmer(fml, data = df_radg_l)
+mrr_neo <- lmer(fml, data = df_neo_l)
+mrr_scan <- lmer(fml, data = df_scan_l)
+mrr_bio <- lmer(fml, data = df_bio_l)
+mrr_onyx <- lmer(fml, data = df_onyx_l)
+
+# Format output
+stargazer(mrr_radg,mrr_neo, mrr_scan,mrr_bio, mrr_onyx,
+                type = "text",
+                title = title,
+                covariate.labels = labels1,
+                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx"),
+                dep.var.labels = "Respiratory Rate")
+```
+
+# Using Individual Typography Angle
+## Measurement of SpO2
+```{r}
+# Define title, outcome, and model
+title <- "Effect of ITA on SpO2 Measurement across Index Devices"
+outcome <- "index_o2"
+fml <- paste(outcome, "~", predictor2, covariates, "(1|ppt_id)", sep = "")
+
+# Build models using different device df's
+mo2_radg <- lmer(fml, data = df_radg_l)
+mo2_neo <- lmer(fml, data = df_neo_l)
+mo2_scan <- lmer(fml, data = df_scan_l)
+mo2_bio <- lmer(fml, data = df_bio_l)
+mo2_onyx <- lmer(fml, data = df_onyx_l)
+
+# Format output
+stargazer(mo2_radg,mo2_neo, mo2_scan,mo2_bio, mo2_onyx,
+                type = "text",
+                title = title,
+                covariate.labels = labels2,
+                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx"),
+                dep.var.labels = "SpO2")
+```
+
+## Measurement of Temperature
+```{r}
+# Define title, outcome, and model
+title <- "Effect of ITA on Temperature Measurement across Index Devices"
+outcome <- "index_temp"
+fml <- paste(outcome, "~", predictor2, covariates, "(1|ppt_id)", sep = "")
+
+# Build models using different device df's
+mtemp_radg <- lmer(fml, data = df_radg_l)
+mtemp_neo <- lmer(fml, data = df_neo_l)
+mtemp_scan <- lmer(fml, data = df_scan_l)
+
+# Format output
+stargazer(mtemp_radg,mtemp_neo, mtemp_scan,
+                type = "text",
+                title = title,
+                covariate.labels = labels2,
+                column.labels = c("Rad-G", "Neopenda", "Scanbo"),
+                dep.var.labels = "Temperature")
+```
+
+## Measurement of Pulse Rate
+```{r}
+# Define title, outcome, and model
+title <- "Effect of ITA on Pulse Rate Measurement across Index Devices"
+outcome <- "index_pr"
+fml <- paste(outcome, "~", predictor2, covariates, "(1|ppt_id)", sep = "")
+
+# Build models using different device df's
+mpr_radg <- lmer(fml, data = df_radg_l)
+mpr_neo <- lmer(fml, data = df_neo_l)
+mpr_scan <- lmer(fml, data = df_scan_l)
+mpr_bio <- lmer(fml, data = df_bio_l)
+mpr_onyx <- lmer(fml, data = df_onyx_l)
+
+# Format output
+stargazer(mpr_radg,mpr_neo, mpr_scan,mpr_bio, mpr_onyx,
+                type = "text",
+                title = title,
+                covariate.labels = labels2,
+                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx"),
+                dep.var.labels = "Pulse Rate")
+```
+
+## Measurement of Respiratory Rate
+```{r}
+# Define title, outcome, and model
+title <- "Effect of ITA on Respiratory Rate Measurement across Index Devices"
+outcome <- "index_rr"
+fml <- paste(outcome, "~", predictor2, covariates, "(1|ppt_id)", sep = "")
+
+# Build models using different device df's
+mrr_radg <- lmer(fml, data = df_radg_l)
+mrr_neo <- lmer(fml, data = df_neo_l)
+mrr_scan <- lmer(fml, data = df_scan_l)
+mrr_bio <- lmer(fml, data = df_bio_l)
+mrr_onyx <- lmer(fml, data = df_onyx_l)
+
+# Format output
+stargazer(mrr_radg,mrr_neo, mrr_scan,mrr_bio, mrr_onyx,
+                type = "text",
+                title = title,
+                covariate.labels = labels2,
+                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx"),
+                dep.var.labels = "Respiratory Rate")
+```
+
+# Monk Skin Tone vs. Individual Typography Angle
+```{r}
+tdf <- df_og %>% select(ppt_id, monk, ita)
+tdf <- tdf %>% mutate(ita_cat = 
+                        case_when(ita>55 ~ "Very light",
+                         ita<=55 & ita>=41 ~ "Light",
+                         ita<41 & ita>=28 ~ "Intermediate",
+                         ita<28 & ita>=10 ~ "Tan",
+                         ita<10 & ita>= -30 ~ "Brown",
+                         ita< -30 ~ "Dark"),
+                      monk_cat = 
+                        case_when(monk==1 ~ "A",
+                                  monk==2 ~ "B",
+                                  monk==3 ~ "C",
+                                  monk==4 ~ "D",
+                                  monk==5 ~ "E",
+                                  monk==6 ~ "F",
+                                  monk==7 ~ "G",
+                                  monk==8 ~ "H",
+                                  monk==9 ~ "I",
+                                  monk==10 ~ "J",
+                                  monk>10 ~ NA)
+)
+tdf$ita_cat <- factor(tdf$ita_cat, levels = c("Dark", "Brown", "Tan", "Very light"))
+cat.table <- table(tdf$monk_cat, tdf$ita_cat)
+```
+`r knitr::kable(cat.table)`
+
+```{r}
+stats::fisher.test(cat.table, hybrid = T, simulate.p.value = T)
+```
+
