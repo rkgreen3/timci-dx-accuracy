@@ -247,9 +247,9 @@ This is a companion document to the TIMCI Diagnostic Accuracy Study Data Analysi
 ```{r lmer_setup, echo=FALSE, include=FALSE}
 # Define parameters applicable to all sections
 ## Covariates and predictors
-covariates <- "+age_months+calm2+"
-predictor1 <- "monk"
-predictor2 <- "ita"
+covariates <- "+scale(age_months)+scale(calm)+"
+predictor1 <- "scale(monk)"
+predictor2 <- "scale(ita)"
 
 ## Labels for regression outputs
 labels1 <- c("Monk skin tone", "Age in months", "Calmness")
@@ -260,9 +260,11 @@ labels2 <- c("ITA", "Age in Months", "Calmness")
 ## Measurement of SpO2
 ```{r}
 # Define title, outcome, and model
-title <- "Effect of Monk Skin Tone on SpO2 Measurement across Index Devices"
+title <- "Effect of Monk Skin Tone on SpO2 Measurement across Devices"
 outcome <- "index_o2"
+outcome2 <- "ref_o2"
 fml <- paste(outcome, "~", predictor1, covariates, "(1|ppt_id)", sep = "")
+fml2 <- paste(outcome2, "~", predictor1, covariates, "(1|ppt_id)", sep = "")
 
 # Build models using different device df's
 mo2_radg <- lmer(fml, data = df_radg_l)
@@ -270,44 +272,64 @@ mo2_neo <- lmer(fml, data = df_neo_l)
 mo2_scan <- lmer(fml, data = df_scan_l)
 mo2_bio <- lmer(fml, data = df_bio_l)
 mo2_onyx <- lmer(fml, data = df_onyx_l)
+mo2_ref <- lmer(fml2, data = mdf_reshaped)
 
 # Format output
-stargazer(mo2_radg,mo2_neo, mo2_scan,mo2_bio, mo2_onyx,
+stargazer(mo2_radg,mo2_neo, mo2_scan,mo2_bio, mo2_onyx, mo2_ref,
                 type = "text",
                 ci = TRUE,
                 title = title,
                 covariate.labels = labels1,
-                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx"),
-                dep.var.labels = "SpO2")
+                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx", "Reference"),
+                dep.var.labels = c("Index SpO2", "Reference SpO2"))
 ```
+
+```{r include=FALSE}
+# validating covariate inclusion
+
+model1 <- lmer(index_o2 ~ scale(monk) + (1|ppt_id), data = df_radg_l)
+model2 <- lmer(index_o2 ~ scale(monk) + scale(age_months) + scale(calm) + (1|ppt_id), data = df_radg_l)
+
+summary(model1)
+summary(model2)
+
+stargazer(model1, model2, type= "text", ci = TRUE)
+```
+
 
 ## Measurement of Temperature
 ```{r}
 # Define title, outcome, and model
-title <- "Effect of Monk Skin Tone on Temperature Measurement across Index Devices"
+title <- "Effect of Monk Skin Tone on Temperature Measurement across Devices"
 outcome <- "index_temp"
+outcome2 <- "ref_temp"
 fml <- paste(outcome, "~", predictor1, covariates, "(1|ppt_id)", sep = "")
+fml2 <- paste(outcome2, "~", predictor1, covariates, "(1|ppt_id)", sep = "")
 
 # Build models using different device df's
 mtemp_radg <- lmer(fml, data = df_radg_l)
 mtemp_neo <- lmer(fml, data = df_neo_l)
 mtemp_scan <- lmer(fml, data = df_scan_l)
+mtemp_ref <- lmer(fml2, data = mdf_reshaped)
 
 # Format output
-stargazer(mtemp_radg,mtemp_neo, mtemp_scan,
+stargazer(mtemp_radg,mtemp_neo, mtemp_scan, mtemp_ref,
                 type = "text",
+                ci = TRUE,
                 title = title,
                 covariate.labels = labels1,
-                column.labels = c("Rad-G", "Neopenda", "Scanbo"),
-                dep.var.labels = "Temperature")
+                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Reference"),
+                dep.var.labels = c("Index Temperature", "Reference Temperature"))
 ```
 
 ## Measurement of Pulse Rate
 ```{r}
 # Define title, outcome, and model
-title <- "Effect of Monk Skin Tone on Pulse Rate Measurement across Index Devices"
+title <- "Effect of Monk Skin Tone on Pulse Rate Measurement across Devices"
 outcome <- "index_pr"
+outcome2 <- "ref_pr"
 fml <- paste(outcome, "~", predictor1, covariates, "(1|ppt_id)", sep = "")
+fml2 <- paste(outcome2, "~", predictor1, covariates, "(1|ppt_id)", sep = "")
 
 # Build models using different device df's
 mpr_radg <- lmer(fml, data = df_radg_l)
@@ -315,22 +337,26 @@ mpr_neo <- lmer(fml, data = df_neo_l)
 mpr_scan <- lmer(fml, data = df_scan_l)
 mpr_bio <- lmer(fml, data = df_bio_l)
 mpr_onyx <- lmer(fml, data = df_onyx_l)
+mpr_ref <- lmer(fml2, data = mdf_reshaped)
 
 # Format output
-stargazer(mpr_radg,mpr_neo, mpr_scan,mpr_bio, mpr_onyx,
+stargazer(mpr_radg,mpr_neo, mpr_scan,mpr_bio, mpr_onyx, mpr_ref,
                 type = "text",
+                ci = TRUE,
                 title = title,
                 covariate.labels = labels1,
-                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx"),
-                dep.var.labels = "Pulse Rate")
+                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx", "Reference"),
+                dep.var.labels = c("Index Pulse Rate", "Reference Pulse Rate"))
 ```
 
 ## Measurement of Respiratory Rate
 ```{r}
 # Define title, outcome, and model
-title <- "Effect of Monk Skin Tone on Respiratory Rate Measurement across Index Devices"
+title <- "Effect of Monk Skin Tone on Respiratory Rate Measurement across Devices"
 outcome <- "index_rr"
+outcome2 <- "ref_rracoustic"
 fml <- paste(outcome, "~", predictor1, covariates, "(1|ppt_id)", sep = "")
+fml2 <- paste(outcome2, "~", predictor1, covariates, "(1|ppt_id)", sep = "")
 
 # Build models using different device df's
 mrr_radg <- lmer(fml, data = df_radg_l)
@@ -338,23 +364,27 @@ mrr_neo <- lmer(fml, data = df_neo_l)
 mrr_scan <- lmer(fml, data = df_scan_l)
 mrr_bio <- lmer(fml, data = df_bio_l)
 mrr_onyx <- lmer(fml, data = df_onyx_l)
+mrr_ref <- lmer(fml2, data = mdf_reshaped)
 
 # Format output
-stargazer(mrr_radg,mrr_neo, mrr_scan,mrr_bio, mrr_onyx,
+stargazer(mrr_radg,mrr_neo, mrr_scan,mrr_bio, mrr_onyx, mrr_ref,
                 type = "text",
+                ci = TRUE,
                 title = title,
                 covariate.labels = labels1,
-                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx"),
-                dep.var.labels = "Respiratory Rate")
+                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx", "Reference"),
+                dep.var.labels = c("Index Respiratory Rate", "Reference Respiratory Rate"))
 ```
 
 # Using Individual Typography Angle
 ## Measurement of SpO2
 ```{r}
 # Define title, outcome, and model
-title <- "Effect of ITA on SpO2 Measurement across Index Devices"
+title <- "Effect of ITA on SpO2 Measurement across Devices"
 outcome <- "index_o2"
+outcome2 <- "ref_o2"
 fml <- paste(outcome, "~", predictor2, covariates, "(1|ppt_id)", sep = "")
+fml2 <- paste(outcome2, "~", predictor2, covariates, "(1|ppt_id)", sep = "")
 
 # Build models using different device df's
 mo2_radg <- lmer(fml, data = df_radg_l)
@@ -362,43 +392,51 @@ mo2_neo <- lmer(fml, data = df_neo_l)
 mo2_scan <- lmer(fml, data = df_scan_l)
 mo2_bio <- lmer(fml, data = df_bio_l)
 mo2_onyx <- lmer(fml, data = df_onyx_l)
+mo2_ref <- lmer(fml2, data = mdf_reshaped)
 
 # Format output
-stargazer(mo2_radg,mo2_neo, mo2_scan,mo2_bio, mo2_onyx,
+stargazer(mo2_radg,mo2_neo, mo2_scan,mo2_bio, mo2_onyx, mo2_ref,
                 type = "text",
+                ci = TRUE,
                 title = title,
                 covariate.labels = labels2,
-                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx"),
-                dep.var.labels = "SpO2")
+                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx", "Reference"),
+                dep.var.labels = c("Index SpO2", "Reference SpO2"))
 ```
 
 ## Measurement of Temperature
 ```{r}
 # Define title, outcome, and model
-title <- "Effect of ITA on Temperature Measurement across Index Devices"
+title <- "Effect of ITA on Temperature Measurement across Devices"
 outcome <- "index_temp"
+outcome2 <- "ref_temp"
 fml <- paste(outcome, "~", predictor2, covariates, "(1|ppt_id)", sep = "")
+fml2 <- paste(outcome2, "~", predictor2, covariates, "(1|ppt_id)", sep = "")
 
 # Build models using different device df's
 mtemp_radg <- lmer(fml, data = df_radg_l)
 mtemp_neo <- lmer(fml, data = df_neo_l)
 mtemp_scan <- lmer(fml, data = df_scan_l)
+mtemp_ref <- lmer(fml2, data = mdf_reshaped)
 
 # Format output
-stargazer(mtemp_radg,mtemp_neo, mtemp_scan,
+stargazer(mtemp_radg,mtemp_neo, mtemp_scan, mtemp_ref,
                 type = "text",
+                ci = TRUE,
                 title = title,
                 covariate.labels = labels2,
-                column.labels = c("Rad-G", "Neopenda", "Scanbo"),
-                dep.var.labels = "Temperature")
+                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Reference"),
+                dep.var.labels = c("Index Temperature", "Reference Temperature"))
 ```
 
 ## Measurement of Pulse Rate
 ```{r}
 # Define title, outcome, and model
-title <- "Effect of ITA on Pulse Rate Measurement across Index Devices"
+title <- "Effect of ITA on Pulse Rate Measurement across Devices"
 outcome <- "index_pr"
+outcome2 <- "ref_pr"
 fml <- paste(outcome, "~", predictor2, covariates, "(1|ppt_id)", sep = "")
+fml2 <- paste(outcome2, "~", predictor2, covariates, "(1|ppt_id)", sep = "")
 
 # Build models using different device df's
 mpr_radg <- lmer(fml, data = df_radg_l)
@@ -406,22 +444,26 @@ mpr_neo <- lmer(fml, data = df_neo_l)
 mpr_scan <- lmer(fml, data = df_scan_l)
 mpr_bio <- lmer(fml, data = df_bio_l)
 mpr_onyx <- lmer(fml, data = df_onyx_l)
+mpr_ref <- lmer(fml2, data = mdf_reshaped)
 
 # Format output
-stargazer(mpr_radg,mpr_neo, mpr_scan,mpr_bio, mpr_onyx,
+stargazer(mpr_radg,mpr_neo, mpr_scan,mpr_bio, mpr_onyx, mpr_ref,
                 type = "text",
+                ci = TRUE,
                 title = title,
                 covariate.labels = labels2,
-                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx"),
-                dep.var.labels = "Pulse Rate")
+                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx", "Reference"),
+                dep.var.labels = c("Index Pulse Rate", "Reference Pulse Rate"))
 ```
 
 ## Measurement of Respiratory Rate
 ```{r}
 # Define title, outcome, and model
-title <- "Effect of ITA on Respiratory Rate Measurement across Index Devices"
+title <- "Effect of ITA on Respiratory Rate Measurement across Devices"
 outcome <- "index_rr"
+outcome2 <- "ref_rracoustic"
 fml <- paste(outcome, "~", predictor2, covariates, "(1|ppt_id)", sep = "")
+fml2 <- paste(outcome2, "~", predictor2, covariates, "(1|ppt_id)", sep = "")
 
 # Build models using different device df's
 mrr_radg <- lmer(fml, data = df_radg_l)
@@ -429,19 +471,21 @@ mrr_neo <- lmer(fml, data = df_neo_l)
 mrr_scan <- lmer(fml, data = df_scan_l)
 mrr_bio <- lmer(fml, data = df_bio_l)
 mrr_onyx <- lmer(fml, data = df_onyx_l)
+mrr_ref <- lmer(fml2, data = mdf_reshaped)
 
 # Format output
-stargazer(mrr_radg,mrr_neo, mrr_scan,mrr_bio, mrr_onyx,
+stargazer(mrr_radg,mrr_neo, mrr_scan,mrr_bio, mrr_onyx, mrr_ref,
                 type = "text",
+                ci = TRUE,
                 title = title,
                 covariate.labels = labels2,
-                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx"),
-                dep.var.labels = "Respiratory Rate")
+                column.labels = c("Rad-G", "Neopenda", "Scanbo", "Biolight", "Onyx", "Reference"),
+                dep.var.labels = c("Index Respiratory Rate", "Reference Respiratory Rate"))
 ```
 
 # Monk Skin Tone vs. Individual Typography Angle
 ```{r}
-tdf <- df_og %>% select(ppt_id, monk, ita)
+tdf <- df_og %>% select(ppt_id, monk, ita, colorimeter_l, colorimeter_b)
 tdf <- tdf %>% mutate(ita_cat = 
                         case_when(ita>55 ~ "Very light",
                          ita<=55 & ita>=41 ~ "Light",
