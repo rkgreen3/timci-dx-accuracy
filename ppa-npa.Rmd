@@ -1,0 +1,1694 @@
+---
+title: "TIMCI Hybrid Study: \nPositive & Negative Percent Agreement"
+author: "Rebecca Green"
+date: "`r Sys.Date()`"
+output: 
+  word_document:
+    reference_docx: "C:/Users/rgreen/OneDrive - PATH/Desktop/Limbo/formatted_template.docx"
+    toc: TRUE
+---
+
+```{r setup, include=FALSE}
+rm(list = ls())
+
+# Rmd setup (since we echo all code)
+knitr::opts_chunk$set(echo = FALSE)
+
+# install these packages if not already on your computer
+library(plyr)
+library(dplyr)
+library(exactci)
+library(epiR)
+library(reshape2)
+library(flextable)
+
+filename <- "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2024-03-28.csv" #primary analysis, contains outliers
+df_og <- read.csv(filename)
+df_og <- df_og %>% select(-c("X", "m1_index_temp_f", "m2_index_temp_f", "m3_index_temp_f"))
+
+# Relevel age_cat as factor
+df_og$age_cat <- factor(df_og$age_cat,levels = c("0-1 month","2-11 months","12-59 months"))
+
+# Write function to create 2x2 tables in the proper orientation
+twoXtwo <- function(index, ref) { 
+     tp <- sum(ref==1 & index==1, na.rm = TRUE)
+     fp <- sum(ref==0 & index==1, na.rm = TRUE)
+     fn <- sum(ref==1 & index==0, na.rm = TRUE)
+     tn <- sum(ref==0 & index==0, na.rm = TRUE)
+     
+     tab <- matrix(c(tp, fn, fp, tn), ncol = 2)
+     dimnames(tab) <- list(c("Positive (Index)", "Negative (Index)"), c("Positive (Reference)", "Negative (Reference)"))
+     tab <- as.table(tab)
+     
+     return(tab)
+ }
+## Example usage
+# mytable <- twoXtwo(index = df_radg_l$index_hypoxic, ref = df_radg_l$ref_hypoxic)
+```
+
+```{r long_dfs, warning=FALSE}
+# --- SECTION 1: CREATING LONG DF
+# Create reshaped df's
+## use regular expressions to identify measurement-related columns and trim to only variables needed
+df_reshaped <- df_og %>% select(ppt_id, index_device_name, age_months, age_cat, colnames(df_og[grepl("m[[:digit:]]_index_+", names(df_og))]), colnames(df_og[grepl("therm", names(df_og))]), colnames(df_og[grepl("m[[:digit:]]_ref_+", names(df_og))]))
+df_reshaped <- df_reshaped %>% select(-c(colnames(df_og[grepl("error", names(df_og))]), colnames(df_og[grepl("attempt", names(df_og))]), colnames(df_og[grepl("thb", names(df_og))])))
+df_reshaped <- df_reshaped %>% select(-c(colnames(df_reshaped[grepl("confident", names(df_reshaped))])))
+mdf_reshaped <- melt(df_reshaped, id.vars = c("ppt_id", "index_device_name", "age_months", "age_cat")) ## Melt df into long format, maintaining ID vars
+mdf_reshaped$grp <- toupper(substr(mdf_reshaped$variable, start = 1, stop = 2)) # Extract measurement number into grouping variable
+mdf_reshaped$mes <- substr(mdf_reshaped$variable, start = 4, stop = nchar(as.character(mdf_reshaped$variable))) # Extract index/ref and measurement type into variable
+mdf_reshaped <- mdf_reshaped %>% select(-c(variable))
+mdf_reshaped$mes <- ifelse(mdf_reshaped$mes=="therm_skin_temp", "ref_temp", mdf_reshaped$mes)
+## Subset into index measurements only, further subset into each measurement type so value can be renamed accordingly
+mdf_reshaped_i <- subset(mdf_reshaped, grepl("index", mdf_reshaped$mes))
+mdf_reshaped_i_temp <- subset(mdf_reshaped_i, grepl("temp", mdf_reshaped_i$mes)) # Temp
+names(mdf_reshaped_i_temp)[5] <- paste(mdf_reshaped_i_temp$mes)
+mdf_reshaped_i_temp <- mdf_reshaped_i_temp %>% select(-c(mes))
+mdf_reshaped_i_o2 <- subset(mdf_reshaped_i, grepl("_o2", mdf_reshaped_i$mes)) # O2
+names(mdf_reshaped_i_o2)[5] <- paste(mdf_reshaped_i_o2$mes)
+mdf_reshaped_i_o2 <- mdf_reshaped_i_o2 %>% select(-c(mes))
+mdf_reshaped_i_pr <- subset(mdf_reshaped_i, grepl("pr", mdf_reshaped_i$mes)) # PR
+names(mdf_reshaped_i_pr)[5] <- paste(mdf_reshaped_i_pr$mes)
+mdf_reshaped_i_pr <- mdf_reshaped_i_pr %>% select(-c(mes))
+mdf_reshaped_i_pi <- subset(mdf_reshaped_i, grepl("pi", mdf_reshaped_i$mes)) # PI
+names(mdf_reshaped_i_pi)[5] <- paste(mdf_reshaped_i_pi$mes)
+mdf_reshaped_i_pi <- mdf_reshaped_i_pi %>% select(-c(mes))
+mdf_reshaped_i_rr <- subset(mdf_reshaped_i, grepl("rr", mdf_reshaped_i$mes)) # RR
+names(mdf_reshaped_i_rr)[5] <- paste(mdf_reshaped_i_rr$mes)
+mdf_reshaped_i_rr <- mdf_reshaped_i_rr %>% select(-c(mes))
+## Join back to one df for recreation of full df
+mdf_reshaped_i <- left_join(mdf_reshaped_i_temp, mdf_reshaped_i_o2, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_pr, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_pi, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+mdf_reshaped_i <- left_join(mdf_reshaped_i, mdf_reshaped_i_rr, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+## Do all of the above for reference measurements
+mdf_reshaped_r <- subset(mdf_reshaped, grepl("ref", mdf_reshaped$mes))
+mdf_reshaped_r_temp <- subset(mdf_reshaped_r, grepl("temp", mdf_reshaped_r$mes)) # Temp
+names(mdf_reshaped_r_temp)[5] <- paste(mdf_reshaped_r_temp$mes)
+mdf_reshaped_r_temp <- mdf_reshaped_r_temp %>% select(-c(mes))
+mdf_reshaped_r_o2 <- subset(mdf_reshaped_r, grepl("_o2", mdf_reshaped_r$mes)) # O2
+names(mdf_reshaped_r_o2)[5] <- paste(mdf_reshaped_r_o2$mes)
+mdf_reshaped_r_o2 <- mdf_reshaped_r_o2 %>% select(-c(mes))
+mdf_reshaped_r_pr <- subset(mdf_reshaped_r, grepl("pr", mdf_reshaped_r$mes)) # PR
+names(mdf_reshaped_r_pr)[5] <- paste(mdf_reshaped_r_pr$mes)
+mdf_reshaped_r_pr <- mdf_reshaped_r_pr %>% select(-c(mes))
+mdf_reshaped_r_pi <- subset(mdf_reshaped_r, grepl("pi", mdf_reshaped_r$mes)) # PI
+names(mdf_reshaped_r_pi)[5] <- paste(mdf_reshaped_r_pi$mes)
+mdf_reshaped_r_pi <- mdf_reshaped_r_pi %>% select(-c(mes))
+mdf_reshaped_r_rr <- subset(mdf_reshaped_r, grepl("rr", mdf_reshaped_r$mes)) # RR-all
+mdf_reshaped_r_rrac <- subset(mdf_reshaped_r_rr, grepl("rracoustic", mdf_reshaped_r_rr$mes)) # RR-acoustic
+names(mdf_reshaped_r_rrac)[5] <- paste(mdf_reshaped_r_rrac$mes)
+mdf_reshaped_r_rr <- subset(mdf_reshaped_r_rr, !grepl("rracoustic", mdf_reshaped_r_rr$mes)) # RR
+names(mdf_reshaped_r_rr)[5] <- paste(mdf_reshaped_r_rr$mes)
+mdf_reshaped_r_rr <- mdf_reshaped_r_rr %>% select(-c(mes))
+mdf_reshaped_r_rrac <- mdf_reshaped_r_rrac %>% select(-c(mes))
+## Join back to one df for recreation of full df
+mdf_reshaped_r <- left_join(mdf_reshaped_r_temp, mdf_reshaped_r_o2, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_pr, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_pi, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_rr, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+mdf_reshaped_r <- left_join(mdf_reshaped_r, mdf_reshaped_r_rrac, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp"))
+# Join index and ref df's back to one melted df
+mdf_reshaped <- left_join(mdf_reshaped_i, mdf_reshaped_r, by = c("ppt_id", "index_device_name", "age_months", "age_cat", "grp")) #long format df w/index & ref measurements for all devices & measurement types
+
+# Add indicator variables here for clinical thresholds (long format) -- Note: From the SAP, these are defined for the user in Section 5, if changed here be sure to change there and below
+mdf_reshaped$index_hypoxic <- ifelse(mdf_reshaped$index_o2<90, 1, 0)
+mdf_reshaped$ref_hypoxic <- ifelse(mdf_reshaped$ref_o2<90, 1, 0)
+mdf_reshaped$index_fever <- ifelse(mdf_reshaped$index_temp>=37.5, 1, 0)
+mdf_reshaped$ref_fever <- ifelse(mdf_reshaped$ref_temp>=37.5, 1, 0)
+mdf_reshaped$index_fastbreath_12mo <- ifelse(mdf_reshaped$index_rr>49 & mdf_reshaped$age_months<12, 1, 0)
+mdf_reshaped$ref_fastbreath_12mo <- ifelse(mdf_reshaped$ref_rr>49 & mdf_reshaped$age_months<12, 1, 0)
+mdf_reshaped$refac_fastbreath_12mo <- ifelse(mdf_reshaped$ref_rracoustic>49 & mdf_reshaped$age_months<12, 1, 0)
+mdf_reshaped$index_fastbreath_35mo <- ifelse(mdf_reshaped$index_rr>39 & (mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36), 1, 0)
+mdf_reshaped$ref_fastbreath_35mo <- ifelse(mdf_reshaped$ref_rr>39 & (mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36), 1, 0)
+mdf_reshaped$refac_fastbreath_35mo <- ifelse(mdf_reshaped$ref_rracoustic>39 & (mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36), 1, 0)
+mdf_reshaped$index_fastbreath_59mo <- ifelse(mdf_reshaped$index_rr>29 & (mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60), 1, 0)
+mdf_reshaped$ref_fastbreath_59mo <- ifelse(mdf_reshaped$ref_rr>29 & (mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60), 1, 0)
+mdf_reshaped$refac_fastbreath_59mo <- ifelse(mdf_reshaped$ref_rracoustic>29 & (mdf_reshaped$age_months>35 & mdf_reshaped$age_months<60), 1, 0)
+mdf_reshaped$index_fastbreath <- ifelse(mdf_reshaped$index_fastbreath_12mo==1 | mdf_reshaped$index_fastbreath_35mo==1 | mdf_reshaped$index_fastbreath_59mo==1, 1, 0)
+mdf_reshaped$ref_fastbreath <- ifelse(mdf_reshaped$ref_fastbreath_12mo==1 | mdf_reshaped$ref_fastbreath_35mo==1 | mdf_reshaped$ref_fastbreath_59mo==1, 1, 0)
+mdf_reshaped$refac_fastbreath <- ifelse(mdf_reshaped$refac_fastbreath_12mo==1 | mdf_reshaped$refac_fastbreath_35mo==1 | mdf_reshaped$refac_fastbreath_59mo==1, 1, 0)
+mdf_reshaped$index_tachycardic_12mo <- ifelse(mdf_reshaped$index_pr>179 & mdf_reshaped$age_months<12, 1, 0)
+mdf_reshaped$ref_tachycardic_12mo <- ifelse(mdf_reshaped$ref_pr>179 & mdf_reshaped$age_months<12, 1, 0)
+mdf_reshaped$index_tachycardic_59mo <- ifelse(mdf_reshaped$index_pr>139 & mdf_reshaped$age_months>11, 1, 0)
+mdf_reshaped$ref_tachycardic_59mo <- ifelse(mdf_reshaped$ref_pr>139 & mdf_reshaped$age_months>11, 1, 0)
+mdf_reshaped$index_tachycardic <- ifelse(mdf_reshaped$index_tachycardic_12mo==1 | mdf_reshaped$index_tachycardic_59mo==1, 1, 0)
+mdf_reshaped$ref_tachycardic <- ifelse(mdf_reshaped$ref_tachycardic_12mo==1 | mdf_reshaped$ref_tachycardic_59mo==1, 1, 0)
+# Add clinical age category for fast breathing, ensuring groupings fall within study age categories as well
+mdf_reshaped$age_cat_fastbreathe <- case_when(mdf_reshaped$age_months<2 ~ "0-1 month",
+                                              mdf_reshaped$age_months>1 & mdf_reshaped$age_months<12 ~ "2-11 months",
+                                              mdf_reshaped$age_months>11 & mdf_reshaped$age_months<36 ~ "12-35 months",
+                                              mdf_reshaped$age_months>35 ~ "36-59 months")
+mdf_reshaped$grp <- as.factor(mdf_reshaped$grp)
+
+# --- SECTION 2: CREATING DEVICE DF'S
+# Create a df for each device (in long format) -- note: any variable formatting (e.g., converting to factors) or additional variable creation should happen prior to creating these little dataframes
+
+## Long format (M1-M3 are levels of one variable)
+df_radg_l <- subset(mdf_reshaped, index_device_name=="Rad-G Temp (Masimo)")
+df_radg_cat1_l <- subset(df_radg_l, age_cat=="0-1 month")
+df_radg_cat2_l <- subset(df_radg_l, age_cat=="2-11 months")
+df_radg_cat3_l <- subset(df_radg_l, age_cat=="12-59 months")
+df_radg_cat1fb_l <- subset(df_radg_l, age_cat_fastbreathe=="0-1 month")
+df_radg_cat2fb_l <- subset(df_radg_l, age_cat_fastbreathe=="2-11 months")
+df_radg_cat3fb_l <- subset(df_radg_l, age_cat_fastbreathe=="12-35 months")
+df_radg_cat4fb_l <- subset(df_radg_l, age_cat_fastbreathe=="36-59 months")
+
+df_bio_l <- subset(mdf_reshaped, index_device_name=="m800 (Biolight)")
+df_bio_cat1_l <- subset(df_bio_l, age_cat=="0-1 month")
+df_bio_cat2_l <- subset(df_bio_l, age_cat=="2-11 months")
+df_bio_cat3_l <- subset(df_bio_l, age_cat=="12-59 months")
+df_bio_cat1fb_l <- subset(df_bio_l, age_cat_fastbreathe=="0-1 month")
+df_bio_cat2fb_l <- subset(df_bio_l, age_cat_fastbreathe=="2-11 months")
+df_bio_cat3fb_l <- subset(df_bio_l, age_cat_fastbreathe=="12-35 months")
+df_bio_cat4fb_l <- subset(df_bio_l, age_cat_fastbreathe=="36-59 months")
+
+df_neo_l <- subset(mdf_reshaped, index_device_name=="NeoGuard (Neopenda)")
+df_neo_cat1_l <- subset(df_neo_l, age_cat=="0-1 month")
+df_neo_cat2_l <- subset(df_neo_l, age_cat=="2-11 months")
+df_neo_cat3_l <- subset(df_neo_l, age_cat=="12-59 months")
+df_neo_cat1fb_l <- subset(df_neo_l, age_cat_fastbreathe=="0-1 month")
+df_neo_cat2fb_l <- subset(df_neo_l, age_cat_fastbreathe=="2-11 months")
+df_neo_cat3fb_l <- subset(df_neo_l, age_cat_fastbreathe=="12-35 months")
+df_neo_cat4fb_l <- subset(df_neo_l, age_cat_fastbreathe=="36-59 months")
+
+df_onyx_l <- subset(mdf_reshaped, index_device_name=="Onyx PO+RR (Nonin)")
+df_onyx_cat3_l <- subset(df_onyx_l, age_cat=="12-59 months")
+df_onyx_cat3fb_l <- subset(df_onyx_l, age_cat_fastbreathe=="12-35 months")
+df_onyx_cat4fb_l <- subset(df_onyx_l, age_cat_fastbreathe=="36-59 months")
+
+df_scan_l <- subset(mdf_reshaped, index_device_name=="Scanbo v8 (Scanbo)")
+df_scan_cat3_l <- subset(df_scan_l, age_cat=="12-59 months")
+df_scan_cat3fb_l <- subset(df_scan_l, age_cat_fastbreathe=="12-35 months")
+df_scan_cat4fb_l <- subset(df_scan_l, age_cat_fastbreathe=="36-59 months")
+```
+
+# Introduction
+This is a companion document to the TIMCI Diagnostic Accuracy Study Data Analysis at the global level. This document has been prepared to supplement the overall analysis with positive and negative percent agreement for each device and clinical measurement across the age categories. Due to low cell counts, this has only been conducted at the overall level and will not be analyzed at the country level. Analyses have been completed using the long data format, disregarding within-subject variance and handling each measurement instance as its own independent occurrence. Clinical thresholds applied are as follows:
+
+- Hypoxemia: <90%
+- Fast breathing: <12 months (>49 bpm); 12-35 months (>39 bpm); 36-60 months (>29 bpm)
+- Tachycardia: <12 months (>179 bpm); 12-60 months (>139 bpm)
+- Fever: ≥37.5C
+
+Definitions used in this document:
+
+- Dx Accuracy: Diagnostic Accuracy, the correctly classified portion overall (where both index and reference device give the same classification)
+- PPA: Positive Percent Agreement (Sensitivity, ability to detect true positive)
+- NPA: Negative Percent Agreement (Specificity, ability to detect true negatives)
+- PPV: Positive Predictive Value (likelihood a positive test result truly indicates presence of condition)
+- NPV: Negative Predictive Value (likelihood a negative test result truly indicates absence of condition)
+- CI: Confidence Interval (95%)
+
+# Rad-G Temp (Masimo)
+```{r}
+# Use twoXtwo function from above to create 2x2 tables for each clinical outcome overall and by age group
+## Hypoxia
+cm_hypoxia_overall <- twoXtwo(df_radg_l$index_hypoxic, df_radg_l$ref_hypoxic)
+cm_hypoxia_cat1 <- twoXtwo(df_radg_cat1_l$index_hypoxic, df_radg_cat1_l$ref_hypoxic)
+cm_hypoxia_cat2 <- twoXtwo(df_radg_cat2_l$index_hypoxic, df_radg_cat2_l$ref_hypoxic)
+cm_hypoxia_cat3 <- twoXtwo(df_radg_cat3_l$index_hypoxic, df_radg_cat3_l$ref_hypoxic)
+## Fever
+cm_fever_overall <- twoXtwo(df_radg_l$index_fever, df_radg_l$ref_fever)
+cm_fever_cat1 <- twoXtwo(df_radg_cat1_l$index_fever, df_radg_cat1_l$ref_fever)
+cm_fever_cat2 <- twoXtwo(df_radg_cat2_l$index_fever, df_radg_cat2_l$ref_fever)
+cm_fever_cat3 <- twoXtwo(df_radg_cat3_l$index_fever, df_radg_cat3_l$ref_fever)
+## Fast breathing (acoustic)
+cm_fbac_overall <- twoXtwo(df_radg_l$index_fastbreath, df_radg_l$refac_fastbreath)
+cm_fbac_cat1 <- twoXtwo(df_radg_cat1fb_l$index_fastbreath_12mo, df_radg_cat1fb_l$refac_fastbreath_12mo)
+cm_fbac_cat2 <- twoXtwo(df_radg_cat2fb_l$index_fastbreath_12mo, df_radg_cat2fb_l$refac_fastbreath_12mo)
+cm_fbac_cat3 <- twoXtwo(df_radg_cat3fb_l$index_fastbreath_35mo, df_radg_cat3fb_l$refac_fastbreath_35mo)
+cm_fbac_cat4 <- twoXtwo(df_radg_cat4fb_l$index_fastbreath_59mo, df_radg_cat4fb_l$refac_fastbreath_59mo)
+## Fast breathing (annotated)
+cm_fb_overall <- twoXtwo(df_radg_l$index_fastbreath, df_radg_l$ref_fastbreath)
+cm_fb_cat1 <- twoXtwo(df_radg_cat1fb_l$index_fastbreath_12mo, df_radg_cat1fb_l$ref_fastbreath_12mo)
+cm_fb_cat2 <- twoXtwo(df_radg_cat2fb_l$index_fastbreath_12mo, df_radg_cat2fb_l$ref_fastbreath_12mo)
+cm_fb_cat3 <- twoXtwo(df_radg_cat3fb_l$index_fastbreath_35mo, df_radg_cat3fb_l$ref_fastbreath_35mo)
+cm_fb_cat4 <- twoXtwo(df_radg_cat4fb_l$index_fastbreath_59mo, df_radg_cat4fb_l$ref_fastbreath_59mo)
+## Tachycardia
+cm_tachy_overall <- twoXtwo(df_radg_l$index_tachycardic, df_radg_l$ref_tachycardic)
+cm_tachy_cat1 <- twoXtwo(df_radg_cat1_l$index_tachycardic_12mo, df_radg_cat1_l$ref_tachycardic_12mo)
+cm_tachy_cat2 <- twoXtwo(df_radg_cat2_l$index_tachycardic_12mo, df_radg_cat2_l$ref_tachycardic_12mo)
+cm_tachy_cat3 <- twoXtwo(df_radg_cat3_l$index_tachycardic_59mo, df_radg_cat3_l$ref_tachycardic_59mo)
+
+# Create epi.tests object with dx accuracy parameters using above 2x2 tables
+# epi.tests object contains several outcome measures, including sensitivity, specificity, overall dx accuracy, PPV, NPV, and all associated upper/lower CIs
+## Hypoxia
+hypoxia_overall <- epi.tests(cm_hypoxia_overall)
+hypoxia_cat1 <- epi.tests(cm_hypoxia_cat1)
+hypoxia_cat2 <- epi.tests(cm_hypoxia_cat2)
+hypoxia_cat3 <- epi.tests(cm_hypoxia_cat3)
+## Fever
+fever_overall <- epi.tests(cm_fever_overall)
+fever_cat1 <- epi.tests(cm_fever_cat1)
+fever_cat2 <- epi.tests(cm_fever_cat2)
+fever_cat3 <- epi.tests(cm_fever_cat3)
+## Fast breathing (acoustic)
+fbac_overall <- epi.tests(cm_fbac_overall)
+fbac_cat1 <- epi.tests(cm_fbac_cat1)
+fbac_cat2 <- epi.tests(cm_fbac_cat2)
+fbac_cat3 <- epi.tests(cm_fbac_cat3)
+fbac_cat4 <- epi.tests(cm_fbac_cat4)
+## Fast breathing (annotated)
+fb_overall <- epi.tests(cm_fb_overall)
+fb_cat1 <- epi.tests(cm_fb_cat1)
+fb_cat2 <- epi.tests(cm_fb_cat2)
+fb_cat3 <- epi.tests(cm_fb_cat3)
+fb_cat4 <- epi.tests(cm_fb_cat4)
+## Tachycardia
+tachy_overall <- epi.tests(cm_tachy_overall)
+tachy_cat1 <- epi.tests(cm_tachy_cat1)
+tachy_cat2 <- epi.tests(cm_tachy_cat2)
+tachy_cat3 <- epi.tests(cm_tachy_cat3)
+
+# To call specific parameters from an epi.tests object (estimate, lower CI, upper CI):
+## PPA/Sensitivity: object[["detail"]][["est"]][3] / object[["detail"]][["lower"]][3] / object[["detail"]][["upper"]][3]
+## NPA/Specificity: object[["detail"]][["est"]][4] / object[["detail"]][["lower"]][4] / object[["detail"]][["upper"]][4]
+## Diagnostic Accuracy (Overall): object[["detail"]][["est"]][5] / object[["detail"]][["lower"]][5] / object[["detail"]][["upper"]][5]
+## PPV: object[["detail"]][["est"]][9] / object[["detail"]][["lower"]][9] / object[["detail"]][["upper"]][9]
+## NPV: object[["detail"]][["est"]][10] / object[["detail"]][["lower"]][10] / object[["detail"]][["upper"]][10]
+```
+
+## Hypoxia
+```{r}
+# Create table as data frame and output as flextable
+radg_hypoxia <- data.frame(col1 = c("Overall", "0-1 month", "2-11 months", "12-59 months"),
+                           dx_accuracy = c(paste(round(hypoxia_overall[["detail"]][["est"]][5], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat1[["detail"]][["est"]][5], 2), " (", round(hypoxia_cat1[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(hypoxia_cat1[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat2[["detail"]][["est"]][5], 2), " (", round(hypoxia_cat2[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(hypoxia_cat2[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][5], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(hypoxia_overall[["detail"]][["est"]][3], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat1[["detail"]][["est"]][3], 2), " (", round(hypoxia_cat1[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(hypoxia_cat1[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat2[["detail"]][["est"]][3], 2), " (", round(hypoxia_cat2[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(hypoxia_cat2[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][3], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(hypoxia_overall[["detail"]][["est"]][4], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat1[["detail"]][["est"]][4], 2), " (", round(hypoxia_cat1[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(hypoxia_cat1[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat2[["detail"]][["est"]][4], 2), " (", round(hypoxia_cat2[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(hypoxia_cat2[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][4], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(hypoxia_overall[["detail"]][["est"]][9], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat1[["detail"]][["est"]][9], 2), " (", round(hypoxia_cat1[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(hypoxia_cat1[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat2[["detail"]][["est"]][9], 2), " (", round(hypoxia_cat2[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(hypoxia_cat2[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][9], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(hypoxia_overall[["detail"]][["est"]][10], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat1[["detail"]][["est"]][10], 2), " (", round(hypoxia_cat1[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(hypoxia_cat1[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat2[["detail"]][["est"]][10], 2), " (", round(hypoxia_cat2[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(hypoxia_cat2[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][10], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(radg_hypoxia) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "Rad-G Temp, Hypoxia"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Fever
+```{r}
+# Create table as data frame and output as flextable
+radg_fever <- data.frame(col1 = c("Overall", "0-1 month", "2-11 months", "12-59 months"),
+                           dx_accuracy = c(paste(round(fever_overall[["detail"]][["est"]][5], 2), " (", round(fever_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fever_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fever_cat1[["detail"]][["est"]][5], 2), " (", round(fever_cat1[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fever_cat1[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fever_cat2[["detail"]][["est"]][5], 2), " (", round(fever_cat2[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fever_cat2[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fever_cat3[["detail"]][["est"]][5], 2), " (", round(fever_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fever_cat3[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(fever_overall[["detail"]][["est"]][3], 2), " (", round(fever_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fever_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fever_cat1[["detail"]][["est"]][3], 2), " (", round(fever_cat1[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fever_cat1[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fever_cat2[["detail"]][["est"]][3], 2), " (", round(fever_cat2[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fever_cat2[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fever_cat3[["detail"]][["est"]][3], 2), " (", round(fever_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fever_cat3[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(fever_overall[["detail"]][["est"]][4], 2), " (", round(fever_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fever_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fever_cat1[["detail"]][["est"]][4], 2), " (", round(fever_cat1[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fever_cat1[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fever_cat2[["detail"]][["est"]][4], 2), " (", round(fever_cat2[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fever_cat2[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fever_cat3[["detail"]][["est"]][4], 2), " (", round(fever_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fever_cat3[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(fever_overall[["detail"]][["est"]][9], 2), " (", round(fever_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fever_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fever_cat1[["detail"]][["est"]][9], 2), " (", round(fever_cat1[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fever_cat1[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fever_cat2[["detail"]][["est"]][9], 2), " (", round(fever_cat2[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fever_cat2[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fever_cat3[["detail"]][["est"]][9], 2), " (", round(fever_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fever_cat3[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(fever_overall[["detail"]][["est"]][10], 2), " (", round(fever_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fever_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fever_cat1[["detail"]][["est"]][10], 2), " (", round(fever_cat1[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fever_cat1[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fever_cat2[["detail"]][["est"]][10], 2), " (", round(fever_cat2[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fever_cat2[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fever_cat3[["detail"]][["est"]][10], 2), " (", round(fever_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fever_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(radg_fever) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "Rad-G Temp, Fever"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Fast breathing (acoustic)
+```{r}
+# Create table as data frame and output as flextable
+radg_fbac <- data.frame(col1 = c("Overall", "0-1 month", "2-11 months", "12-35 months", "36-59 months"),
+                           dx_accuracy = c(paste(round(fbac_overall[["detail"]][["est"]][5], 2), " (", round(fbac_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fbac_cat1[["detail"]][["est"]][5], 2), " (", round(fbac_cat1[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_cat1[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fbac_cat2[["detail"]][["est"]][5], 2), " (", round(fbac_cat2[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_cat2[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][5], 2), " (", round(fbac_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][5], 2), " (", round(fbac_cat4[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(fbac_overall[["detail"]][["est"]][3], 2), " (", round(fbac_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fbac_cat1[["detail"]][["est"]][3], 2), " (", round(fbac_cat1[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_cat1[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fbac_cat2[["detail"]][["est"]][3], 2), " (", round(fbac_cat2[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_cat2[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][3], 2), " (", round(fbac_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][3], 2), " (", round(fbac_cat4[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(fbac_overall[["detail"]][["est"]][4], 2), " (", round(fbac_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fbac_cat1[["detail"]][["est"]][4], 2), " (", round(fbac_cat1[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_cat1[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fbac_cat2[["detail"]][["est"]][4], 2), " (", round(fbac_cat2[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_cat2[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][4], 2), " (", round(fbac_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][4], 2), " (", round(fbac_cat4[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(fbac_overall[["detail"]][["est"]][9], 2), " (", round(fbac_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fbac_cat1[["detail"]][["est"]][9], 2), " (", round(fbac_cat1[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_cat1[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fbac_cat2[["detail"]][["est"]][9], 2), " (", round(fbac_cat2[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_cat2[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][9], 2), " (", round(fbac_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][9], 2), " (", round(fbac_cat4[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(fbac_overall[["detail"]][["est"]][10], 2), " (", round(fbac_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fbac_cat1[["detail"]][["est"]][10], 2), " (", round(fbac_cat1[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_cat1[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fbac_cat2[["detail"]][["est"]][10], 2), " (", round(fbac_cat2[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_cat2[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][10], 2), " (", round(fbac_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][10], 2), " (", round(fbac_cat4[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(radg_fbac) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "Rad-G Temp, Fast breathing (acoustic)"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Fast breathing (annotated)
+```{r}
+# Create table as data frame and output as flextable
+radg_fb <- data.frame(col1 = c("Overall", "0-1 month", "2-11 months", "12-35 months", "36-59 months"),
+                           dx_accuracy = c(paste(round(fb_overall[["detail"]][["est"]][5], 2), " (", round(fb_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fb_cat1[["detail"]][["est"]][5], 2), " (", round(fb_cat1[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_cat1[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fb_cat2[["detail"]][["est"]][5], 2), " (", round(fb_cat2[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_cat2[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][5], 2), " (", round(fb_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][5], 2), " (", round(fb_cat4[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(fb_overall[["detail"]][["est"]][3], 2), " (", round(fb_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fb_cat1[["detail"]][["est"]][3], 2), " (", round(fb_cat1[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_cat1[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fb_cat2[["detail"]][["est"]][3], 2), " (", round(fb_cat2[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_cat2[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][3], 2), " (", round(fb_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][3], 2), " (", round(fb_cat4[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(fb_overall[["detail"]][["est"]][4], 2), " (", round(fb_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fb_cat1[["detail"]][["est"]][4], 2), " (", round(fb_cat1[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_cat1[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fb_cat2[["detail"]][["est"]][4], 2), " (", round(fb_cat2[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_cat2[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][4], 2), " (", round(fb_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][4], 2), " (", round(fb_cat4[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(fb_overall[["detail"]][["est"]][9], 2), " (", round(fb_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fb_cat1[["detail"]][["est"]][9], 2), " (", round(fb_cat1[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_cat1[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fb_cat2[["detail"]][["est"]][9], 2), " (", round(fb_cat2[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_cat2[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][9], 2), " (", round(fb_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][9], 2), " (", round(fb_cat4[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(fb_overall[["detail"]][["est"]][10], 2), " (", round(fb_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fb_cat1[["detail"]][["est"]][10], 2), " (", round(fb_cat1[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_cat1[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fb_cat2[["detail"]][["est"]][10], 2), " (", round(fb_cat2[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_cat2[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][10], 2), " (", round(fb_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][10], 2), " (", round(fb_cat4[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(radg_fb) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "Rad-G Temp, Fast breathing (annotated)"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Tachycardia
+```{r}
+# Create table as data frame and output as flextable
+radg_tachy <- data.frame(col1 = c("Overall", "0-1 month", "2-11 months", "12-59 months"),
+                           dx_accuracy = c(paste(round(tachy_overall[["detail"]][["est"]][5], 2), " (", round(tachy_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(tachy_cat1[["detail"]][["est"]][5], 2), " (", round(tachy_cat1[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(tachy_cat1[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(tachy_cat2[["detail"]][["est"]][5], 2), " (", round(tachy_cat2[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(tachy_cat2[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][5], 2), " (", round(tachy_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(tachy_overall[["detail"]][["est"]][3], 2), " (", round(tachy_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(tachy_cat1[["detail"]][["est"]][3], 2), " (", round(tachy_cat1[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(tachy_cat1[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(tachy_cat2[["detail"]][["est"]][3], 2), " (", round(tachy_cat2[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(tachy_cat2[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][3], 2), " (", round(tachy_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(tachy_overall[["detail"]][["est"]][4], 2), " (", round(tachy_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(tachy_cat1[["detail"]][["est"]][4], 2), " (", round(tachy_cat1[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(tachy_cat1[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(tachy_cat2[["detail"]][["est"]][4], 2), " (", round(tachy_cat2[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(tachy_cat2[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][4], 2), " (", round(tachy_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(tachy_overall[["detail"]][["est"]][9], 2), " (", round(tachy_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(tachy_cat1[["detail"]][["est"]][9], 2), " (", round(tachy_cat1[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(tachy_cat1[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(tachy_cat2[["detail"]][["est"]][9], 2), " (", round(tachy_cat2[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(tachy_cat2[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][9], 2), " (", round(tachy_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(tachy_overall[["detail"]][["est"]][10], 2), " (", round(tachy_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(tachy_cat1[["detail"]][["est"]][10], 2), " (", round(tachy_cat1[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(tachy_cat1[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(tachy_cat2[["detail"]][["est"]][10], 2), " (", round(tachy_cat2[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(tachy_cat2[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][10], 2), " (", round(tachy_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(radg_tachy) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "Rad-G Temp, Tachycardia"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+# m800 (Biolight)
+```{r}
+# Use twoXtwo function from above to create 2x2 tables for each clinical outcome overall and by age group
+## Hypoxia
+cm_hypoxia_overall <- twoXtwo(df_bio_l$index_hypoxic, df_bio_l$ref_hypoxic)
+cm_hypoxia_cat1 <- twoXtwo(df_bio_cat1_l$index_hypoxic, df_bio_cat1_l$ref_hypoxic)
+cm_hypoxia_cat2 <- twoXtwo(df_bio_cat2_l$index_hypoxic, df_bio_cat2_l$ref_hypoxic)
+cm_hypoxia_cat3 <- twoXtwo(df_bio_cat3_l$index_hypoxic, df_bio_cat3_l$ref_hypoxic)
+## Fast breathing (acoustic)
+cm_fbac_overall <- twoXtwo(df_bio_l$index_fastbreath, df_bio_l$refac_fastbreath)
+cm_fbac_cat1 <- twoXtwo(df_bio_cat1fb_l$index_fastbreath_12mo, df_bio_cat1fb_l$refac_fastbreath_12mo)
+cm_fbac_cat2 <- twoXtwo(df_bio_cat2fb_l$index_fastbreath_12mo, df_bio_cat2fb_l$refac_fastbreath_12mo)
+cm_fbac_cat3 <- twoXtwo(df_bio_cat3fb_l$index_fastbreath_35mo, df_bio_cat3fb_l$refac_fastbreath_35mo)
+cm_fbac_cat4 <- twoXtwo(df_bio_cat4fb_l$index_fastbreath_59mo, df_bio_cat4fb_l$refac_fastbreath_59mo)
+## Fast breathing (annotated)
+cm_fb_overall <- twoXtwo(df_bio_l$index_fastbreath, df_bio_l$ref_fastbreath)
+cm_fb_cat1 <- twoXtwo(df_bio_cat1fb_l$index_fastbreath_12mo, df_bio_cat1fb_l$ref_fastbreath_12mo)
+cm_fb_cat2 <- twoXtwo(df_bio_cat2fb_l$index_fastbreath_12mo, df_bio_cat2fb_l$ref_fastbreath_12mo)
+cm_fb_cat3 <- twoXtwo(df_bio_cat3fb_l$index_fastbreath_35mo, df_bio_cat3fb_l$ref_fastbreath_35mo)
+cm_fb_cat4 <- twoXtwo(df_bio_cat4fb_l$index_fastbreath_59mo, df_bio_cat4fb_l$ref_fastbreath_59mo)
+## Tachycardia
+cm_tachy_overall <- twoXtwo(df_bio_l$index_tachycardic, df_bio_l$ref_tachycardic)
+cm_tachy_cat1 <- twoXtwo(df_bio_cat1_l$index_tachycardic_12mo, df_bio_cat1_l$ref_tachycardic_12mo)
+cm_tachy_cat2 <- twoXtwo(df_bio_cat2_l$index_tachycardic_12mo, df_bio_cat2_l$ref_tachycardic_12mo)
+cm_tachy_cat3 <- twoXtwo(df_bio_cat3_l$index_tachycardic_59mo, df_bio_cat3_l$ref_tachycardic_59mo)
+
+# Create epi.tests object with dx accuracy parameters using above 2x2 tables
+# epi.tests object contains several outcome measures, including sensitivity, specificity, overall dx accuracy, PPV, NPV, and all associated upper/lower CIs
+## Hypoxia
+hypoxia_overall <- epi.tests(cm_hypoxia_overall)
+hypoxia_cat1 <- epi.tests(cm_hypoxia_cat1)
+hypoxia_cat2 <- epi.tests(cm_hypoxia_cat2)
+hypoxia_cat3 <- epi.tests(cm_hypoxia_cat3)
+## Fast breathing (acoustic)
+fbac_overall <- epi.tests(cm_fbac_overall)
+fbac_cat1 <- epi.tests(cm_fbac_cat1)
+fbac_cat2 <- epi.tests(cm_fbac_cat2)
+fbac_cat3 <- epi.tests(cm_fbac_cat3)
+fbac_cat4 <- epi.tests(cm_fbac_cat4)
+## Fast breathing (annotated)
+fb_overall <- epi.tests(cm_fb_overall)
+fb_cat1 <- epi.tests(cm_fb_cat1)
+fb_cat2 <- epi.tests(cm_fb_cat2)
+fb_cat3 <- epi.tests(cm_fb_cat3)
+fb_cat4 <- epi.tests(cm_fb_cat4)
+## Tachycardia
+tachy_overall <- epi.tests(cm_tachy_overall)
+tachy_cat1 <- epi.tests(cm_tachy_cat1)
+tachy_cat2 <- epi.tests(cm_tachy_cat2)
+tachy_cat3 <- epi.tests(cm_tachy_cat3)
+```
+
+## Hypoxia
+```{r}
+# Create table as data frame and output as flextable
+bio_hypoxia <- data.frame(col1 = c("Overall", "0-1 month", "2-11 months", "12-59 months"),
+                           dx_accuracy = c(paste(round(hypoxia_overall[["detail"]][["est"]][5], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat1[["detail"]][["est"]][5], 2), " (", round(hypoxia_cat1[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(hypoxia_cat1[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat2[["detail"]][["est"]][5], 2), " (", round(hypoxia_cat2[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(hypoxia_cat2[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][5], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(hypoxia_overall[["detail"]][["est"]][3], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat1[["detail"]][["est"]][3], 2), " (", round(hypoxia_cat1[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(hypoxia_cat1[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat2[["detail"]][["est"]][3], 2), " (", round(hypoxia_cat2[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(hypoxia_cat2[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][3], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(hypoxia_overall[["detail"]][["est"]][4], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat1[["detail"]][["est"]][4], 2), " (", round(hypoxia_cat1[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(hypoxia_cat1[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat2[["detail"]][["est"]][4], 2), " (", round(hypoxia_cat2[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(hypoxia_cat2[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][4], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(hypoxia_overall[["detail"]][["est"]][9], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat1[["detail"]][["est"]][9], 2), " (", round(hypoxia_cat1[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(hypoxia_cat1[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat2[["detail"]][["est"]][9], 2), " (", round(hypoxia_cat2[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(hypoxia_cat2[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][9], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(hypoxia_overall[["detail"]][["est"]][10], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat1[["detail"]][["est"]][10], 2), " (", round(hypoxia_cat1[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(hypoxia_cat1[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat2[["detail"]][["est"]][10], 2), " (", round(hypoxia_cat2[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(hypoxia_cat2[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][10], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(bio_hypoxia) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "m800, Hypoxia"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Fast breathing (acoustic)
+```{r}
+# Create table as data frame and output as flextable
+bio_fbac <- data.frame(col1 = c("Overall", "0-1 month", "2-11 months", "12-35 months", "36-59 months"),
+                           dx_accuracy = c(paste(round(fbac_overall[["detail"]][["est"]][5], 2), " (", round(fbac_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fbac_cat1[["detail"]][["est"]][5], 2), " (", round(fbac_cat1[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_cat1[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fbac_cat2[["detail"]][["est"]][5], 2), " (", round(fbac_cat2[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_cat2[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][5], 2), " (", round(fbac_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][5], 2), " (", round(fbac_cat4[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(fbac_overall[["detail"]][["est"]][3], 2), " (", round(fbac_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fbac_cat1[["detail"]][["est"]][3], 2), " (", round(fbac_cat1[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_cat1[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fbac_cat2[["detail"]][["est"]][3], 2), " (", round(fbac_cat2[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_cat2[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][3], 2), " (", round(fbac_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][3], 2), " (", round(fbac_cat4[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(fbac_overall[["detail"]][["est"]][4], 2), " (", round(fbac_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fbac_cat1[["detail"]][["est"]][4], 2), " (", round(fbac_cat1[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_cat1[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fbac_cat2[["detail"]][["est"]][4], 2), " (", round(fbac_cat2[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_cat2[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][4], 2), " (", round(fbac_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][4], 2), " (", round(fbac_cat4[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(fbac_overall[["detail"]][["est"]][9], 2), " (", round(fbac_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fbac_cat1[["detail"]][["est"]][9], 2), " (", round(fbac_cat1[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_cat1[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fbac_cat2[["detail"]][["est"]][9], 2), " (", round(fbac_cat2[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_cat2[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][9], 2), " (", round(fbac_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][9], 2), " (", round(fbac_cat4[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(fbac_overall[["detail"]][["est"]][10], 2), " (", round(fbac_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fbac_cat1[["detail"]][["est"]][10], 2), " (", round(fbac_cat1[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_cat1[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fbac_cat2[["detail"]][["est"]][10], 2), " (", round(fbac_cat2[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_cat2[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][10], 2), " (", round(fbac_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][10], 2), " (", round(fbac_cat4[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(bio_fbac) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "m800, Fast breathing (acoustic)"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Fast breathing (annotated)
+```{r}
+# Create table as data frame and output as flextable
+bio_fb <- data.frame(col1 = c("Overall", "0-1 month", "2-11 months", "12-35 months", "36-59 months"),
+                           dx_accuracy = c(paste(round(fb_overall[["detail"]][["est"]][5], 2), " (", round(fb_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fb_cat1[["detail"]][["est"]][5], 2), " (", round(fb_cat1[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_cat1[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fb_cat2[["detail"]][["est"]][5], 2), " (", round(fb_cat2[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_cat2[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][5], 2), " (", round(fb_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][5], 2), " (", round(fb_cat4[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(fb_overall[["detail"]][["est"]][3], 2), " (", round(fb_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fb_cat1[["detail"]][["est"]][3], 2), " (", round(fb_cat1[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_cat1[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fb_cat2[["detail"]][["est"]][3], 2), " (", round(fb_cat2[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_cat2[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][3], 2), " (", round(fb_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][3], 2), " (", round(fb_cat4[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(fb_overall[["detail"]][["est"]][4], 2), " (", round(fb_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fb_cat1[["detail"]][["est"]][4], 2), " (", round(fb_cat1[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_cat1[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fb_cat2[["detail"]][["est"]][4], 2), " (", round(fb_cat2[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_cat2[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][4], 2), " (", round(fb_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][4], 2), " (", round(fb_cat4[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(fb_overall[["detail"]][["est"]][9], 2), " (", round(fb_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fb_cat1[["detail"]][["est"]][9], 2), " (", round(fb_cat1[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_cat1[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fb_cat2[["detail"]][["est"]][9], 2), " (", round(fb_cat2[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_cat2[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][9], 2), " (", round(fb_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][9], 2), " (", round(fb_cat4[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(fb_overall[["detail"]][["est"]][10], 2), " (", round(fb_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fb_cat1[["detail"]][["est"]][10], 2), " (", round(fb_cat1[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_cat1[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fb_cat2[["detail"]][["est"]][10], 2), " (", round(fb_cat2[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_cat2[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][10], 2), " (", round(fb_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][10], 2), " (", round(fb_cat4[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(bio_fb) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "m800, Fast breathing (annotated)"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Tachycardia
+```{r}
+# Create table as data frame and output as flextable
+bio_tachy <- data.frame(col1 = c("Overall", "0-1 month", "2-11 months", "12-59 months"),
+                           dx_accuracy = c(paste(round(tachy_overall[["detail"]][["est"]][5], 2), " (", round(tachy_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(tachy_cat1[["detail"]][["est"]][5], 2), " (", round(tachy_cat1[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(tachy_cat1[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(tachy_cat2[["detail"]][["est"]][5], 2), " (", round(tachy_cat2[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(tachy_cat2[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][5], 2), " (", round(tachy_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(tachy_overall[["detail"]][["est"]][3], 2), " (", round(tachy_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(tachy_cat1[["detail"]][["est"]][3], 2), " (", round(tachy_cat1[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(tachy_cat1[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(tachy_cat2[["detail"]][["est"]][3], 2), " (", round(tachy_cat2[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(tachy_cat2[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][3], 2), " (", round(tachy_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(tachy_overall[["detail"]][["est"]][4], 2), " (", round(tachy_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(tachy_cat1[["detail"]][["est"]][4], 2), " (", round(tachy_cat1[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(tachy_cat1[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(tachy_cat2[["detail"]][["est"]][4], 2), " (", round(tachy_cat2[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(tachy_cat2[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][4], 2), " (", round(tachy_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(tachy_overall[["detail"]][["est"]][9], 2), " (", round(tachy_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(tachy_cat1[["detail"]][["est"]][9], 2), " (", round(tachy_cat1[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(tachy_cat1[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(tachy_cat2[["detail"]][["est"]][9], 2), " (", round(tachy_cat2[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(tachy_cat2[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][9], 2), " (", round(tachy_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(tachy_overall[["detail"]][["est"]][10], 2), " (", round(tachy_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(tachy_cat1[["detail"]][["est"]][10], 2), " (", round(tachy_cat1[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(tachy_cat1[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(tachy_cat2[["detail"]][["est"]][10], 2), " (", round(tachy_cat2[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(tachy_cat2[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][10], 2), " (", round(tachy_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(bio_tachy) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "m800, Tachycardia"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+# NeoGuard (Neopenda)
+```{r}
+# Use twoXtwo function from above to create 2x2 tables for each clinical outcome overall and by age group
+## Hypoxia
+cm_hypoxia_overall <- twoXtwo(df_neo_l$index_hypoxic, df_neo_l$ref_hypoxic)
+cm_hypoxia_cat1 <- twoXtwo(df_neo_cat1_l$index_hypoxic, df_neo_cat1_l$ref_hypoxic)
+cm_hypoxia_cat2 <- twoXtwo(df_neo_cat2_l$index_hypoxic, df_neo_cat2_l$ref_hypoxic)
+cm_hypoxia_cat3 <- twoXtwo(df_neo_cat3_l$index_hypoxic, df_neo_cat3_l$ref_hypoxic)
+## Fever
+cm_fever_overall <- twoXtwo(df_neo_l$index_fever, df_neo_l$ref_fever)
+cm_fever_cat1 <- twoXtwo(df_neo_cat1_l$index_fever, df_neo_cat1_l$ref_fever)
+cm_fever_cat2 <- twoXtwo(df_neo_cat2_l$index_fever, df_neo_cat2_l$ref_fever)
+cm_fever_cat3 <- twoXtwo(df_neo_cat3_l$index_fever, df_neo_cat3_l$ref_fever)
+## Fast breathing (acoustic)
+cm_fbac_overall <- twoXtwo(df_neo_l$index_fastbreath, df_neo_l$refac_fastbreath)
+cm_fbac_cat1 <- twoXtwo(df_neo_cat1fb_l$index_fastbreath_12mo, df_neo_cat1fb_l$refac_fastbreath_12mo)
+cm_fbac_cat2 <- twoXtwo(df_neo_cat2fb_l$index_fastbreath_12mo, df_neo_cat2fb_l$refac_fastbreath_12mo)
+cm_fbac_cat3 <- twoXtwo(df_neo_cat3fb_l$index_fastbreath_35mo, df_neo_cat3fb_l$refac_fastbreath_35mo)
+cm_fbac_cat4 <- twoXtwo(df_neo_cat4fb_l$index_fastbreath_59mo, df_neo_cat4fb_l$refac_fastbreath_59mo)
+## Fast breathing (annotated)
+cm_fb_overall <- twoXtwo(df_neo_l$index_fastbreath, df_neo_l$ref_fastbreath)
+cm_fb_cat1 <- twoXtwo(df_neo_cat1fb_l$index_fastbreath_12mo, df_neo_cat1fb_l$ref_fastbreath_12mo)
+cm_fb_cat2 <- twoXtwo(df_neo_cat2fb_l$index_fastbreath_12mo, df_neo_cat2fb_l$ref_fastbreath_12mo)
+cm_fb_cat3 <- twoXtwo(df_neo_cat3fb_l$index_fastbreath_35mo, df_neo_cat3fb_l$ref_fastbreath_35mo)
+cm_fb_cat4 <- twoXtwo(df_neo_cat4fb_l$index_fastbreath_59mo, df_neo_cat4fb_l$ref_fastbreath_59mo)
+## Tachycardia
+cm_tachy_overall <- twoXtwo(df_neo_l$index_tachycardic, df_neo_l$ref_tachycardic)
+cm_tachy_cat1 <- twoXtwo(df_neo_cat1_l$index_tachycardic_12mo, df_neo_cat1_l$ref_tachycardic_12mo)
+cm_tachy_cat2 <- twoXtwo(df_neo_cat2_l$index_tachycardic_12mo, df_neo_cat2_l$ref_tachycardic_12mo)
+cm_tachy_cat3 <- twoXtwo(df_neo_cat3_l$index_tachycardic_59mo, df_neo_cat3_l$ref_tachycardic_59mo)
+
+# Create epi.tests object with dx accuracy parameters using above 2x2 tables
+# epi.tests object contains several outcome measures, including sensitivity, specificity, overall dx accuracy, PPV, NPV, and all associated upper/lower CIs
+## Hypoxia
+hypoxia_overall <- epi.tests(cm_hypoxia_overall)
+hypoxia_cat1 <- epi.tests(cm_hypoxia_cat1)
+hypoxia_cat2 <- epi.tests(cm_hypoxia_cat2)
+hypoxia_cat3 <- epi.tests(cm_hypoxia_cat3)
+## Fever
+fever_overall <- epi.tests(cm_fever_overall)
+fever_cat1 <- epi.tests(cm_fever_cat1)
+fever_cat2 <- epi.tests(cm_fever_cat2)
+fever_cat3 <- epi.tests(cm_fever_cat3)
+## Fast breathing (acoustic)
+fbac_overall <- epi.tests(cm_fbac_overall)
+fbac_cat1 <- epi.tests(cm_fbac_cat1)
+fbac_cat2 <- epi.tests(cm_fbac_cat2)
+fbac_cat3 <- epi.tests(cm_fbac_cat3)
+fbac_cat4 <- epi.tests(cm_fbac_cat4)
+## Fast breathing (annotated)
+fb_overall <- epi.tests(cm_fb_overall)
+fb_cat1 <- epi.tests(cm_fb_cat1)
+fb_cat2 <- epi.tests(cm_fb_cat2)
+fb_cat3 <- epi.tests(cm_fb_cat3)
+fb_cat4 <- epi.tests(cm_fb_cat4)
+## Tachycardia
+tachy_overall <- epi.tests(cm_tachy_overall)
+tachy_cat1 <- epi.tests(cm_tachy_cat1)
+tachy_cat2 <- epi.tests(cm_tachy_cat2)
+tachy_cat3 <- epi.tests(cm_tachy_cat3)
+```
+
+## Hypoxia
+```{r}
+# Create table as data frame and output as flextable
+neo_hypoxia <- data.frame(col1 = c("Overall", "0-1 month", "2-11 months", "12-59 months"),
+                           dx_accuracy = c(paste(round(hypoxia_overall[["detail"]][["est"]][5], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat1[["detail"]][["est"]][5], 2), " (", round(hypoxia_cat1[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(hypoxia_cat1[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat2[["detail"]][["est"]][5], 2), " (", round(hypoxia_cat2[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(hypoxia_cat2[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][5], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(hypoxia_overall[["detail"]][["est"]][3], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat1[["detail"]][["est"]][3], 2), " (", round(hypoxia_cat1[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(hypoxia_cat1[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat2[["detail"]][["est"]][3], 2), " (", round(hypoxia_cat2[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(hypoxia_cat2[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][3], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(hypoxia_overall[["detail"]][["est"]][4], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat1[["detail"]][["est"]][4], 2), " (", round(hypoxia_cat1[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(hypoxia_cat1[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat2[["detail"]][["est"]][4], 2), " (", round(hypoxia_cat2[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(hypoxia_cat2[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][4], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(hypoxia_overall[["detail"]][["est"]][9], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat1[["detail"]][["est"]][9], 2), " (", round(hypoxia_cat1[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(hypoxia_cat1[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat2[["detail"]][["est"]][9], 2), " (", round(hypoxia_cat2[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(hypoxia_cat2[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][9], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(hypoxia_overall[["detail"]][["est"]][10], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat1[["detail"]][["est"]][10], 2), " (", round(hypoxia_cat1[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(hypoxia_cat1[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat2[["detail"]][["est"]][10], 2), " (", round(hypoxia_cat2[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(hypoxia_cat2[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][10], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(neo_hypoxia) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "NeoGuard, Hypoxia"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Fever
+```{r}
+# Create table as data frame and output as flextable
+neo_fever <- data.frame(col1 = c("Overall", "0-1 month", "2-11 months", "12-59 months"),
+                           dx_accuracy = c(paste(round(fever_overall[["detail"]][["est"]][5], 2), " (", round(fever_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fever_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fever_cat1[["detail"]][["est"]][5], 2), " (", round(fever_cat1[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fever_cat1[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fever_cat2[["detail"]][["est"]][5], 2), " (", round(fever_cat2[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fever_cat2[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fever_cat3[["detail"]][["est"]][5], 2), " (", round(fever_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fever_cat3[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(fever_overall[["detail"]][["est"]][3], 2), " (", round(fever_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fever_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fever_cat1[["detail"]][["est"]][3], 2), " (", round(fever_cat1[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fever_cat1[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fever_cat2[["detail"]][["est"]][3], 2), " (", round(fever_cat2[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fever_cat2[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fever_cat3[["detail"]][["est"]][3], 2), " (", round(fever_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fever_cat3[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(fever_overall[["detail"]][["est"]][4], 2), " (", round(fever_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fever_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fever_cat1[["detail"]][["est"]][4], 2), " (", round(fever_cat1[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fever_cat1[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fever_cat2[["detail"]][["est"]][4], 2), " (", round(fever_cat2[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fever_cat2[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fever_cat3[["detail"]][["est"]][4], 2), " (", round(fever_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fever_cat3[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(fever_overall[["detail"]][["est"]][9], 2), " (", round(fever_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fever_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fever_cat1[["detail"]][["est"]][9], 2), " (", round(fever_cat1[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fever_cat1[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fever_cat2[["detail"]][["est"]][9], 2), " (", round(fever_cat2[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fever_cat2[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fever_cat3[["detail"]][["est"]][9], 2), " (", round(fever_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fever_cat3[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(fever_overall[["detail"]][["est"]][10], 2), " (", round(fever_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fever_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fever_cat1[["detail"]][["est"]][10], 2), " (", round(fever_cat1[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fever_cat1[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fever_cat2[["detail"]][["est"]][10], 2), " (", round(fever_cat2[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fever_cat2[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fever_cat3[["detail"]][["est"]][10], 2), " (", round(fever_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fever_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(neo_fever) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "NeoGuard, Fever"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Fast breathing (acoustic)
+```{r}
+# Create table as data frame and output as flextable
+neo_fbac <- data.frame(col1 = c("Overall", "0-1 month", "2-11 months", "12-35 months", "36-59 months"),
+                           dx_accuracy = c(paste(round(fbac_overall[["detail"]][["est"]][5], 2), " (", round(fbac_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fbac_cat1[["detail"]][["est"]][5], 2), " (", round(fbac_cat1[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_cat1[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fbac_cat2[["detail"]][["est"]][5], 2), " (", round(fbac_cat2[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_cat2[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][5], 2), " (", round(fbac_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][5], 2), " (", round(fbac_cat4[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(fbac_overall[["detail"]][["est"]][3], 2), " (", round(fbac_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fbac_cat1[["detail"]][["est"]][3], 2), " (", round(fbac_cat1[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_cat1[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fbac_cat2[["detail"]][["est"]][3], 2), " (", round(fbac_cat2[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_cat2[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][3], 2), " (", round(fbac_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][3], 2), " (", round(fbac_cat4[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(fbac_overall[["detail"]][["est"]][4], 2), " (", round(fbac_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fbac_cat1[["detail"]][["est"]][4], 2), " (", round(fbac_cat1[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_cat1[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fbac_cat2[["detail"]][["est"]][4], 2), " (", round(fbac_cat2[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_cat2[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][4], 2), " (", round(fbac_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][4], 2), " (", round(fbac_cat4[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(fbac_overall[["detail"]][["est"]][9], 2), " (", round(fbac_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fbac_cat1[["detail"]][["est"]][9], 2), " (", round(fbac_cat1[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_cat1[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fbac_cat2[["detail"]][["est"]][9], 2), " (", round(fbac_cat2[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_cat2[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][9], 2), " (", round(fbac_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][9], 2), " (", round(fbac_cat4[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(fbac_overall[["detail"]][["est"]][10], 2), " (", round(fbac_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fbac_cat1[["detail"]][["est"]][10], 2), " (", round(fbac_cat1[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_cat1[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fbac_cat2[["detail"]][["est"]][10], 2), " (", round(fbac_cat2[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_cat2[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][10], 2), " (", round(fbac_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][10], 2), " (", round(fbac_cat4[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(neo_fbac) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "NeoGuard, Fast breathing (acoustic)"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Fast breathing (annotated)
+```{r}
+# Create table as data frame and output as flextable
+neo_fb <- data.frame(col1 = c("Overall", "0-1 month", "2-11 months", "12-35 months", "36-59 months"),
+                           dx_accuracy = c(paste(round(fb_overall[["detail"]][["est"]][5], 2), " (", round(fb_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fb_cat1[["detail"]][["est"]][5], 2), " (", round(fb_cat1[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_cat1[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fb_cat2[["detail"]][["est"]][5], 2), " (", round(fb_cat2[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_cat2[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][5], 2), " (", round(fb_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][5], 2), " (", round(fb_cat4[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(fb_overall[["detail"]][["est"]][3], 2), " (", round(fb_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fb_cat1[["detail"]][["est"]][3], 2), " (", round(fb_cat1[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_cat1[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fb_cat2[["detail"]][["est"]][3], 2), " (", round(fb_cat2[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_cat2[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][3], 2), " (", round(fb_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][3], 2), " (", round(fb_cat4[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(fb_overall[["detail"]][["est"]][4], 2), " (", round(fb_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fb_cat1[["detail"]][["est"]][4], 2), " (", round(fb_cat1[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_cat1[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fb_cat2[["detail"]][["est"]][4], 2), " (", round(fb_cat2[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_cat2[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][4], 2), " (", round(fb_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][4], 2), " (", round(fb_cat4[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(fb_overall[["detail"]][["est"]][9], 2), " (", round(fb_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fb_cat1[["detail"]][["est"]][9], 2), " (", round(fb_cat1[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_cat1[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fb_cat2[["detail"]][["est"]][9], 2), " (", round(fb_cat2[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_cat2[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][9], 2), " (", round(fb_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][9], 2), " (", round(fb_cat4[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(fb_overall[["detail"]][["est"]][10], 2), " (", round(fb_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fb_cat1[["detail"]][["est"]][10], 2), " (", round(fb_cat1[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_cat1[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fb_cat2[["detail"]][["est"]][10], 2), " (", round(fb_cat2[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_cat2[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][10], 2), " (", round(fb_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][10], 2), " (", round(fb_cat4[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(neo_fb) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "NeoGuard, Fast breathing (annotated)"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Tachycardia
+```{r}
+# Create table as data frame and output as flextable
+neo_tachy <- data.frame(col1 = c("Overall", "0-1 month", "2-11 months", "12-59 months"),
+                           dx_accuracy = c(paste(round(tachy_overall[["detail"]][["est"]][5], 2), " (", round(tachy_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(tachy_cat1[["detail"]][["est"]][5], 2), " (", round(tachy_cat1[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(tachy_cat1[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(tachy_cat2[["detail"]][["est"]][5], 2), " (", round(tachy_cat2[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(tachy_cat2[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][5], 2), " (", round(tachy_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(tachy_overall[["detail"]][["est"]][3], 2), " (", round(tachy_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(tachy_cat1[["detail"]][["est"]][3], 2), " (", round(tachy_cat1[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(tachy_cat1[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(tachy_cat2[["detail"]][["est"]][3], 2), " (", round(tachy_cat2[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(tachy_cat2[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][3], 2), " (", round(tachy_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(tachy_overall[["detail"]][["est"]][4], 2), " (", round(tachy_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(tachy_cat1[["detail"]][["est"]][4], 2), " (", round(tachy_cat1[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(tachy_cat1[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(tachy_cat2[["detail"]][["est"]][4], 2), " (", round(tachy_cat2[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(tachy_cat2[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][4], 2), " (", round(tachy_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(tachy_overall[["detail"]][["est"]][9], 2), " (", round(tachy_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(tachy_cat1[["detail"]][["est"]][9], 2), " (", round(tachy_cat1[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(tachy_cat1[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(tachy_cat2[["detail"]][["est"]][9], 2), " (", round(tachy_cat2[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(tachy_cat2[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][9], 2), " (", round(tachy_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(tachy_overall[["detail"]][["est"]][10], 2), " (", round(tachy_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(tachy_cat1[["detail"]][["est"]][10], 2), " (", round(tachy_cat1[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(tachy_cat1[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(tachy_cat2[["detail"]][["est"]][10], 2), " (", round(tachy_cat2[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(tachy_cat2[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][10], 2), " (", round(tachy_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(neo_tachy) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "NeoGuard, Tachycardia"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+# Onyx PO+RR (Nonin)
+
+```{r}
+# Use twoXtwo function from above to create 2x2 tables for each clinical outcome overall and by age group
+## Hypoxia
+cm_hypoxia_overall <- twoXtwo(df_onyx_l$index_hypoxic, df_onyx_l$ref_hypoxic)
+cm_hypoxia_cat3 <- twoXtwo(df_onyx_cat3_l$index_hypoxic, df_onyx_cat3_l$ref_hypoxic)
+## Fast breathing (acoustic)
+cm_fbac_overall <- twoXtwo(df_onyx_l$index_fastbreath, df_onyx_l$refac_fastbreath)
+cm_fbac_cat3 <- twoXtwo(df_onyx_cat3fb_l$index_fastbreath_35mo, df_onyx_cat3fb_l$refac_fastbreath_35mo)
+cm_fbac_cat4 <- twoXtwo(df_onyx_cat4fb_l$index_fastbreath_59mo, df_onyx_cat4fb_l$refac_fastbreath_59mo)
+## Fast breathing (annotated)
+cm_fb_overall <- twoXtwo(df_onyx_l$index_fastbreath, df_onyx_l$ref_fastbreath)
+cm_fb_cat3 <- twoXtwo(df_onyx_cat3fb_l$index_fastbreath_35mo, df_onyx_cat3fb_l$ref_fastbreath_35mo)
+cm_fb_cat4 <- twoXtwo(df_onyx_cat4fb_l$index_fastbreath_59mo, df_onyx_cat4fb_l$ref_fastbreath_59mo)
+## Tachycardia
+cm_tachy_overall <- twoXtwo(df_onyx_l$index_tachycardic, df_onyx_l$ref_tachycardic)
+cm_tachy_cat3 <- twoXtwo(df_onyx_cat3_l$index_tachycardic_59mo, df_onyx_cat3_l$ref_tachycardic_59mo)
+
+# Create epi.tests object with dx accuracy parameters using above 2x2 tables
+# epi.tests object contains several outcome measures, including sensitivity, specificity, overall dx accuracy, PPV, NPV, and all associated upper/lower CIs
+## Hypoxia
+hypoxia_overall <- epi.tests(cm_hypoxia_overall)
+hypoxia_cat3 <- epi.tests(cm_hypoxia_cat3)
+## Fast breathing (acoustic)
+fbac_overall <- epi.tests(cm_fbac_overall)
+fbac_cat3 <- epi.tests(cm_fbac_cat3)
+fbac_cat4 <- epi.tests(cm_fbac_cat4)
+## Fast breathing (annotated)
+fb_overall <- epi.tests(cm_fb_overall)
+fb_cat3 <- epi.tests(cm_fb_cat3)
+fb_cat4 <- epi.tests(cm_fb_cat4)
+## Tachycardia
+tachy_overall <- epi.tests(cm_tachy_overall)
+tachy_cat3 <- epi.tests(cm_tachy_cat3)
+
+```
+
+## Hypoxia
+```{r}
+# Create table as data frame and output as flextable
+onyx_hypoxia <- data.frame(col1 = c("Overall", "12-59 months"),
+                           dx_accuracy = c(paste(round(hypoxia_overall[["detail"]][["est"]][5], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][5], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(hypoxia_overall[["detail"]][["est"]][3], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][3], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(hypoxia_overall[["detail"]][["est"]][4], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][4], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(hypoxia_overall[["detail"]][["est"]][9], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][9], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(hypoxia_overall[["detail"]][["est"]][10], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][10], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(onyx_hypoxia) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "Onyx PO+RR, Hypoxia"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Fast breathing (acoustic)
+```{r}
+# Create table as data frame and output as flextable
+onyx_fbac <- data.frame(col1 = c("Overall", "12-35 months", "36-59 months"),
+                           dx_accuracy = c(paste(round(fbac_overall[["detail"]][["est"]][5], 2), " (", round(fbac_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][5], 2), " (", round(fbac_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][5], 2), " (", round(fbac_cat4[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(fbac_overall[["detail"]][["est"]][3], 2), " (", round(fbac_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][3], 2), " (", round(fbac_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][3], 2), " (", round(fbac_cat4[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(fbac_overall[["detail"]][["est"]][4], 2), " (", round(fbac_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][4], 2), " (", round(fbac_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][4], 2), " (", round(fbac_cat4[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(fbac_overall[["detail"]][["est"]][9], 2), " (", round(fbac_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][9], 2), " (", round(fbac_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][9], 2), " (", round(fbac_cat4[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(fbac_overall[["detail"]][["est"]][10], 2), " (", round(fbac_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][10], 2), " (", round(fbac_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][10], 2), " (", round(fbac_cat4[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(onyx_fbac) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "Onyx PO+RR, Fast breathing (acoustic)"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Fast breathing (annotated)
+```{r}
+# Create table as data frame and output as flextable
+onyx_fb <- data.frame(col1 = c("Overall", "12-35 months", "36-59 months"),
+                           dx_accuracy = c(paste(round(fb_overall[["detail"]][["est"]][5], 2), " (", round(fb_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][5], 2), " (", round(fb_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][5], 2), " (", round(fb_cat4[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(fb_overall[["detail"]][["est"]][3], 2), " (", round(fb_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][3], 2), " (", round(fb_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][3], 2), " (", round(fb_cat4[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(fb_overall[["detail"]][["est"]][4], 2), " (", round(fb_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][4], 2), " (", round(fb_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][4], 2), " (", round(fb_cat4[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(fb_overall[["detail"]][["est"]][9], 2), " (", round(fb_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][9], 2), " (", round(fb_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][9], 2), " (", round(fb_cat4[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(fb_overall[["detail"]][["est"]][10], 2), " (", round(fb_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][10], 2), " (", round(fb_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][10], 2), " (", round(fb_cat4[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(onyx_fb) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "Onyx PO+RR, Fast breathing (annotated)"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Tachycardia
+```{r}
+# Create table as data frame and output as flextable
+onyx_tachy <- data.frame(col1 = c("Overall", "12-59 months"),
+                           dx_accuracy = c(paste(round(tachy_overall[["detail"]][["est"]][5], 2), " (", round(tachy_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][5], 2), " (", round(tachy_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(tachy_overall[["detail"]][["est"]][3], 2), " (", round(tachy_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][3], 2), " (", round(tachy_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(tachy_overall[["detail"]][["est"]][4], 2), " (", round(tachy_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][4], 2), " (", round(tachy_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(tachy_overall[["detail"]][["est"]][9], 2), " (", round(tachy_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][9], 2), " (", round(tachy_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(tachy_overall[["detail"]][["est"]][10], 2), " (", round(tachy_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][10], 2), " (", round(tachy_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(onyx_tachy) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "Onyx PO+RR, Tachycardia"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+# Scanbo v8 (Scanbo)
+
+```{r}
+# Use twoXtwo function from above to create 2x2 tables for each clinical outcome overall and by age group
+## Hypoxia
+cm_hypoxia_overall <- twoXtwo(df_scan_l$index_hypoxic, df_scan_l$ref_hypoxic)
+cm_hypoxia_cat3 <- twoXtwo(df_scan_cat3_l$index_hypoxic, df_scan_cat3_l$ref_hypoxic)
+## Fever
+cm_fever_overall <- twoXtwo(df_scan_l$index_fever, df_scan_l$ref_fever)
+cm_fever_cat3 <- twoXtwo(df_scan_cat3_l$index_fever, df_scan_cat3_l$ref_fever)
+## Fast breathing (acoustic)
+cm_fbac_overall <- twoXtwo(df_scan_l$index_fastbreath, df_scan_l$refac_fastbreath)
+cm_fbac_cat3 <- twoXtwo(df_scan_cat3fb_l$index_fastbreath_35mo, df_scan_cat3fb_l$refac_fastbreath_35mo)
+cm_fbac_cat4 <- twoXtwo(df_scan_cat4fb_l$index_fastbreath_59mo, df_scan_cat4fb_l$refac_fastbreath_59mo)
+## Fast breathing (annotated)
+cm_fb_overall <- twoXtwo(df_scan_l$index_fastbreath, df_scan_l$ref_fastbreath)
+cm_fb_cat3 <- twoXtwo(df_scan_cat3fb_l$index_fastbreath_35mo, df_scan_cat3fb_l$ref_fastbreath_35mo)
+cm_fb_cat4 <- twoXtwo(df_scan_cat4fb_l$index_fastbreath_59mo, df_scan_cat4fb_l$ref_fastbreath_59mo)
+## Tachycardia
+cm_tachy_overall <- twoXtwo(df_scan_l$index_tachycardic, df_scan_l$ref_tachycardic)
+cm_tachy_cat3 <- twoXtwo(df_scan_cat3_l$index_tachycardic_59mo, df_scan_cat3_l$ref_tachycardic_59mo)
+
+# Create epi.tests object with dx accuracy parameters using above 2x2 tables
+# epi.tests object contains several outcome measures, including sensitivity, specificity, overall dx accuracy, PPV, NPV, and all associated upper/lower CIs
+## Hypoxia
+hypoxia_overall <- epi.tests(cm_hypoxia_overall)
+hypoxia_cat3 <- epi.tests(cm_hypoxia_cat3)
+## Fever
+fever_overall <- epi.tests(cm_fever_overall)
+fever_cat3 <- epi.tests(cm_fever_cat3)
+## Fast breathing (acoustic)
+fbac_overall <- epi.tests(cm_fbac_overall)
+fbac_cat3 <- epi.tests(cm_fbac_cat3)
+fbac_cat4 <- epi.tests(cm_fbac_cat4)
+## Fast breathing (annotated)
+fb_overall <- epi.tests(cm_fb_overall)
+fb_cat3 <- epi.tests(cm_fb_cat3)
+fb_cat4 <- epi.tests(cm_fb_cat4)
+## Tachycardia
+tachy_overall <- epi.tests(cm_tachy_overall)
+tachy_cat3 <- epi.tests(cm_tachy_cat3)
+```
+
+## Hypoxia
+```{r}
+# Create table as data frame and output as flextable
+scan_hypoxia <- data.frame(col1 = c("Overall", "12-59 months"),
+                           dx_accuracy = c(paste(round(hypoxia_overall[["detail"]][["est"]][5], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][5], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(hypoxia_overall[["detail"]][["est"]][3], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][3], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(hypoxia_overall[["detail"]][["est"]][4], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][4], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(hypoxia_overall[["detail"]][["est"]][9], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][9], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(hypoxia_overall[["detail"]][["est"]][10], 2), " (", round(hypoxia_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(hypoxia_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(hypoxia_cat3[["detail"]][["est"]][10], 2), " (", round(hypoxia_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(hypoxia_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(scan_hypoxia) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "Scanbo v8, Hypoxia"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Fever
+```{r}
+# Create table as data frame and output as flextable
+scan_fever <- data.frame(col1 = c("Overall", "12-59 months"),
+                           dx_accuracy = c(paste(round(fever_overall[["detail"]][["est"]][5], 2), " (", round(fever_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fever_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fever_cat3[["detail"]][["est"]][5], 2), " (", round(fever_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fever_cat3[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(fever_overall[["detail"]][["est"]][3], 2), " (", round(fever_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fever_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fever_cat3[["detail"]][["est"]][3], 2), " (", round(fever_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fever_cat3[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(fever_overall[["detail"]][["est"]][4], 2), " (", round(fever_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fever_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fever_cat3[["detail"]][["est"]][4], 2), " (", round(fever_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fever_cat3[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(fever_overall[["detail"]][["est"]][9], 2), " (", round(fever_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fever_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fever_cat3[["detail"]][["est"]][9], 2), " (", round(fever_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fever_cat3[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(fever_overall[["detail"]][["est"]][10], 2), " (", round(fever_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fever_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fever_cat3[["detail"]][["est"]][10], 2), " (", round(fever_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fever_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(scan_fever) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "Scanbo v8, Fever"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Fast breathing (acoustic)
+```{r}
+# Create table as data frame and output as flextable
+scan_fbac <- data.frame(col1 = c("Overall", "12-35 months", "36-59 months"),
+                           dx_accuracy = c(paste(round(fbac_overall[["detail"]][["est"]][5], 2), " (", round(fbac_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][5], 2), " (", round(fbac_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][5], 2), " (", round(fbac_cat4[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(fbac_overall[["detail"]][["est"]][3], 2), " (", round(fbac_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][3], 2), " (", round(fbac_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][3], 2), " (", round(fbac_cat4[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(fbac_overall[["detail"]][["est"]][4], 2), " (", round(fbac_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][4], 2), " (", round(fbac_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][4], 2), " (", round(fbac_cat4[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(fbac_overall[["detail"]][["est"]][9], 2), " (", round(fbac_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][9], 2), " (", round(fbac_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][9], 2), " (", round(fbac_cat4[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(fbac_overall[["detail"]][["est"]][10], 2), " (", round(fbac_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fbac_cat3[["detail"]][["est"]][10], 2), " (", round(fbac_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fbac_cat4[["detail"]][["est"]][10], 2), " (", round(fbac_cat4[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fbac_cat4[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(scan_fbac) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "Scanbo v8, Fast breathing (acoustic)"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Fast breathing (annotated)
+```{r}
+# Create table as data frame and output as flextable
+scan_fb <- data.frame(col1 = c("Overall", "12-35 months", "36-59 months"),
+                           dx_accuracy = c(paste(round(fb_overall[["detail"]][["est"]][5], 2), " (", round(fb_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][5], 2), " (", round(fb_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][5], 2), " (", round(fb_cat4[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(fb_overall[["detail"]][["est"]][3], 2), " (", round(fb_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][3], 2), " (", round(fb_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][3], 2), " (", round(fb_cat4[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(fb_overall[["detail"]][["est"]][4], 2), " (", round(fb_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][4], 2), " (", round(fb_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][4], 2), " (", round(fb_cat4[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(fb_overall[["detail"]][["est"]][9], 2), " (", round(fb_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][9], 2), " (", round(fb_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][9], 2), " (", round(fb_cat4[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(fb_overall[["detail"]][["est"]][10], 2), " (", round(fb_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fb_cat3[["detail"]][["est"]][10], 2), " (", round(fb_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(fb_cat4[["detail"]][["est"]][10], 2), " (", round(fb_cat4[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(fb_cat4[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(scan_fb) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "Scanbo v8, Fast breathing (annotated)"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
+
+## Tachycardia
+```{r}
+# Create table as data frame and output as flextable
+scan_tachy <- data.frame(col1 = c("Overall", "12-59 months"),
+                           dx_accuracy = c(paste(round(tachy_overall[["detail"]][["est"]][5], 2), " (", round(tachy_overall[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][5], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][5], 2), " (", round(tachy_cat3[["detail"]][["lower"]][5], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][5], 2), ")", sep = "")
+                                           ),
+                           ppa = c(paste(round(tachy_overall[["detail"]][["est"]][3], 2), " (", round(tachy_overall[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][3], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][3], 2), " (", round(tachy_cat3[["detail"]][["lower"]][3], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][3], 2), ")", sep = "")
+                                    ),
+                           npa = c(paste(round(tachy_overall[["detail"]][["est"]][4], 2), " (", round(tachy_overall[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][4], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][4], 2), " (", round(tachy_cat3[["detail"]][["lower"]][4], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][4], 2), ")", sep = "")
+                                   ),
+                           ppv = c(paste(round(tachy_overall[["detail"]][["est"]][9], 2), " (", round(tachy_overall[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][9], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][9], 2), " (", round(tachy_cat3[["detail"]][["lower"]][9], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][9], 2), ")", sep = "")
+                                   ),
+                           npv = c(paste(round(tachy_overall[["detail"]][["est"]][10], 2), " (", round(tachy_overall[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(tachy_overall[["detail"]][["upper"]][10], 2), ")", sep = ""),
+                                           paste(round(tachy_cat3[["detail"]][["est"]][10], 2), " (", round(tachy_cat3[["detail"]][["lower"]][10], 2), "-", 
+                                                 round(tachy_cat3[["detail"]][["upper"]][10], 2), ")", sep = ""))
+                  )
+flextable(scan_tachy) %>% 
+  set_table_properties(layout = "autofit") %>%
+  set_header_labels(col1= "", dx_accuracy = "Dx Accuracy (95%CI)", ppa = "PPA (95%CI)", npa = "NPA (95%CI)", ppv = "PPV (95%CI)", npv = "NPV (95%CI)") %>%
+  add_header_row(values = c("", "Scanbo v8, Tachycardia"), colwidths = c(1, 5)) %>%
+  italic(i = 1, italic = TRUE, part = "header") %>%
+  align(i = c(1), align = "center", part = "header")
+```
