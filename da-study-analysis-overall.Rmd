@@ -32,8 +32,8 @@ library(reshape2)
 library(ggplot2)
 
 # Read in (cleaned) data 
-#filename <- "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2024-03-28.csv" #primary analysis
-filename <- "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_outliers_excluded_2024-03-29.csv" #sensitivity analysis
+filename <- "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_clean_2024-03-28.csv" #primary analysis
+#filename <- "C:/Users/rgreen/Box/3_Output 3/Hybrid study/Diagnostic accuracy study/Analysis/dx-accuracy-data_outliers_excluded_2024-03-29.csv" #sensitivity analysis
 df_og <- read.csv(filename)
 df_og <- df_og %>% select(-c("X", "m1_index_temp_f", "m2_index_temp_f", "m3_index_temp_f"))
 
@@ -1340,10 +1340,10 @@ bland.altman.plot(df_neo_cat3_l$ref_temp, df_neo_cat3_l$index_temp, graph.sys = 
 bland.altman.plot(df_neo_cat1_l$ref_o2, df_neo_cat1_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard O2 (0-1 month)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_neo_cat2_l$ref_o2, df_neo_cat2_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard o2 (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+bland.altman.plot(df_neo_cat2_l$ref_o2, df_neo_cat2_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard O2 (2-11 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_neo_cat3_l$ref_o2, df_neo_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard o2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+bland.altman.plot(df_neo_cat3_l$ref_o2, df_neo_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: NeoGuard O2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
 
 ### Pulse Rate
@@ -1410,7 +1410,7 @@ bland.altman.plot(df_scan_cat3_l$ref_temp, df_scan_cat3_l$index_temp, graph.sys 
 
 ### Oxygen
 ```{r, results='hide', fig.keep='last'}
-bland.altman.plot(df_scan_cat3_l$ref_o2, df_scan_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Scanbo o2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
+bland.altman.plot(df_scan_cat3_l$ref_o2, df_scan_cat3_l$index_o2, graph.sys = "base", xlab = "Means", ylab = "Differences", main = "Bland-Altman Plot: Scanbo O2 (12-59 months)", col = c("black", "#EB6864", "#777777"), pch=c(19, 17, 15))
 ```
 
 ### Pulse Rate
